@@ -1,0 +1,50 @@
+﻿@using JCarrollOnlineV2.Entities
+@model IEnumerable<Forum>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Fora</h1>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table-striped table-bordered" cellpadding="10" id="fora_index">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayName("Thread Count")
+        </th>
+        <th>
+            @Html.DisplayName("Last Thread")
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <div class="rowTitle">
+                    @Html.ActionLink(item.Title, "Index", "ForumThreadEntries", new { forumTitle = item.Title, forumId = item.Id }, null)
+                </div>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ForumThreads.Count)
+            </td>
+            <td>
+                @Html.DisplayName("Not Implemented")
+            </td>
+        </tr>
+    }
+
+</table>

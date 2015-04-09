@@ -1,0 +1,76 @@
+﻿@model IEnumerable<JCarrollOnlineV2.Entities.ForumThreadEntry>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.ForumTitle</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create", new { forumId = ViewBag.ForumId, parentId=0 })
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Content)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AuthorId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Locked)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ForumId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatedAt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UpdatedAt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PostNumber)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink(item.Title, "Details", new { forumTitle=ViewBag.ForumTitle, threadId = item.ForumThreadEntryId });
+       </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Content)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AuthorId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Locked)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ForumId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedAt)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UpdatedAt)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PostNumber)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ForumThreadEntryId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ForumThreadEntryId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ForumThreadEntryId })
+        </td>
+    </tr>
+}
+
+</table>

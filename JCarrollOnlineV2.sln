@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2", "JCarrollOnlineV2\JCarrollOnlineV2.csproj", "{2835FDBA-96BA-4D5C-850D-A909BB12F4E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.Entities", "JCarrollOnlineV2.Entities\JCarrollOnlineV2.Entities.csproj", "{5D0CBBDA-1F49-4C1B-A508-FDAB11B4D72F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.ViewModels", "JCarrollOnlineV2.ViewModels\JCarrollOnlineV2.ViewModels.csproj", "{A4675E34-6310-4FEF-9AD8-498CDC8C7757}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.Test", "JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj", "{73819D1D-84B2-4E96-ACC8-0BBE815732BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2835FDBA-96BA-4D5C-850D-A909BB12F4E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2835FDBA-96BA-4D5C-850D-A909BB12F4E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2835FDBA-96BA-4D5C-850D-A909BB12F4E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2835FDBA-96BA-4D5C-850D-A909BB12F4E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D0CBBDA-1F49-4C1B-A508-FDAB11B4D72F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0CBBDA-1F49-4C1B-A508-FDAB11B4D72F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0CBBDA-1F49-4C1B-A508-FDAB11B4D72F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0CBBDA-1F49-4C1B-A508-FDAB11B4D72F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4675E34-6310-4FEF-9AD8-498CDC8C7757}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4675E34-6310-4FEF-9AD8-498CDC8C7757}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4675E34-6310-4FEF-9AD8-498CDC8C7757}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4675E34-6310-4FEF-9AD8-498CDC8C7757}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73819D1D-84B2-4E96-ACC8-0BBE815732BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73819D1D-84B2-4E96-ACC8-0BBE815732BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73819D1D-84B2-4E96-ACC8-0BBE815732BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73819D1D-84B2-4E96-ACC8-0BBE815732BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

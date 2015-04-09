@@ -1,0 +1,13 @@
+﻿@using JCarrollOnlineV2.Entities
+@model HierarchyNode<ForumThreadEntry>
+
+<article>
+    @*<%= gravatar_for get_author(forum_thread.author_id), :size => 40 %>
+    <%= markdown(forum_thread.forum_thread_content) %>*@
+    <div class="gravatar">
+        @Html.Gravatar(User.Identity.Name, 52, new { Title = "My Gravatar", Alt = "Gravatar" })
+    </div>
+    <div class="content" >
+        @Model.Entity.Content
+    </div>
+</article>

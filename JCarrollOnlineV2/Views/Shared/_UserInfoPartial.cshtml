@@ -1,0 +1,22 @@
+﻿@using Microsoft.AspNet.Identity
+@using System.Web.Security
+
+<div class="container toppad">
+    <div class="row nopadding">
+        <div class="col-sm-2 nopadding">
+            <div class="gravatar">
+                @Html.Gravatar(User.Identity.Name, 52, new { Title = "My Gravatar", Alt = "Gravatar" })
+            </div>
+        </div>
+        <div class="col-sm-9 verticalcenter">
+            <div class="container nopadding">
+                <div class="row nopadding">
+                        @User.Identity.Name
+                </div>
+                <div class="row nopadding">
+                    @Html.ActionLink("View my profile", "Index", "Home")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

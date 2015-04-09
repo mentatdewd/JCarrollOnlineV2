@@ -1,0 +1,22 @@
+﻿@using JCarrollOnlineV2.CustomHtmlHelpers
+@using JCarrollOnlineV2.Entities
+@model IEnumerable<HierarchyNode<ForumThreadEntry>>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#hierarchy").treeview();
+    });
+</script>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.ForumTitle</h2>
+
+    @Html.Partial("_TreeView", Model);
+<p>
+    @Html.ActionLink("Create New", "Create", new { forumId = ViewBag.ForumId, parent = 0 })
+</p>

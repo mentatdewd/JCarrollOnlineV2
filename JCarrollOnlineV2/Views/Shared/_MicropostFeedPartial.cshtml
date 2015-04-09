@@ -1,0 +1,10 @@
+﻿@using JCarrollOnlineV2.Entities
+@model IEnumerable<Micropost>
+
+@if (Model != null)
+{
+    foreach (Micropost micropost in Model)
+    {
+        @Html.Partial("_MicropostFeedItemPartial", micropost)
+    }
+}

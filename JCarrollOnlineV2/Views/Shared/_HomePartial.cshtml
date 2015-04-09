@@ -1,0 +1,20 @@
+﻿
+<div class="container">
+    <div class="col-sm-4">
+        @Html.Partial("_UserInfoPartial")
+        @*<%= render 'shared/user_info' %>*@
+        @Html.Partial("_UserStatsPartial")
+    </div>
+</div>
+<div class="container">
+<div class="col-sm-4">
+    @Html.Partial("_MicroPostFormPartial")
+</div>
+    <div class="col-sm-4">
+        @Html.Partial("_MicropostFeedPartial")
+    </div>
+<div class="col-sm-4">
+    @Html.Partial("_RssFeedPartial")
+</div>
+    </div>
+

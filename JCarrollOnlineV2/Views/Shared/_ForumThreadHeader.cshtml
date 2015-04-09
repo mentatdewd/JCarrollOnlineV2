@@ -1,0 +1,31 @@
+﻿@using Microsoft.AspNet.Identity
+@using JCarrollOnlineV2.Entities
+@using JCarrollOnlineV2.CustomHtmlHelpers
+
+@model HierarchyNode<ForumThreadEntry>
+
+<div class="forum_thread_header">
+	<header>
+		@*<%= link_to get_author(forum_thread.author_id).name, user_path(forum_thread.author_id) %>*@
+        @Html.ActionLink(UserInfoHtmlHelper.GetAuthor(Model.Entity.AuthorId), "Details");
+        @Html.Raw("(")
+        @UserInfoHtmlHelper.GetPostCount(User.Identity.GetUserId())
+        @Html.Raw(" posts)")
+		<br>
+
+		<div class="header_title">
+            @Html.Raw(Model.Entity.PostNumber + " " + Model.Entity.Title)
+		</div>
+		<div class="thread_info" align="right">
+			<div class="reply_to">
+                @if(Model.Entity.ParentId != null)
+                {
+                    Html.ActionLink("Reply to", "Details");
+                }
+				<div class="created_at">
+                    @Model.Entity.CreatedAt
+				</div>
+			</div>
+		</div>
+	</header>
+</div>

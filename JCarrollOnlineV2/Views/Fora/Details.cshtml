@@ -1,0 +1,50 @@
+﻿@model JCarrollOnlineV2.Entities.Forum
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Html.DisplayFor(model => model.Title)</h2>
+<p>@Html.DisplayFor(model => model.Description)</p>
+
+<div>
+    <table cellpadding="10">
+        <tr>
+            <th>Title</th>
+            <th>Replies</th>
+            <th>Author</th>
+            <th>Start time</th>
+            <th>Last reply</th>
+            <th>Recs</th>
+            <th>Views</th>
+            <th> Lock</th>
+        </tr>
+
+        
+        @if (Model.ForumThreads.Count != 0)
+        {
+            foreach (var item in Model.ForumThreads)
+            {
+                <tr>
+                    <td>@Html.ActionLink(item.Title, "Details", "ForumThreads", new { id = item.Id }, null)</td>
+                    <td>0</td>
+                    <td>@*<a href="/users/1">John</a>*@</td>
+                    <td>04:26:33 AM March 24, 2015</td>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>@*<a href="/toggle_thread_lock?thread_id=29">Lock</a>*@</td>
+                </tr>
+            }
+        }
+    </table>
+</div>
+<p>
+    @Html.ActionLink("Create New", "Create", "ForumThreads", new { forumId = Model.Id, parent = 0 }, null)
+</p>
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
