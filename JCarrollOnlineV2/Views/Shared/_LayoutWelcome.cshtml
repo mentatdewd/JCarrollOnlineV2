@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - JCarrollOnline</title>
+    <title>@Model.PageTitle - JCarrollOnline</title>
     <meta name="description" content="JCarrollOnlineV2 Website" />
     @Styles.Render("~/bundles/css")
     @Scripts.Render("~/bundles/modernizr")
 
 </head>
 <body class="welcome_page_body">
-    <div class="@ViewBag.PageContainer">
+    <div class="@Model.PageContainer">
         <div>
             @RenderBody()
         </div>

@@ -136,6 +136,9 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Omu.ValueInjecter">
+      <HintPath>..\packages\valueinjecter.2.3.3\lib\net35\Omu.ValueInjecter.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -223,6 +226,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="ControllerHelpers\ControllerHelpers.cs" />
     <Compile Include="Controllers\ForaController.cs" />
     <Compile Include="Controllers\ForumModeratorsController.cs" />
     <Compile Include="Controllers\ForumThreadEntriesController.cs" />
@@ -231,6 +235,9 @@
     <Compile Include="Controllers\MicropostsController.cs" />
     <Compile Include="Controllers\RelationshipsController.cs" />
     <Compile Include="Controllers\RssFeedsController.cs" />
+    <Compile Include="Controllers\SandboxController.cs" />
+    <Compile Include="Controllers\UsersController.cs" />
+    <Compile Include="CustomHtmlHelpers\ForumHelper.cs" />
     <Compile Include="CustomHtmlHelpers\TreeViewHtmlHelper.cs" />
     <Compile Include="CustomHtmlHelpers\UserInfoHtmlHelper.cs" />
     <Compile Include="CustomLinqExtensions\LinqToObjectsExtensionMethods.cs" />
@@ -239,9 +246,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201504091949186_Initial.cs" />
-    <Compile Include="Migrations\201504091949186_Initial.Designer.cs">
-      <DependentUpon>201504091949186_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201504142148542_Initial.cs" />
+    <Compile Include="Migrations\201504142148542_Initial.Designer.cs">
+      <DependentUpon>201504142148542_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504152338360_ChangedRootIdToNullable.cs" />
+    <Compile Include="Migrations\201504152338360_ChangedRootIdToNullable.Designer.cs">
+      <DependentUpon>201504152338360_ChangedRootIdToNullable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -251,6 +262,12 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\images\Deception_Pass_Bridge_in_fog.jpg" />
     <Content Include="Content\images\Deception_Pass_Bridge_in_fog2.jpg" />
+    <Content Include="Content\images\reply-new.gif" />
+    <Content Include="Content\images\reply-old.gif" />
+    <Content Include="Content\images\rtable-fork.gif" />
+    <Content Include="Content\images\rtable-line.gif" />
+    <Content Include="Content\images\rtable-space.gif" />
+    <Content Include="Content\images\rtable-turn.gif" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.less" />
@@ -405,9 +422,9 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_AdvertisePartial.cshtml" />
     <Content Include="Views\Shared\_FooterPartial.cshtml" />
-    <Content Include="Views\Shared\_ForumThreadContent.cshtml" />
-    <Content Include="Views\Shared\_ForumThreadFooter.cshtml" />
-    <Content Include="Views\Shared\_ForumThreadHeader.cshtml" />
+    <Content Include="Views\Shared\_ForumThreadContentPartial.cshtml" />
+    <Content Include="Views\Shared\_ForumThreadFooterPartial.cshtml" />
+    <Content Include="Views\Shared\_ForumThreadHeaderPartial.cshtml" />
     <Content Include="Views\Shared\_ForumThreadPartial.cshtml" />
     <Content Include="Views\Shared\_HomePartial.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
@@ -417,9 +434,13 @@
     <Content Include="Views\Shared\_MicropostFeedPartial.cshtml" />
     <Content Include="Views\Shared\_MicropostFormPartial.cshtml" />
     <Content Include="Views\Shared\_RssFeedPartial.cshtml" />
-    <Content Include="Views\Shared\_TreeView.cshtml" />
     <Content Include="Views\Shared\_UserInfoPartial.cshtml" />
     <Content Include="Views\Shared\_UserStatsPartial.cshtml" />
+    <Content Include="Views\Shared\_LastThreadPartial.cshtml" />
+    <Content Include="Views\Shared\_ForumThreadEntryTOCPartial.cshtml" />
+    <Content Include="Views\Shared\_ForumThreadEntryTOCItemPartial.cshtml" />
+    <Content Include="Views\Users\Index.cshtml" />
+    <Content Include="Views\Sandbox\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -441,8 +462,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201504091949186_Initial.resx">
-      <DependentUpon>201504091949186_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201504142148542_Initial.resx">
+      <DependentUpon>201504142148542_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504152338360_ChangedRootIdToNullable.resx">
+      <DependentUpon>201504152338360_ChangedRootIdToNullable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,5 +1,0 @@
-﻿@using JCarrollOnlineV2.CustomHtmlHelpers
-@using JCarrollOnlineV2.Entities
-@model IEnumerable<HierarchyNode<ForumThreadEntry>>
-
-@Html.Raw(Html.TreeView("forumThreads", Model, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadPartial", l)).ToString()));

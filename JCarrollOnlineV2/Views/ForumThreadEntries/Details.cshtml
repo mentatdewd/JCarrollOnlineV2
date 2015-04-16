@@ -1,22 +1,19 @@
 ﻿@using JCarrollOnlineV2.CustomHtmlHelpers
+@using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.Entities
-@model IEnumerable<HierarchyNode<ForumThreadEntry>>
+@model ForumThreadEntryDetailsViewModel
 
-<script type="text/javascript">
-
-    $(document).ready(function () {
-        $("#hierarchy").treeview();
-    });
-</script>
 
 @{
-    ViewBag.Title = "Index";
+    Model.PageTitle = Model.ForumTitle;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>@ViewBag.ForumTitle</h2>
+<h1 class="text-center">@Model.PageTitle</h1>
 
-    @Html.Partial("_TreeView", Model);
-<p>
-    @Html.ActionLink("Create New", "Create", new { forumId = ViewBag.ForumId, parent = 0 })
-</p>
+@Html.Partial("_ForumThreadPartial", Model.ForumThreadEntryDetailItems.ForumThreadEntries.First())
+@{
+    <h2>Replies to this post</h2>
+@Html.Partial("_ForumThreadEntryTOCPartial", Model.ForumThreadEntryTOCItems)
+}
+@Html.Raw(Html.TreeView("forumThreads", Model.ForumThreadEntryDetailItems.ForumThreadEntries.First().ChildNodes, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadPartial", l)).ToString()))

@@ -7,13 +7,13 @@ namespace JCarrollOnlineV2.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Initial : IMigrationMetadata
+    public sealed partial class ChangedRootIdToNullable : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Initial));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedRootIdToNullable));
         
         string IMigrationMetadata.Id
         {
-            get { return "201504091949186_Initial"; }
+            get { return "201504152338360_ChangedRootIdToNullable"; }
         }
         
         string IMigrationMetadata.Source

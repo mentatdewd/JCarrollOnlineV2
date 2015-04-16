@@ -36,6 +36,8 @@ namespace JCarrollOnlineV2.Entities
         public int PostNumber { get; set; }
 
         public int? ParentId { get; set; }
+
+        public int? RootId { get; set; }
         //public virtual ForumThreadEntry Parent { get; set; }
         //public virtual ICollection<ForumThreadEntry> Children { get; set; }
     }

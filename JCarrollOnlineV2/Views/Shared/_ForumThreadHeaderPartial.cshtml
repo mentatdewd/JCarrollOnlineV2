@@ -1,0 +1,42 @@
+﻿@using Microsoft.AspNet.Identity
+@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.CustomHtmlHelpers
+
+@model ForumThreadEntryDetailsItemViewModel
+
+<div class="forum_thread_header">
+    <header>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="userinfo">
+                    @Html.ActionLink(UserInfoHtmlHelper.GetAuthor(Model.AuthorId), "Details")
+                    @Html.Raw("(")
+                    @UserInfoHtmlHelper.GetPostCount(Model.AuthorId)
+                    @Html.Raw(" posts)")
+                    <div class="header_title">
+                        @Html.Raw(Model.PostNumber + ". " + Model.Title)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="threadinfo">
+                    <div class="reply_to">
+                        @if (Model.ParentId == null)
+                        {
+                            @Html.Raw("Original post")
+                        }
+                        else
+                        {
+                            @Html.Raw("Response to ")
+                            var parentpostnumber = UserInfoHtmlHelper.GetParentPostNumber(Model.ParentId);
+                            @Html.ActionLink(Model.ParentAuthor + "(Reply #" + parentpostnumber + ")", "Details", "ForumThreadEntries", null, null, "post" + parentpostnumber, new { forumId = Model.ForumId, forumThreadEntryId = Model.RootId }, null)
+                        }
+                        <div class="created_at">
+                            @Model.CreatedAt
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+</div>

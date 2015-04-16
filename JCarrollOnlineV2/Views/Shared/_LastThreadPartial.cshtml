@@ -1,0 +1,8 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model LastThreadViewModel
+
+@{
+    @Html.ActionLink(Model.Title, "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.ForumId, forumThreadEntryId = Model.PostRoot }, null);
+    @Html.Raw(" by " + Model.Author);
+    @Html.Raw("<br>" + Model.UpdatedAt);
+}

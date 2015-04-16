@@ -24,13 +24,13 @@ namespace JCarrollOnlineV2.Migrations
                 "dbo.Fora",
                 c => new
                     {
-                        Id = c.Int(nullable: false, identity: true),
+                        ForumId = c.Int(nullable: false, identity: true),
                         Title = c.String(nullable: false, maxLength: 255),
                         Description = c.String(),
                         CreatedAt = c.DateTime(nullable: false),
                         UpdatedAt = c.DateTime(nullable: false),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.ForumId);
             
             CreateTable(
                 "dbo.ForumThreadEntries",
@@ -46,6 +46,7 @@ namespace JCarrollOnlineV2.Migrations
                         UpdatedAt = c.DateTime(nullable: false),
                         PostNumber = c.Int(nullable: false),
                         ParentId = c.Int(),
+                        RootId = c.Int(nullable: false),
                         ApplicationUser_Id = c.String(maxLength: 128),
                     })
                 .PrimaryKey(t => t.Id)
@@ -63,8 +64,11 @@ namespace JCarrollOnlineV2.Migrations
                         UserId = c.Int(nullable: false),
                         CreatedAt = c.DateTime(nullable: false),
                         UpdatedAt = c.DateTime(nullable: false),
+                        ApplicationUser_Id = c.String(maxLength: 128),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ApplicationUsers", t => t.ApplicationUser_Id)
+                .Index(t => t.ApplicationUser_Id);
             
             CreateTable(
                 "dbo.Relationships",
@@ -171,6 +175,7 @@ namespace JCarrollOnlineV2.Migrations
         public override void Down()
         {
             DropForeignKey("dbo.IdentityUserRoles", "ApplicationUser_Id", "dbo.ApplicationUsers");
+            DropForeignKey("dbo.Microposts", "ApplicationUser_Id", "dbo.ApplicationUsers");
             DropForeignKey("dbo.IdentityUserLogins", "ApplicationUser_Id", "dbo.ApplicationUsers");
             DropForeignKey("dbo.ForumThreadEntries", "ApplicationUser_Id", "dbo.ApplicationUsers");
             DropForeignKey("dbo.IdentityUserClaims", "ApplicationUser_Id", "dbo.ApplicationUsers");
@@ -184,6 +189,7 @@ namespace JCarrollOnlineV2.Migrations
             DropIndex("dbo.Relationships", "FollowerAndFollowedIndex");
             DropIndex("dbo.Relationships", "FollowedIndex");
             DropIndex("dbo.Relationships", "FollowerIndex");
+            DropIndex("dbo.Microposts", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.ForumThreadEntries", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.ForumThreadEntries", new[] { "ForumId" });
             DropIndex("dbo.ForumModerators", new[] { "ForumId" });

@@ -20,6 +20,7 @@ namespace JCarrollOnlineV2.ViewModels
             return userIdentity;
         }
         public virtual ICollection<ForumThreadEntry> ForumThreadEntries { get; set; }
+        public virtual ICollection<Micropost> Microposts { get; set; }
     }
 
     //public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JCarrollOnlineV2.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,35 +11,40 @@ namespace JCarrollOnlineV2.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.PageContainer = "Home";
-            return View();
+            HomeViewModel vm = new HomeViewModel();
+            vm.PageContainer = "Home";
+            return View(vm);
         }
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
-            ViewBag.PageContainer = "AboutPage";
-            return View();
+            AboutViewModel vm = new AboutViewModel();
+
+            vm.Message = "Your application description page.";
+            vm.PageContainer = "AboutPage";
+            return View(vm);
         }
 
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
-            ViewBag.PageContainer = "ContactPater";
-            return View();
+            ContactViewModel vm = new ContactViewModel();
+
+            vm.Message = "Your contact page.";
+            vm.PageContainer = "ContactPater";
+            return View(vm);
         }
 
         public ActionResult Welcome()
         {
+            HomeViewModel vm = new HomeViewModel();
+            vm.PageContainer = "Welcome";
             if (Request.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                ViewBag.Message = "YourWelcome page";
-                ViewBag.PageContainer = "WelcomePage";
-                return View("Welcome", "_LayoutWelcome");
+                return View("Welcome", "_LayoutWelcome", vm);
             }
         }
     }

@@ -1,9 +1,11 @@
-﻿@using JCarrollOnlineV2.Entities
-@model IEnumerable<Micropost>
+﻿@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.Entities
 
-@if (Model != null)
+@model HomeViewModel
+
+@if (Model.Microposts != null)
 {
-    foreach (Micropost micropost in Model)
+    foreach (Micropost micropost in Model.Microposts)
     {
         @Html.Partial("_MicropostFeedItemPartial", micropost)
     }

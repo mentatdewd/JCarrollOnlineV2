@@ -1,0 +1,48 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.Entities
+@using JCarrollOnlineV2.CustomHtmlHelpers
+@model HierarchyNode<ForumThreadEntryTOCItemViewModel>
+
+<td id="TOCTableData">
+    @{
+        if (Model.ImageList != null)
+        {
+            foreach (string item in Model.ImageList)
+            {
+                if (item != Model.ImageList.Last())
+                {
+                    @Html.Raw("<img id=TOCImage src=\"" + item + "\"/>");
+                }
+                else
+                {
+                    @Html.Raw("<img id=TOCPostImage src=\"" + item + "\"/>");
+                }
+            }
+        }
+    }
+    @if (Model.Entity.PostNumber == 1)
+    {
+        @Model.Entity.Title
+    }
+    else
+    {
+        @Html.ActionLink(Model.Entity.Title, "Details", "ForumThreadEntries", null, null, "post" + Model.Entity.PostNumber, new { forumId = Model.Entity.ForumId, forumThreadEntryId = Model.Entity.RootId }, null)
+    }
+</td>
+<td id="TOCTableData">
+    @UserInfoHtmlHelper.GetAuthor(Model.Entity.AuthorId)
+</td>
+<td id="TOCTableData">
+    @Model.Entity.CreatedAt
+</td>
+<td id="TOCTableData">
+    @if (Model.Entity.PostNumber == 1)
+    {
+        @Html.Raw("OP");
+    }
+    else
+    {
+        @Html.Raw("#" + @Model.Entity.PostNumber)
+    }
+</td>
+

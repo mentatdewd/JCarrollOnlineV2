@@ -1,76 +1,67 @@
-﻿@model IEnumerable<JCarrollOnlineV2.Entities.ForumThreadEntry>
+﻿@using JCarrollOnlineV2.CustomHtmlHelpers
+@using JCarrollOnlineV2.ViewModels
+@model ForumThreadEntryIndexViewModel
 
 @{
-    ViewBag.Title = "Index";
+    Model.PageTitle = Model.ForumTitle;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>@ViewBag.ForumTitle</h2>
+<h1 class="text-center">@Model.ForumTitle</h1>
 
-<p>
-    @Html.ActionLink("Create New", "Create", new { forumId = ViewBag.ForumId, parentId=0 })
-</p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Title)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Content)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Replies)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.AuthorId)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().AuthorId)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Locked)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().CreatedAt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumId)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().LastReply)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CreatedAt)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Recs)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.UpdatedAt)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.PostNumber)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Views)
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.ActionLink(item.Title, "Details", new { forumTitle=ViewBag.ForumTitle, threadId = item.ForumThreadEntryId });
-       </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Content)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AuthorId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Locked)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ForumId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CreatedAt)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UpdatedAt)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.PostNumber)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ForumThreadEntryId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ForumThreadEntryId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ForumThreadEntryId })
-        </td>
-    </tr>
-}
-
+    @foreach (var item in Model.ForumThreadIndexEntries)
+    {
+        <tr>
+            <td>
+                @Html.ActionLink(item.Title, "Details", new { forumId = item.ForumId, forumThreadEntryId = item.ForumThreadEntryId })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Replies)
+            </td>
+            <td>
+                @UserInfoHtmlHelper.GetAuthor(item.AuthorId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @ForumHelper.GetLatestThreadPostDate(item.RootId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Recs)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Views)
+            </td>
+        </tr>
+    }
 </table>
+<p class="text-center">
+    @Html.ActionLink("Create New", "Create", "ForumThreadEntries", new { forumId = Model.ForumId }, new { @class = "btn btn-large btn-primary" })
+</p>

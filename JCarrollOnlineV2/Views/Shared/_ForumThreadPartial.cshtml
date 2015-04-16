@@ -1,10 +1,18 @@
-﻿@using JCarrollOnlineV2.Entities
-@model HierarchyNode<ForumThreadEntry>
+﻿@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.Entities
+@model HierarchyNode<ForumThreadEntryDetailsItemViewModel>
 
-<div class="container">
+@Html.Raw("<a class=\"anchor\" id=\"post" + Model.Entity.PostNumber + "\"/>")
+
+
 <div class="reply-border">
-@Html.Partial("_ForumThreadHeader", Model)
-@Html.Partial("_ForumThreadContent", Model)
-@Html.Partial("_ForumThreadFooter", Model)
-</div>
+        @Html.Partial("_ForumThreadHeaderPartial", Model.Entity)
+    @{
+        if(Model.Entity.CreatedAt != Model.Entity.UpdatedAt)
+        {
+            @Html.Raw("<p id='postEdited'>Last edited " + Model.Entity.UpdatedAt.ToString("f") + "</p>") 
+        }
+    }
+        @Html.Partial("_ForumThreadContentPartial", Model.Entity)
+        @Html.Partial("_ForumThreadFooterPartial", Model.Entity)
 </div>

@@ -9,7 +9,9 @@ namespace JCarrollOnlineV2.Entities
 {
     public class Forum
     {
-        public int Id { get; set; }
+        [Key]
+        [Required]
+        public int ForumId { get; set; }
 
         [Required]
         [StringLength(255)]

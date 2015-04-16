@@ -4,9 +4,91 @@ using System.Linq;
 using System.Web;
 using JCarrollOnlineV2.Entities;
 using System.Linq.Expressions;
+using Omu.ValueInjecter;
+using JCarrollOnlineV2.ViewModels;
 
-namespace JCarrollOnlineV2.LinqToSqlExtensions
+namespace JCarrollOnlineV2.Extensions
 {
+    public static class IEnumerableExtensions
+    {
+        public static IEnumerable<HierarchyNode<TView>> ProjectToView<TDom, TView>(this IEnumerable<HierarchyNode<TDom>> query)
+            where TView : class, new()
+            where TDom : class
+        {
+            List<HierarchyNode<TView>> viewList = new List<HierarchyNode<TView>>();
+            ConstructTree<TDom, TView>(query, viewList, null);
+            return viewList;
+        }
+        private static void ConstructTree<TDom, TView>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNode<TView>> viewList, TView parent)
+            where TView : class, new()
+            where TDom : class
+        {
+            if (dataModel != null)
+            {
+                foreach (var item in dataModel)
+                {
+                    HierarchyNode<TView> hnvm = new HierarchyNode<TView>();
+                    hnvm.ImageList = new List<string>();
+                    hnvm.ImageList.Add("/Content/images/reply-new.gif");
+                    hnvm.Entity = new TView();
+                    hnvm.Parent = parent;
+                    hnvm.Depth = item.Depth;
+                    hnvm.Entity.InjectFrom<FilterId>(item.Entity);
+                    viewList.Add(hnvm);
+                    hnvm.ChildNodes = new List<HierarchyNode<TView>>();
+                    if (item.ChildNodes.Count > 0)
+                    {
+                        AppendChildren(item.ChildNodes, hnvm.ChildNodes, hnvm.Entity, false);
+                    }
+                }
+            }
+        }
+        public static void AppendChildren<TView, TDom>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNode<TView>> viewList, TView parent, bool hasSibblings)
+            where TView : class, new()
+            where TDom : class
+        {
+            bool hasSibbs = false;
+
+            if (dataModel.Count() > 1)
+                hasSibbs = true;
+
+            foreach (var item in dataModel)
+            {
+                HierarchyNode<TView> hnvm = new HierarchyNode<TView>();
+                hnvm.ImageList = new List<string>();
+
+                hnvm.ImageList.Add("/Content/images/reply-new.gif");
+
+                if (item == dataModel.Last())
+                {
+                    hasSibbs = false;
+                    hnvm.ImageList.Insert(0, "/Content/images/rtable-turn.gif");
+                }
+                else
+                    hnvm.ImageList.Insert(0, "/Content/images/rtable-fork.gif");
+
+                for (int i = 0; i < item.Depth - 2; i++)
+                {
+                    if (hasSibblings)
+                        hnvm.ImageList.Insert(0, "/Content/images/rtable-line.gif");
+                    else
+                        hnvm.ImageList.Insert(0, "/Content/images/rtable-space.gif");
+                }
+                hnvm.Entity = new TView();
+                hnvm.Parent = parent;
+                hnvm.Depth = item.Depth;
+                hnvm.Entity.InjectFrom<FilterId>(item.Entity);
+                viewList.Add(hnvm);
+                hnvm.ChildNodes = new List<HierarchyNode<TView>>();
+                if (item.ChildNodes.Count > 0)
+                {
+                    //hnvm.ImageList.Insert(0, "/Content/images/rtable-space.gif");
+                    AppendChildren(item.ChildNodes, hnvm.ChildNodes, hnvm.Entity, hasSibbs);
+                }
+            }
+        }
+    }
+
     // Stefan Cruysberghs, July 2008, http://www.scip.be
     /// <summary>
     /// AsHierarchy extension methods for LINQ to SQL IQueryable
@@ -66,7 +148,7 @@ namespace JCarrollOnlineV2.LinqToSqlExtensions
                           {
                               Entity = item,
                               ChildNodes =
-                                CreateHierarchy(allItems, item, propertyNameId, propertyNameParentId, null, maxDepth, depth),
+                                CreateHierarchy(allItems, item, propertyNameId, propertyNameParentId, null, maxDepth, depth).ToList(),
                               Depth = depth,
                               Parent = parentItem
                           };

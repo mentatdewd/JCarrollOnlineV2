@@ -1,9 +1,5 @@
-﻿@model JCarrollOnlineV2.Entities.Micropost
-
-@{
-    ViewBag.Title = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@using JCarrollOnlineV2.ViewModels
+@model HomeViewModel
 
 <h2>Create</h2>
 
@@ -17,10 +13,13 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
-            @Html.LabelFor(model => model.Content, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Micropost.Content, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Content, new { htmlAttributes = new { @class = "form-control", @cols = 40, @rows = 20 } })
-                @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
+                @if (Model.Micropost != null)
+                {
+                    @Html.EditorFor(model => model.Micropost.Content, new { htmlAttributes = new { @class = "form-control", @cols = 40, @rows = 20 } })
+                    @Html.ValidationMessageFor(model => model.Micropost.Content, "", new { @class = "text-danger" })
+                }
             </div>
         </div>
         <div class="form-group">
@@ -69,20 +68,20 @@
 
 
 @*<textarea cols="40" id="micropost_content" name="micropost[content]" placeholder="Compose new micropost (140 char max)..." rows="20"></textarea>
-@*<script>
-	function textCounter(field, field2, maxlimit) {
-		var countfield = document.getElementById(field2);
-		if (field.value.length > maxlimit) {
-			field.value = field.value.substring(0, maxlimit);
-			return false;
-		} else {
-			countfield.value = maxlimit - field.value.length;
-		}
-	}
-</script>
-<div class="actions">
-	@*<%= f.submit "Post", class: "btn btn-large btn-primary" %>
-    @*<p class="center">
-    @Html.ActionLink("Post", "Create", "Microposts", null, new { @class = "btn btn-large btn-primary" })
-    </p>
-</div>*@
+    @*<script>
+        function textCounter(field, field2, maxlimit) {
+            var countfield = document.getElementById(field2);
+            if (field.value.length > maxlimit) {
+                field.value = field.value.substring(0, maxlimit);
+                return false;
+            } else {
+                countfield.value = maxlimit - field.value.length;
+            }
+        }
+    </script>
+    <div class="actions">
+        @*<%= f.submit "Post", class: "btn btn-large btn-primary" %>
+        @*<p class="center">
+        @Html.ActionLink("Post", "Create", "Microposts", null, new { @class = "btn btn-large btn-primary" })
+        </p>
+    </div>*@

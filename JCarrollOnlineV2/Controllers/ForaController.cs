@@ -9,6 +9,9 @@ using System.Web;
 using System.Web.Mvc;
 using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.ViewModels;
+using Omu.ValueInjecter;
+using JCarrollOnlineV2.ControllerHelpers;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -17,9 +20,23 @@ namespace JCarrollOnlineV2.Controllers
         private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
 
         // GET: Fora
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            return View(await db.Forums.ToListAsync());
+            ForaIndexViewModel fvm = new ForaIndexViewModel();
+            fvm.ForaIndexItems = new List<ForaIndexItemViewModel>();
+
+            var dlist = db.Forums.ToList();
+            foreach(var item in dlist)
+            {
+                var fitem = new ForaIndexItemViewModel();
+                fitem.InjectFrom<FilterId>(item);
+                fitem.ThreadCount = ControllerHelpers.Forums.GetThreadCount(fitem.ForumId);
+                if(fitem.ThreadCount > 0)
+                    fitem.LastThread = ControllerHelpers.Forums.GetLatestThreadData(fitem.ForumId);
+
+                fvm.ForaIndexItems.Add(fitem);
+            }
+            return View(fvm);
         }
 
         // GET: Fora/Details/5
@@ -29,7 +46,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Forum forum = db.Forums.Where(f => f.Id == id).Include(f => f.ForumThreads).FirstOrDefault();
+            Forum forum = db.Forums.Where(f => f.ForumId == id).Include(f => f.ForumThreads).FirstOrDefault();
             if (forum == null)
             {
                 return HttpNotFound();
@@ -38,9 +55,11 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Fora/Create
+        [Authorize]
         public ActionResult Create()
         {
-            return View();
+            ForaCreateViewModel vm = new ForaCreateViewModel();
+            return View(vm);
         }
 
         // POST: Fora/Create
@@ -48,10 +67,13 @@ namespace JCarrollOnlineV2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Title,Description,CreatedAt,UpdatedAt")] Forum forum)
+        [Authorize]
+        public async Task<ActionResult> Create([Bind(Include = "Title,Description,CreatedAt,UpdatedAt")] ForaCreateViewModel forumViewModel)
         {
             if (ModelState.IsValid)
             {
+                Forum forum = new Forum();
+                forum.InjectFrom(forumViewModel);
                 forum.CreatedAt = DateTime.Now;
                 forum.UpdatedAt = DateTime.Now;
                 db.Forums.Add(forum);
@@ -59,10 +81,11 @@ namespace JCarrollOnlineV2.Controllers
                 return RedirectToAction("Index");
             }
 
-            return View(forum);
+            return View(forumViewModel);
         }
 
         // GET: Fora/Edit/5
+        [Authorize]
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
@@ -82,6 +105,7 @@ namespace JCarrollOnlineV2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Title,Description,CreatedAt,UpdatedAt")] Forum forum)
         {
             if (ModelState.IsValid)
@@ -94,6 +118,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Fora/Delete/5
+        [Authorize]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -111,6 +136,7 @@ namespace JCarrollOnlineV2.Controllers
         // POST: Fora/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             Forum forum = await db.Forums.FindAsync(id);

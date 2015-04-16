@@ -1,0 +1,10 @@
+﻿@using JCarrollOnlineV2.ViewModels
+
+@model ForumThreadEntryDetailsItemViewModel
+
+<div class="gravataruser">
+    @Html.Gravatar(User.Identity.Name, 52, new { Title = "My Gravatar", Alt = "Gravatar" })
+</div>
+<div class="forum_thread_content">
+    @Model.Content
+</div>

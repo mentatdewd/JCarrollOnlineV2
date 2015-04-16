@@ -12,6 +12,7 @@ using JCarrollOnlineV2.Entities;
 
 namespace JCarrollOnlineV2.Controllers
 {
+    [Authorize]
     public class RelationshipsController : Controller
     {
         private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();

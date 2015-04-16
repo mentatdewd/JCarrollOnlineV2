@@ -1,50 +1,62 @@
 ﻿@using JCarrollOnlineV2.Entities
-@model IEnumerable<Forum>
+@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.CustomHtmlHelpers
+@model ForaIndexViewModel
 
 @{
-    ViewBag.Title = "Index";
+    Model.PageTitle = "Fora";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Fora</h1>
+<h1 class="text-center">Fora</h1>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table-striped table-bordered" cellpadding="10" id="fora_index">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Title)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.DisplayName("Thread Count")
-        </th>
-        <th>
-            @Html.DisplayName("Last Thread")
-        </th>
-    </tr>
-
-    @foreach (var item in Model)
-    {
+<div class="center-block">
+    <table class="table-striped table-bordered" cellpadding="10" id="fora_index">
         <tr>
-            <td>
-                <div class="rowTitle">
-                    @Html.ActionLink(item.Title, "Index", "ForumThreadEntries", new { forumTitle = item.Title, forumId = item.Id }, null)
-                </div>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ForumThreads.Count)
-            </td>
-            <td>
-                @Html.DisplayName("Not Implemented")
-            </td>
+            <th>
+                @Html.DisplayNameFor(model => model.ForaIndexItems.First().Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ForaIndexItems.First().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ForaIndexItems.First().ThreadCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ForaIndexItems.First().LastThread)
+            </th>
         </tr>
-    }
 
-</table>
+        @foreach (var item in Model.ForaIndexItems)
+        {
+            <tr>
+                <td>
+                    <div class="rowTitle">
+                        @Html.ActionLink(item.Title, "Index", "ForumThreadEntries", new { forumId = item.ForumId }, null)
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ThreadCount)
+                </td>
+                <td>
+                    @{
+            if (item.LastThread != null)
+            {
+                @Html.Partial("_LastThreadPartial", item.LastThread);
+            }
+            else
+            {
+                @Html.Raw("None");
+            }
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+    <p class="text-center">
+        @Html.ActionLink("Create New", "Create", "Fora", new { @class = "btn btn-large btn-primary" })
+    </p>
+</div>

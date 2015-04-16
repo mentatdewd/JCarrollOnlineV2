@@ -1,7 +1,9 @@
-﻿@{
-    ViewBag.Title = "About";
+﻿@using JCarrollOnlineV2.ViewModels
+@model AboutViewModel
+@{
+    Model.PageTitle = "About";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
+<h2>@Model.PageTitle.</h2>
+<h3>@Model.Message</h3>
 
 <p>Use this area to provide additional information.</p>

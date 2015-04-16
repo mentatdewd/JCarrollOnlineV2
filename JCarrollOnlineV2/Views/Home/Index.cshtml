@@ -1,10 +1,12 @@
-﻿@{
-    ViewBag.Title = "Home";
+﻿@using JCarrollOnlineV2.ViewModels
+@model HomeViewModel
+@{
+    Model.PageTitle = "Home";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @if (Request.IsAuthenticated)
 {
-    @Html.Partial("_HomePartial")
+    @Html.Partial("_HomePartial", Model)
     <div class="col-sm-4">
     </div>
 }

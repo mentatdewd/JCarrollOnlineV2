@@ -48,12 +48,11 @@ namespace JCarrollOnlineV2.ViewModels
         public string Email { get; set; }
     }
 
-    public class LoginViewModel
+    public class LoginViewModel : ViewModelBase
     {
         [Required]
-        [Display(Name = "Email")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "Name")]
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -62,12 +61,16 @@ namespace JCarrollOnlineV2.ViewModels
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
+
+        public string ReturnUrl { get; set; }
+        public string LoginProvider { get; set; }
     }
 
-    public class RegisterViewModel
+    public class RegisterViewModel : ViewModelBase
     {
         [Required]
-        public string SiteUserName { get; set; }
+        [Display(Name="User Name")]
+        public string UserName { get; set; }
 
         [Required]
         [EmailAddress]

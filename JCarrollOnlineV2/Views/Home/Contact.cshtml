@@ -1,8 +1,11 @@
-﻿@{
-    ViewBag.Title = "Contact";
+﻿@using JCarrollOnlineV2.ViewModels
+@model ContactViewModel
+
+@{
+    Model.PageTitle = "Contact";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
+<h2>@Model.PageTitle.</h2>
+<h3>@Model.Message</h3>
 
 <address>
     One Microsoft Way<br />
