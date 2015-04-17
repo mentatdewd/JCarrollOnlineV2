@@ -9,6 +9,9 @@ using System.Web;
 using System.Web.Mvc;
 using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.ViewModels;
+using Omu.ValueInjecter;
+using Microsoft.AspNet.Identity;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -49,16 +52,21 @@ namespace JCarrollOnlineV2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] Micropost micropost)
+        public async Task<ActionResult> Create([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] MicropostCreateViewModel micropostVM)
         {
             if (ModelState.IsValid)
             {
-                db.Microposts.Add(micropost);
+                Micropost domModel = new Micropost();
+                domModel.InjectFrom(micropostVM);
+                domModel.CreatedAt = DateTime.Now;
+                domModel.UpdatedAt = DateTime.Now;
+                domModel.UserId = User.Identity.GetUserId();
+                db.Microposts.Add(domModel);
                 await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
 
-            return View(micropost);
+            return View(micropostVM);
         }
 
         // GET: Microposts/Edit/5

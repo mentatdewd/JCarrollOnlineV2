@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using System.Collections.Generic;
 using JCarrollOnlineV2.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace JCarrollOnlineV2.ViewModels
 {
@@ -20,7 +21,10 @@ namespace JCarrollOnlineV2.ViewModels
             return userIdentity;
         }
         public virtual ICollection<ForumThreadEntry> ForumThreadEntries { get; set; }
-        public virtual ICollection<Micropost> Microposts { get; set; }
+
+        public virtual ICollection<Relationship> Follower { get; set; }
+
+        public virtual ICollection<Relationship> Followed { get; set; }
     }
 
     //public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

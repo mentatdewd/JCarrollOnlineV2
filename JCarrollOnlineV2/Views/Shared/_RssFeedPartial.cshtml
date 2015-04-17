@@ -1,2 +1,11 @@
-﻿
+﻿@using JCarrollOnlineV2.ViewModels
+@model RssFeedViewModel
+
 <h3> Mariners News </h3>
+
+<ul class="rss_ul">
+    @foreach (RssFeedItemViewModel rssItemVM in Model.RssFeedItems)
+    {
+        @Html.Partial("_RssFeedItemPartial", rssItemVM)
+    }
+</ul>

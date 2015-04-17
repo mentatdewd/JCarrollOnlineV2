@@ -1,0 +1,7 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.HtmlExtensions
+@model RssFeedItemViewModel
+
+<li style="border-top: 1px solid #eaeaea">
+    @Html.Raw(Html.ExternalLink(Model.Link, Model.Title))
+</li>

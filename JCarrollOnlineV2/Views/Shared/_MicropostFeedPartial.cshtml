@@ -1,12 +1,14 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.Entities
 
-@model HomeViewModel
+@model MicropostFeedViewModel
 
-@if (Model.Microposts != null)
+@if (Model.MicropostFeedItems != null)
 {
-    foreach (Micropost micropost in Model.Microposts)
+    @Html.Raw("<ul>")
+    foreach (MicropostFeedItemViewModel micropost in Model.MicropostFeedItems)
     {
         @Html.Partial("_MicropostFeedItemPartial", micropost)
     }
+    @Html.Raw("</ul>")
 }

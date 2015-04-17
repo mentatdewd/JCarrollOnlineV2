@@ -46,7 +46,5 @@ namespace JCarrollOnlineV2.DataContexts
         public DbSet<Micropost> Microposts { get; set; }
 
         public DbSet<Relationship> Relationships { get; set; }
-
-        public DbSet<RssFeed> RssFeedEntries { get; set; }
     }
 }

@@ -1,0 +1,23 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.HtmlExtensions
+@model UserIndexItemViewModel
+
+<li>
+    <div class="user_item">
+        <a href='@Url.Action("Details", "Users", new { userId = Model.Id })'>
+            @{
+                @Html.Gravatar(Model.Email, 52, new { Title = "My Gravatar", Alt = "Gravatar" });
+            }
+        </a>
+        <span>
+            @Html.ActionLink(Model.UserName, "Details", new { userId = Model.Id })
+        </span>
+        @if (User.IsInRole("Administrator"))
+        {
+            @Html.Raw(" | ")
+            <span>
+                @Html.ActionLink("Delete", "Delete", new { userId = Model.Id })
+            </span>
+        }
+    </div>
+</li>

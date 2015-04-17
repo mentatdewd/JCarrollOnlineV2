@@ -1,22 +1,22 @@
 ﻿@using Microsoft.AspNet.Identity
 @using System.Web.Security
+@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.HtmlExtensions
+@model UserInfoViewModel
 
-<div class="container toppad">
-    <div class="row nopadding">
-        <div class="col-sm-2 nopadding">
-            <div class="gravatar">
-                @Html.Gravatar(User.Identity.Name, 52, new { Title = "My Gravatar", Alt = "Gravatar" })
-            </div>
-        </div>
-        <div class="col-sm-9 verticalcenter">
-            <div class="container nopadding">
-                <div class="row nopadding">
-                        @User.Identity.Name
-                </div>
-                <div class="row nopadding">
-                    @Html.ActionLink("View my profile", "Index", "Home")
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="user_info">
+    <a href='@Url.Action("Details", "Users", new { userId = Model.Id })' />
+    @{
+        @Html.Gravatar(Model.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" });
+    }
+    </a>
+    <span class="user_name">
+        <h1>@User.Identity.Name</h1>
+    </span>
+    <span>
+        @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.Id }, null)
+    </span>
+    <span class="microposts" id="user_info">
+        @Html.Raw(Model.Microposts + " " + @Html.Pluralize(Model.Microposts, "Post"))
+    </span>
 </div>

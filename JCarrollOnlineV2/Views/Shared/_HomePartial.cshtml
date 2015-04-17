@@ -1,23 +1,26 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @model HomeViewModel
+
 <div class="container">
-    <div class="col-sm-4">
-        @Html.Partial("_UserInfoPartial")
-        @*<%= render 'shared/user_info' %>*@
-        @Html.Partial("_UserStatsPartial")
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <aside class="col-md-4">
+            <section>
+                @Html.Partial("_UserInfoPartial", Model.UserInfoVM)
+            </section>
+            <section>
+                @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
+            </section>
+            <section>
+                @Html.Partial("_MicroPostFormPartial", Model.MicropostCreateVM)
+            </section>
+        </aside>
+        <div class="col-md-5">
+            <h1>Posts</h1>
+            @Html.Partial("_MicropostFeedPartial", Model.MicropostFeedVM)
+        </div>
+        <aside class="col-md-3">
+                @Html.Partial("_RssFeedPartial", Model.RssFeedVM)
+        </aside>
     </div>
 </div>
-<div class="container">
-<div class="col-sm-4">
-    @{
-        Html.Partial("_MicroPostFormPartial");
-    }
-</div>
-    <div class="col-sm-4">
-        @Html.Partial("_MicropostFeedPartial", Model)
-    </div>
-<div class="col-sm-4">
-    @Html.Partial("_RssFeedPartial")
-</div>
-    </div>
 

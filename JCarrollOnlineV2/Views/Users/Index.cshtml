@@ -1,5 +1,16 @@
-﻿@{
+﻿@using JCarrollOnlineV2.ViewModels
+@model UsersIndexViewModel
+
+@{
+    Model.PageTitle = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
+<div class="container">
+    <ul>
+        @foreach (var item in Model.Users)
+        {
+            @Html.Partial("_UserItemPartial", item)
+        }
+    </ul>
+</div>

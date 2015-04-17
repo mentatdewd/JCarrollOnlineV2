@@ -6,7 +6,10 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
+using TNX;
+using Omu.ValueInjecter;
 
 namespace JCarrollOnlineV2.ControllerHelpers
 {
@@ -67,6 +70,23 @@ namespace JCarrollOnlineV2.ControllerHelpers
             JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
 
             return db.Forums.Find(forumId).Title;
+        }
+
+        public static async Task<RssFeedViewModel> UpdateRssAsync()
+        {
+            TNX.RssReader.RssFeed rssFeed = await TNX.RssReader.RssHelper.ReadFeedAsync("http://m.mariners.mlb.com/partnerxml/gen/news/rss/sea.xml");
+
+            RssFeedViewModel rssFeedVM = new RssFeedViewModel();
+            rssFeedVM.RssFeedItems = new List<RssFeedItemViewModel>();
+            foreach (var item in rssFeed.Items)
+            {
+                RssFeedItemViewModel rss = new RssFeedItemViewModel();
+
+                rss.InjectFrom(item);
+                rss.UpdatedAt = DateTime.Now;
+                rssFeedVM.RssFeedItems.Add(rss);
+            }
+            return rssFeedVM;
         }
     }
 }

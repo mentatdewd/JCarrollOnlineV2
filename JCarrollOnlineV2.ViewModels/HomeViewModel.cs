@@ -9,7 +9,10 @@ namespace JCarrollOnlineV2.ViewModels
 {
     public class HomeViewModel : ViewModelBase
     {
-        public Micropost Micropost { get; set; }
-        public virtual ICollection<Micropost> Microposts { get; set; }
+        public MicropostCreateViewModel MicropostCreateVM { get; set; }
+        public MicropostFeedViewModel MicropostFeedVM { get; set; }
+        public UserStatsViewModel UserStatsVM { get; set; }
+        public UserInfoViewModel UserInfoVM { get; set; }
+        public RssFeedViewModel RssFeedVM { get; set; }
     }
 }

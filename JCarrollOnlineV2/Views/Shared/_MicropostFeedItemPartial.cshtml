@@ -1,26 +1,28 @@
-﻿@using JCarrollOnlineV2.Entities
-@*@Model Micropost
+﻿@using Microsoft.AspNet.Identity
+@using System.Web.Security
+@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.HtmlExtensions
+@model MicropostFeedItemViewModel
 
 
-<li>@Model.id
-    @*<span class="gravatar">
-        <%= link_to gravatar_for(feed_item.user), feed_item.user %>
+<li class="micropost">
+    <span class="gravatar">
+        <a href='@Url.Action("Details", "Users", new { userId =  Model.UserId })' />
+        @{
+            @Html.Gravatar(Model.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" });
+        }
+        </a>
     </span>
-
     <div class="micropost">
-        @*<span class="user">
-            <%= link_to feed_item.user.name, feed_item.user %>
+        <span class="user">
+            @Html.ActionLink(@Model.UserName, "Details", new { userId = Model.UserId });
         </span>
+
+
         <span class="content">
-            @model.content
+            @Model.Content
         </span>
         <span class="timestamp">
-            Posted (feed_item.created_at) %> ago.
         </span>
     </div>
-    <% if current_user?(feed_item.user) %>
-    <%= link_to "delete", feed_item, :remote=>true, method: :delete,
-    confirm: "You sure?",
-    title: feed_item.content %>
-    <% end %>
-</li>*@
+</li>

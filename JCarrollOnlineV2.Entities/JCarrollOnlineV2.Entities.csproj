@@ -92,7 +92,6 @@
     <Compile Include="Micropost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Relationship.cs" />
-    <Compile Include="RssFeed.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

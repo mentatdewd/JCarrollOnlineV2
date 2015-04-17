@@ -4,24 +4,51 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using JCarrollOnlineV2.ViewModels;
+using JCarrollOnlineV2.DataContexts;
+using Omu.ValueInjecter;
 
 namespace JCarrollOnlineV2.Controllers
 {
     [Authorize]
     public class UsersController : Controller
     {
+        private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+
         // GET: Users
         public ActionResult Index()
         {
-            UsersViewModel vm = new UsersViewModel();
+            UsersIndexViewModel vm = new UsersIndexViewModel();
+            vm.Users = new List<UserIndexItemViewModel>();
+
             vm.PageTitle = "Users";
+
+            var users = db.Users.ToList();
+
+            foreach(var user in users)
+            {
+                UserIndexItemViewModel uivm = new UserIndexItemViewModel();
+
+                uivm.InjectFrom(user);
+                vm.Users.Add(uivm);
+            }
+
+            return View(vm);
+        }
+
+        // Get: Users/Following/5
+        public ActionResult Following(string userId)
+        {
+            UsersFollowingViewModel vm = new UsersFollowingViewModel();
+
             return View(vm);
         }
 
         // GET: Users/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(string userId)
         {
-            return View();
+            UserDetailViewModel vm = new UserDetailViewModel();
+
+            return View(vm);
         }
 
         // GET: Users/Create
@@ -69,7 +96,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Users/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string userId)
         {
             return View();
         }

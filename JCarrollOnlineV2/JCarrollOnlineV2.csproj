@@ -141,6 +141,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -205,6 +206,12 @@
     </Reference>
     <Reference Include="System.Net.Http.WebRequest">
     </Reference>
+    <Reference Include="TNX.ResolveIT">
+      <HintPath>..\packages\TnxResolveIT.1.0.1\lib\TNX.ResolveIT.dll</HintPath>
+    </Reference>
+    <Reference Include="TNX.RssReader">
+      <HintPath>..\packages\TnxRssReader.1.1.4\lib\TNX.RssReader.dll</HintPath>
+    </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
@@ -234,7 +241,6 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\MicropostsController.cs" />
     <Compile Include="Controllers\RelationshipsController.cs" />
-    <Compile Include="Controllers\RssFeedsController.cs" />
     <Compile Include="Controllers\SandboxController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomHtmlHelpers\ForumHelper.cs" />
@@ -246,6 +252,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="HtmlExtensions\MultiLineActionLink.cs" />
     <Compile Include="Migrations\201504142148542_Initial.cs" />
     <Compile Include="Migrations\201504142148542_Initial.Designer.cs">
       <DependentUpon>201504142148542_Initial.cs</DependentUpon>
@@ -253,6 +260,30 @@
     <Compile Include="Migrations\201504152338360_ChangedRootIdToNullable.cs" />
     <Compile Include="Migrations\201504152338360_ChangedRootIdToNullable.Designer.cs">
       <DependentUpon>201504152338360_ChangedRootIdToNullable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504161920011_UpdatedMicropostModelUserIdFromIntToString.cs" />
+    <Compile Include="Migrations\201504161920011_UpdatedMicropostModelUserIdFromIntToString.Designer.cs">
+      <DependentUpon>201504161920011_UpdatedMicropostModelUserIdFromIntToString.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.cs" />
+    <Compile Include="Migrations\201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.Designer.cs">
+      <DependentUpon>201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504162114395_StillPlayingWithManyToManyMicropostsUsers.cs" />
+    <Compile Include="Migrations\201504162114395_StillPlayingWithManyToManyMicropostsUsers.Designer.cs">
+      <DependentUpon>201504162114395_StillPlayingWithManyToManyMicropostsUsers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504170207508_ReworkedRssTable.cs" />
+    <Compile Include="Migrations\201504170207508_ReworkedRssTable.Designer.cs">
+      <DependentUpon>201504170207508_ReworkedRssTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504170213009_ReworkedRssTableRenamedToRssFeed.cs" />
+    <Compile Include="Migrations\201504170213009_ReworkedRssTableRenamedToRssFeed.Designer.cs">
+      <DependentUpon>201504170213009_ReworkedRssTableRenamedToRssFeed.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504170243498_DroppedRssFeeds.cs" />
+    <Compile Include="Migrations\201504170243498_DroppedRssFeeds.Designer.cs">
+      <DependentUpon>201504170243498_DroppedRssFeeds.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -441,6 +472,9 @@
     <Content Include="Views\Shared\_ForumThreadEntryTOCItemPartial.cshtml" />
     <Content Include="Views\Users\Index.cshtml" />
     <Content Include="Views\Sandbox\Index.cshtml" />
+    <Content Include="Views\Shared\_UserItemPartial.cshtml" />
+    <Content Include="Views\Users\Details.cshtml" />
+    <Content Include="Views\Shared\_RssFeedItemPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -467,6 +501,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201504152338360_ChangedRootIdToNullable.resx">
       <DependentUpon>201504152338360_ChangedRootIdToNullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504161920011_UpdatedMicropostModelUserIdFromIntToString.resx">
+      <DependentUpon>201504161920011_UpdatedMicropostModelUserIdFromIntToString.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.resx">
+      <DependentUpon>201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504162114395_StillPlayingWithManyToManyMicropostsUsers.resx">
+      <DependentUpon>201504162114395_StillPlayingWithManyToManyMicropostsUsers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504170207508_ReworkedRssTable.resx">
+      <DependentUpon>201504170207508_ReworkedRssTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504170213009_ReworkedRssTableRenamedToRssFeed.resx">
+      <DependentUpon>201504170213009_ReworkedRssTableRenamedToRssFeed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504170243498_DroppedRssFeeds.resx">
+      <DependentUpon>201504170243498_DroppedRssFeeds.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

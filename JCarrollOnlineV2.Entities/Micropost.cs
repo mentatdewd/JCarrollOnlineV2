@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JCarrollOnlineV2.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,12 +18,15 @@ namespace JCarrollOnlineV2.Entities
         [StringLength(140)]
         public string Content { get; set; }
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; } // :null => false
 
         [DataType(DataType.DateTime)]
         public DateTime UpdatedAt { get; set; } // :null => false
+
+        public virtual ICollection<Relationship> FollowerIds { get; set; }
+        public virtual ICollection<Relationship> FollowedIds { get; set; }
     }
 }
