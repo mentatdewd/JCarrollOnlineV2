@@ -28,28 +28,31 @@ namespace JCarrollOnlineV2.Controllers
             Task<RssFeedViewModel> rss = Forums.UpdateRssAsync();
             //vm.RssFeedVM = await Forums.UpdateRssAsync();
 
-            var user = db.Users.Find(User.Identity.GetUserId());
-
-            vm.UserInfoVM.InjectFrom(user);
-
-            var userId = User.Identity.GetUserId();
-
-            vm.MicropostFeedVM.MicropostFeedItems = new List<MicropostFeedItemViewModel>();
-
-            var microposts = db.Microposts.Include("FollowedIds").Where(m => m.UserId == userId);
-            foreach(var item in microposts)
+            if (User.Identity.IsAuthenticated == true)
             {
-                MicropostFeedItemViewModel itemVm = new MicropostFeedItemViewModel();
+                var user = db.Users.Find(User.Identity.GetUserId());
 
-                itemVm.InjectFrom(item);
-                itemVm.Email = db.Users.Find(item.UserId).Email;
-                itemVm.UserName = db.Users.Find(item.UserId).UserName;
-                vm.MicropostFeedVM.MicropostFeedItems.Add(itemVm);
+                vm.UserInfoVM.InjectFrom(user);
+
+                var userId = User.Identity.GetUserId();
+
+                vm.MicropostFeedVM.MicropostFeedItems = new List<MicropostFeedItemViewModel>();
+
+                var microposts = db.Microposts.Include("FollowedIds").Where(m => m.UserId == userId);
+                foreach (var item in microposts)
+                {
+                    MicropostFeedItemViewModel itemVm = new MicropostFeedItemViewModel();
+
+                    itemVm.InjectFrom(item);
+                    itemVm.Email = db.Users.Find(item.UserId).Email;
+                    itemVm.UserName = db.Users.Find(item.UserId).UserName;
+                    vm.MicropostFeedVM.MicropostFeedItems.Add(itemVm);
+                }
+
+                //vm.RssFeedVM = rss.Wait();
+                vm.RssFeedVM = await rss;
             }
-
             vm.PageContainer = "Home";
-            //vm.RssFeedVM = rss.Wait();
-            vm.RssFeedVM = await rss;
             return View(vm);
         }
 
