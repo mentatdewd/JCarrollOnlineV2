@@ -24,9 +24,9 @@ namespace JCarrollOnlineV2.DataContexts
         }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-#if !DEBUG
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
-#endif
+//#if !DEBUG
+//            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
+//#endif
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<IdentityUserLogin>().HasKey<string>(l => l.UserId);

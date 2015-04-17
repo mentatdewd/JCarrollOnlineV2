@@ -46,6 +46,8 @@ namespace JCarrollOnlineV2.ViewModels
         public int PostNumber { get; set; }
 
         public int? ParentId { get; set; }
+
+        public string AuthorId { get; set; }
     }
 
     public class ForumThreadEntryIndexViewModel : ForumThreadEntriesViewModelBase
@@ -79,8 +81,6 @@ namespace JCarrollOnlineV2.ViewModels
 
         public int PostCount { get; set; }
 
-        public string AuthorId { get; set; }
-
         public int ParentPostNumber { get; set; }
     }
 
@@ -104,7 +104,6 @@ namespace JCarrollOnlineV2.ViewModels
 
     public class ForumThreadEntryTOCItemViewModel : ForumThreadEntriesViewModelBase
     {
-        public string AuthorId { get; set; }
     }
     
     public class ForumThreadEntriesCreateViewModel : ForumThreadEntriesViewModelBase
