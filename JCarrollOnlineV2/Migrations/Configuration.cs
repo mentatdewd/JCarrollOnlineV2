@@ -171,7 +171,7 @@ namespace JCarrollOnlineV2.Migrations
             }
 
             return UserManager.FindByName(newUser.UserName).Id;
-        }
 #endif
+        }
     }
 }
