@@ -13,6 +13,7 @@ using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
 using JCarrollOnlineV2.Extensions;
 using Omu.ValueInjecter;
+using JCarrollOnlineV2;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -21,6 +22,17 @@ namespace JCarrollOnlineV2.Controllers
     {
         private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
 
+        private void DetailItemInjector(ForumThreadEntryDetailsItemViewModel item)
+        {
+            item.Author = ControllerHelpers.GetAuthor(item.AuthorId);
+            item.PostCount = ControllerHelpers.GetAuthorPostCount(item.AuthorId);
+            item.ParentPostNumber = ControllerHelpers.GetParentPostNumber(item.ParentId);
+        }
+
+        private void TOCDetailItemInjector(ForumThreadEntryTOCItemViewModel item)
+        {
+            item.Author = ControllerHelpers.GetAuthor(item.AuthorId);
+        }
 
         // GET: ForumOriginalPost
         public async Task<ActionResult> Index(int forumId)
@@ -37,16 +49,24 @@ namespace JCarrollOnlineV2.Controllers
                 var fitem = new ForumThreadEntryIndexItemViewModel();
                 fitem.InjectFrom<FilterId>(item);
                 fitem.ForumId = forumId;
+                fitem.Author = await ControllerHelpers.GetAuthorAsync(item.AuthorId);
+                fitem.Replies = await ControllerHelpers.GetThreadPostCountAsync(item.ForumThreadEntryId);
+                fitem.LastReply = await ControllerHelpers.GetLastReplyAsync(item.RootId);
                 fvm.ForumThreadIndexEntries.Add(fitem);
             }
             return View(fvm);
         }
 
         // GET: ForumOriginalPost/Details/5
-        public ActionResult Details(int forumId, int forumThreadEntryId)
+        public async Task<ActionResult> Details(int forumId, int forumThreadEntryId)
         {
-            IEnumerable<HierarchyNode<ForumThreadEntryTOCItemViewModel>> fteTOCHierarchy = db.ForumThreadEntries.AsHierarchy("ForumThreadEntryId", "ParentId", forumThreadEntryId, 10).ProjectToView<ForumThreadEntry, ForumThreadEntryTOCItemViewModel>();
-            IEnumerable<HierarchyNode<ForumThreadEntryDetailsItemViewModel>> fteHierarchy = db.ForumThreadEntries.AsHierarchy("ForumThreadEntryId", "ParentId", forumThreadEntryId, 10).ProjectToView<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>();
+            var d1 = new IEnumerableExtensions.InjectorDelegate<ForumThreadEntryTOCItemViewModel>(TOCDetailItemInjector);
+            IEnumerable<HierarchyNode<ForumThreadEntryTOCItemViewModel>> fteTOCHierarchy = await db.ForumThreadEntries.AsHierarchy("ForumThreadEntryId", "ParentId", forumThreadEntryId, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryTOCItemViewModel>(d1);
+
+            var d2 = new IEnumerableExtensions.InjectorDelegate<ForumThreadEntryDetailsItemViewModel>(DetailItemInjector);
+            IEnumerable<HierarchyNode<ForumThreadEntryDetailsItemViewModel>> fteHierarchy = await db.ForumThreadEntries.AsHierarchy("ForumThreadEntryId", "ParentId", forumThreadEntryId, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(d2);
+
+
 
             ForumThreadEntryDetailsViewModel vm = new ForumThreadEntryDetailsViewModel();
             vm.ForumThreadEntryDetailItems = new ForumThreadEntryDetailItemsViewModel();
@@ -65,7 +85,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // GET: ForumOriginalPost/Create
         [Authorize]
-        public ActionResult Create(int forumId, int? parentId, int? rootId)
+        public  ActionResult Create(int forumId, int? parentId, int? rootId)
         {
             ForumThreadEntriesCreateViewModel vm = new ForumThreadEntriesCreateViewModel();
 
@@ -94,23 +114,11 @@ namespace JCarrollOnlineV2.Controllers
                 forumThreadEntry.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = db.Users.FirstOrDefault(x => x.Id == currentUserId);
+                ApplicationUser currentUser = await db.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
                 forumThreadEntry.AuthorId = currentUser.Id;
 
-                //ForumThreadEntry fte = forumThreadEntry;
-                //bool rootNotFound = true;
-
-                //if (forumThreadEntry.ParentId != null)
-                //{
-                //    while (rootNotFound)
-                //    {
-                //        fte = db.ForumThreadEntries.Find(fte.ParentId);
-                //        if (fte.ParentId == null)
-                //            rootNotFound = false;
-                //    }
-                //}
                 if (forumThreadEntry.ParentId != null)
-                    forumThreadEntry.PostNumber = db.ForumThreadEntries.Where(m => m.RootId == forumThreadEntry.RootId).Count() + 1;
+                    forumThreadEntry.PostNumber = await db.ForumThreadEntries.Where(m => m.RootId == forumThreadEntry.RootId).CountAsync() + 1;
                 else
                 { 
                     forumThreadEntry.PostNumber = 1;

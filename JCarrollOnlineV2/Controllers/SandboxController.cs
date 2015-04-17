@@ -4,13 +4,14 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using JCarrollOnlineV2.ViewModels;
+using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.Controllers
 {
     public class SandboxController : Controller
     {
         // GET: Sandbox
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             SandboxViewModel vm = new SandboxViewModel();
 
@@ -19,7 +20,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Sandbox/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
             return View();
         }
@@ -32,7 +33,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // POST: Sandbox/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public async Task<ActionResult> Create(FormCollection collection)
         {
             try
             {
@@ -54,7 +55,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // POST: Sandbox/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public async Task<ActionResult> Edit(int id, FormCollection collection)
         {
             try
             {
@@ -69,14 +70,14 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Sandbox/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             return View();
         }
 
         // POST: Sandbox/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public async Task<ActionResult> Delete(int id, FormCollection collection)
         {
             try
             {

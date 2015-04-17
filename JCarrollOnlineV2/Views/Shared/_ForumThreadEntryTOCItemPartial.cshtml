@@ -1,6 +1,6 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.Entities
-@using JCarrollOnlineV2.CustomHtmlHelpers
+@using JCarrollOnlineV2.HtmlHelperExtensions
 @model HierarchyNode<ForumThreadEntryTOCItemViewModel>
 
 <td id="TOCTableData">
@@ -30,7 +30,7 @@
     }
 </td>
 <td id="TOCTableData">
-    @UserInfoHtmlHelper.GetAuthor(Model.Entity.AuthorId)
+    @Model.Entity.Author
 </td>
 <td id="TOCTableData">
     @Model.Entity.CreatedAt

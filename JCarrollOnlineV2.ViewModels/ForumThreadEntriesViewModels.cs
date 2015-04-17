@@ -31,7 +31,7 @@ namespace JCarrollOnlineV2.ViewModels
 
         [Display(Name = "Author")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public string AuthorId { get; set; }
+        public string Author { get; set; }
 
         public bool Locked { get; set; }
 
@@ -58,7 +58,7 @@ namespace JCarrollOnlineV2.ViewModels
     {
 
         [Display(Name = "Replies")]
-        public string Replies { get; set; }
+        public int Replies { get; set; }
 
 
         [Display(Name = "Last Reply")]
@@ -76,6 +76,12 @@ namespace JCarrollOnlineV2.ViewModels
         [Display(Name = "Parent Author")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string ParentAuthor { get; set; }
+
+        public int PostCount { get; set; }
+
+        public string AuthorId { get; set; }
+
+        public int ParentPostNumber { get; set; }
     }
 
     public class ForumThreadEntryDetailsViewModel : ForumThreadEntriesViewModelBase
@@ -98,10 +104,12 @@ namespace JCarrollOnlineV2.ViewModels
 
     public class ForumThreadEntryTOCItemViewModel : ForumThreadEntriesViewModelBase
     {
+        public string AuthorId { get; set; }
     }
     
     public class ForumThreadEntriesCreateViewModel : ForumThreadEntriesViewModelBase
     {
+        public int ParentPostNumber { get; set; }
     }
 
     public class ForumThreadEntriesEditViewModel : ForumThreadEntriesViewModelBase

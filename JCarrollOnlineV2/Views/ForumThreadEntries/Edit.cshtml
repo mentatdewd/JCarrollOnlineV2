@@ -18,7 +18,7 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.ForumThreadEntryId)
-        @Html.HiddenFor(model => model.AuthorId)
+        @Html.HiddenFor(model => model.Author)
         @Html.HiddenFor(model => model.CreatedAt)
         @Html.HiddenFor(model => model.ForumId)
         @Html.HiddenFor(model => model.Locked)

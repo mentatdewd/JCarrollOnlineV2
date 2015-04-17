@@ -1,10 +1,8 @@
 ﻿
 @using JCarrollOnlineV2.Entities
 @using JCarrollOnlineV2.ViewModels
-@using JCarrollOnlineV2.CustomHtmlHelpers
+@using JCarrollOnlineV2.HtmlHelperExtensions
 @model ForumThreadEntryTOCItemsViewModel
-
-@*@Html.Raw(Html.HierarchicalListView("TOCTable", "TOCHeader", "TOCRow", "TOCtd", Model, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadPartial", l)).ToString()))*@
 
 <table id="TOCTable">
     <tr id="TOCTableRow">
@@ -12,7 +10,7 @@
             @Html.Raw(@Model.NumberOfReplies + " replies")
         </th>
         <th id="TOCTableHeader">
-            @Html.DisplayNameFor(model => model.ForumThreadEntriesToc.First().Entity.AuthorId)
+            @Html.DisplayNameFor(model => model.ForumThreadEntriesToc.First().Entity.Author)
         </th>
         <th id="TOCTableHeader">
             @Html.DisplayNameFor(model => model.ForumThreadEntriesToc.First().Entity.CreatedAt)

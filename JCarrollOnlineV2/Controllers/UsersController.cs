@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.ViewModels;
-using JCarrollOnlineV2.DataContexts;
 using Omu.ValueInjecter;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -15,14 +14,14 @@ namespace JCarrollOnlineV2.Controllers
         private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
 
         // GET: Users
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             UsersIndexViewModel vm = new UsersIndexViewModel();
             vm.Users = new List<UserIndexItemViewModel>();
 
             vm.PageTitle = "Users";
 
-            var users = db.Users.ToList();
+            var users = await db.Users.ToListAsync();
 
             foreach(var user in users)
             {
@@ -36,7 +35,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // Get: Users/Following/5
-        public ActionResult Following(string userId)
+        public async Task<ActionResult> Following(string userId)
         {
             UsersFollowingViewModel vm = new UsersFollowingViewModel();
 
@@ -44,7 +43,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Users/Details/5
-        public ActionResult Details(string userId)
+        public async Task<ActionResult> Details(string userId)
         {
             UserDetailViewModel vm = new UserDetailViewModel();
 
@@ -59,7 +58,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // POST: Users/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public async Task<ActionResult> Create(FormCollection collection)
         {
             try
             {
@@ -81,7 +80,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // POST: Users/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public async Task<ActionResult> Edit(int id, FormCollection collection)
         {
             try
             {
@@ -96,14 +95,14 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Users/Delete/5
-        public ActionResult Delete(string userId)
+        public async Task<ActionResult> Delete(string userId)
         {
             return View();
         }
 
         // POST: Users/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public async Task<ActionResult> Delete(int id, FormCollection collection)
         {
             try
             {

@@ -1,5 +1,5 @@
 ﻿@using JCarrollOnlineV2.ViewModels
-@using JCarrollOnlineV2.CustomHtmlHelpers
+@using JCarrollOnlineV2.HtmlHelperExtensions
 @model ForumThreadEntriesCreateViewModel
 
 @Html.HiddenFor(model => model.ForumId, new { @Value = Model.ForumId })
@@ -41,7 +41,7 @@
     }
 
     <div>
-        @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + ForumHelper.GetParentPostNumber(Model.ParentId), new { forumId = Model.ForumId, forumThreadEntryId = Model.RootId }, null)
+        @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.ParentPostNumber, new { forumId = Model.ForumId, forumThreadEntryId = Model.RootId }, null)
     </div>
 
     @section Scripts {

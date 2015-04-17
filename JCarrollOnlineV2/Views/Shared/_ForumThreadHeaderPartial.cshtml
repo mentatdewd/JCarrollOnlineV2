@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNet.Identity
 @using JCarrollOnlineV2.ViewModels
-@using JCarrollOnlineV2.CustomHtmlHelpers
+@using JCarrollOnlineV2.HtmlHelperExtensions
 
 @model ForumThreadEntryDetailsItemViewModel
 
@@ -9,9 +9,9 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="userinfo">
-                    @Html.ActionLink(UserInfoHtmlHelper.GetAuthor(Model.AuthorId), "Details")
+                    @Html.ActionLink(Model.Author, "Details", "Users", null, null, null, new { userId = Model.AuthorId }, null)
                     @Html.Raw("(")
-                    @UserInfoHtmlHelper.GetPostCount(Model.AuthorId)
+                    @Model.PostCount
                     @Html.Raw(" posts)")
                     <div class="header_title">
                         @Html.Raw(Model.PostNumber + ". " + Model.Title)
@@ -21,15 +21,17 @@
             <div class="col-md-6">
                 <div class="threadinfo">
                     <div class="reply_to">
-                        @if (Model.ParentId == null)
-                        {
-                            @Html.Raw("Original post")
-                        }
-                        else
-                        {
-                            @Html.Raw("Response to ")
-                            var parentpostnumber = UserInfoHtmlHelper.GetParentPostNumber(Model.ParentId);
-                            @Html.ActionLink(Model.ParentAuthor + "(Reply #" + parentpostnumber + ")", "Details", "ForumThreadEntries", null, null, "post" + parentpostnumber, new { forumId = Model.ForumId, forumThreadEntryId = Model.RootId }, null)
+                        @{
+                            if (Model.ParentId == null)
+                            {
+                                @Html.Raw("Original post")
+                            }
+                            else
+                            {
+                                @Html.Raw("Response to ");
+
+                                @Html.ActionLink(Model.ParentAuthor + "(Reply #" + Model.ParentPostNumber + ")", "Details", "ForumThreadEntries", null, null, "post" + Model.ParentPostNumber, new { forumId = Model.ForumId, forumThreadEntryId = Model.RootId }, null);
+                            }
                         }
                         <div class="created_at">
                             @Model.CreatedAt

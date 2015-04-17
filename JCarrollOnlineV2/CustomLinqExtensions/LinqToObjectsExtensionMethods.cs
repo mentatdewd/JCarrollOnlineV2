@@ -6,20 +6,23 @@ using JCarrollOnlineV2.Entities;
 using System.Linq.Expressions;
 using Omu.ValueInjecter;
 using JCarrollOnlineV2.ViewModels;
+using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.Extensions
 {
     public static class IEnumerableExtensions
     {
-        public static IEnumerable<HierarchyNode<TView>> ProjectToView<TDom, TView>(this IEnumerable<HierarchyNode<TDom>> query)
+        public delegate void InjectorDelegate<T>(T item);
+
+        public static async Task<IEnumerable<HierarchyNode<TView>>> ProjectToViewAsync<TDom, TView>(this IEnumerable<HierarchyNode<TDom>> query, InjectorDelegate<TView> EntityInjector)
             where TView : class, new()
             where TDom : class
         {
             List<HierarchyNode<TView>> viewList = new List<HierarchyNode<TView>>();
-            ConstructTree<TDom, TView>(query, viewList, null);
+            await ConstructTreeAsync<TDom, TView>(query, viewList, null, EntityInjector);
             return viewList;
         }
-        private static void ConstructTree<TDom, TView>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNode<TView>> viewList, TView parent)
+        private static async Task ConstructTreeAsync<TDom, TView>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNode<TView>> viewList, TView parent, InjectorDelegate<TView> EntityInjector)
             where TView : class, new()
             where TDom : class
         {
@@ -34,16 +37,21 @@ namespace JCarrollOnlineV2.Extensions
                     hnvm.Parent = parent;
                     hnvm.Depth = item.Depth;
                     hnvm.Entity.InjectFrom<FilterId>(item.Entity);
+
+                    // Call injectordelegate here
+                    var handler = new InjectorDelegate<TView>(EntityInjector);
+                    handler.Invoke(hnvm.Entity);
+
                     viewList.Add(hnvm);
                     hnvm.ChildNodes = new List<HierarchyNode<TView>>();
                     if (item.ChildNodes.Count > 0)
                     {
-                        AppendChildren(item.ChildNodes, hnvm.ChildNodes, hnvm.Entity, false);
+                        await AppendChildrenAsync(item.ChildNodes, hnvm.ChildNodes, hnvm.Entity, false, handler);
                     }
                 }
             }
         }
-        public static void AppendChildren<TView, TDom>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNode<TView>> viewList, TView parent, bool hasSibblings)
+        public static async Task AppendChildrenAsync<TView, TDom>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNode<TView>> viewList, TView parent, bool hasSibblings, InjectorDelegate<TView> handler)
             where TView : class, new()
             where TDom : class
         {
@@ -78,12 +86,13 @@ namespace JCarrollOnlineV2.Extensions
                 hnvm.Parent = parent;
                 hnvm.Depth = item.Depth;
                 hnvm.Entity.InjectFrom<FilterId>(item.Entity);
+                handler.Invoke(hnvm.Entity);
                 viewList.Add(hnvm);
                 hnvm.ChildNodes = new List<HierarchyNode<TView>>();
                 if (item.ChildNodes.Count > 0)
                 {
                     //hnvm.ImageList.Insert(0, "/Content/images/rtable-space.gif");
-                    AppendChildren(item.ChildNodes, hnvm.ChildNodes, hnvm.Entity, hasSibbs);
+                    await AppendChildrenAsync(item.ChildNodes, hnvm.ChildNodes, hnvm.Entity, hasSibbs, handler);
                 }
             }
         }

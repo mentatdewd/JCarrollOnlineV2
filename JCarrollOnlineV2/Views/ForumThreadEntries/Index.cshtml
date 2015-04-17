@@ -1,5 +1,5 @@
-﻿@using JCarrollOnlineV2.CustomHtmlHelpers
-@using JCarrollOnlineV2.ViewModels
+﻿@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.HtmlHelperExtensions
 @model ForumThreadEntryIndexViewModel
 
 @{
@@ -18,7 +18,7 @@
             @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Replies)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().AuthorId)
+            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Author)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().CreatedAt)
@@ -45,13 +45,13 @@
                 @Html.DisplayFor(modelItem => item.Replies)
             </td>
             <td>
-                @UserInfoHtmlHelper.GetAuthor(item.AuthorId)
+                @Html.DisplayFor(modelItem => item.Author)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedAt)
             </td>
             <td>
-                @ForumHelper.GetLatestThreadPostDate(item.RootId)
+                @Html.DisplayFor(modelItem => item.LastReply)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Recs)

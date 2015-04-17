@@ -1,4 +1,4 @@
-﻿using JCarrollOnlineV2.ControllerHelpers;
+﻿using JCarrollOnlineV2;
 using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Data.Entity;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -18,19 +19,17 @@ namespace JCarrollOnlineV2.Controllers
         
         public async Task<ActionResult> Index()
         {
-
             HomeViewModel vm = new HomeViewModel();
             vm.MicropostCreateVM = new MicropostCreateViewModel();
             vm.MicropostFeedVM = new MicropostFeedViewModel();
             vm.UserStatsVM = new UserStatsViewModel();
             vm.UserInfoVM = new UserInfoViewModel();
 
-            Task<RssFeedViewModel> rss = Forums.UpdateRssAsync();
-            //vm.RssFeedVM = await Forums.UpdateRssAsync();
+            Task<RssFeedViewModel> rss = ControllerHelpers.UpdateRssAsync();
 
             if (User.Identity.IsAuthenticated == true)
             {
-                var user = db.Users.Find(User.Identity.GetUserId());
+                var user = await db.Users.FindAsync(User.Identity.GetUserId());
 
                 vm.UserInfoVM.InjectFrom(user);
 
@@ -38,18 +37,18 @@ namespace JCarrollOnlineV2.Controllers
 
                 vm.MicropostFeedVM.MicropostFeedItems = new List<MicropostFeedItemViewModel>();
 
-                var microposts = db.Microposts.Include("FollowedIds").Where(m => m.UserId == userId);
+                var microposts = await db.Microposts.Include("FollowedIds").Where(m => m.UserId == userId).ToListAsync();
+
                 foreach (var item in microposts)
                 {
                     MicropostFeedItemViewModel itemVm = new MicropostFeedItemViewModel();
 
                     itemVm.InjectFrom(item);
-                    itemVm.Email = db.Users.Find(item.UserId).Email;
-                    itemVm.UserName = db.Users.Find(item.UserId).UserName;
+                    var emailTask = await db.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.Email = prevTask.Result.Email);
+                    var userNameTask = await db.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.UserName = prevTask.Result.UserName);
+                    
                     vm.MicropostFeedVM.MicropostFeedItems.Add(itemVm);
                 }
-
-                //vm.RssFeedVM = rss.Wait();
                 vm.RssFeedVM = await rss;
             }
             vm.PageContainer = "Home";
