@@ -14,199 +14,174 @@ namespace JCarrollOnlineV2
 {
     public static class ControllerHelpers
     {
-        public static string GetAuthor(string authorId)
-        {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+        //public static ApplicationUser GetAuthor(string authorId, IContext data)
+        //{
+        //    return data.Users.Find(authorId).UserName;
+        //}
 
-            return db.Users.Find(authorId).UserName;
+        //public static async Task<string> GetAuthorAsync(string authorId, IContext data)
+        //{
+        //    var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(data as DbContext));
+        //    var user = await userManager.FindByIdAsync(authorId);
+        //    return user.UserName;
+        //}
+
+        public static int GetThreadPostCount(int thread, IContext data)
+        {
+            return data.ForumThreadEntries.Where(i => i.RootId == thread).AsQueryable().Count();
         }
 
-        public static async Task<string> GetAuthorAsync(string authorId)
+        public static async Task<int> GetThreadPostCountAsync(int thread, IContext data)
         {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
-            var user = await userManager.FindByIdAsync(authorId);
-            return user.UserName;
+            return await data.ForumThreadEntries.Where(i => i.RootId == thread).AsQueryable().CountAsync();
         }
 
-        public static int GetThreadPostCount(int thread)
+        public static int GetThreadCount(Forum forum, IContext data)
         {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            return db.ForumThreadEntries.Where(i => i.RootId == thread).AsQueryable().Count();
+            //return data.ForumThreadEntries.Where(i => i.ForumId == forumId && i.ParentId == null).Count();
+            return data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).Count();
         }
 
-        public static async Task<int> GetThreadPostCountAsync(int thread)
+        public static async Task<int> GetThreadCountAsync(Forum forum, IContext data)
         {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            return await db.ForumThreadEntries.Where(i => i.RootId == thread).AsQueryable().CountAsync();
+                //return await data.ForumThreadEntries.Where(i => i.ForumId == forumId && i.ParentId == null).CountAsync();
+            return await data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync();
         }
 
-        public static int GetThreadCount(int forumId)
+        public static int GetAuthorPostCount(ApplicationUser author, IContext data)
         {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            return db.ForumThreadEntries.Where(i => i.ForumId == forumId && i.ParentId == null).Count();
+            //return data.ForumThreadEntries.Where(i => i.AuthorId == authorId).Count();
+            return data.ForumThreadEntries.Where(i => i.Author.Id == author.Id).Count();
         }
 
-        public static async Task<int> GetThreadCountAsync(int forumId)
+        public static async Task<int> GetAuthorPostCountAsync(ApplicationUser author, IContext data)
         {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                return await db.ForumThreadEntries.Where(i => i.ForumId == forumId && i.ParentId == null).CountAsync();
+            //return await data.ForumThreadEntries.Where(i => i.AuthorId == authorId).CountAsync();
+            return await data.ForumThreadEntries.Where(i => i.Author.Id == author.Id).CountAsync();
         }
 
-        public static int GetAuthorPostCount(string authorId)
-        {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            return db.ForumThreadEntries.Where(i => i.AuthorId == authorId).Count();
-        }
-
-        public static async Task<int> GetAuthorPostCountAsync(string authorId)
-        {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            return await db.ForumThreadEntries.Where(i => i.AuthorId == authorId).CountAsync();
-        }
-
-        public static DateTime GetLastReply(int? rootId)
+        public static DateTime GetLastReply(int? rootId, IContext data)
         {
             if (rootId != null)
             {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                ForumThreadEntry fte = db.ForumThreadEntries.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefault();
+                ForumThreadEntry fte = data.ForumThreadEntries.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefault();
                 return fte.UpdatedAt;
             }
             else return DateTime.Now;
         }
 
-        public static async Task<DateTime> GetLastReplyAsync(int? rootId)
+        public static async Task<DateTime> GetLastReplyAsync(int? rootId, IContext data)
         {
             if (rootId != null)
             {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                ForumThreadEntry fte = await db.ForumThreadEntries.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
+                ForumThreadEntry fte = await data.ForumThreadEntries.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
                 return fte.UpdatedAt;
             }
             else return DateTime.Now;
         }
 
-        public static int GetParentPostNumber(int? parentId)
+        public static int GetParentPostNumber(int? parentId, IContext data)
         {
             if (parentId != null)
             {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                return db.ForumThreadEntries.Find(parentId).PostNumber;
+                return data.ForumThreadEntries.Find(parentId).PostNumber;
             }
             return 1;
         }
 
-        public static async Task<int> GetParentPostNumberAsync(int? parentId)
+        public static async Task<int> GetParentPostNumberAsync(int? parentId, IContext data)
         {
             if (parentId != null)
             {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                var parent = await db.ForumThreadEntries.FindAsync(parentId);
+                var parent = await data.ForumThreadEntries.FindAsync(parentId);
 
                 return parent.PostNumber;
             }
             return 1;
         }
 
-        public static LastThreadViewModel GetLatestThreadData(int forumId)
+        public static LastThreadViewModel GetLatestThreadData(Forum forum, IContext data)
         {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
             LastThreadViewModel ltvm = new LastThreadViewModel();
 
-            ForumThreadEntry fte = db.ForumThreadEntries.Where(i => i.ForumId == forumId).OrderByDescending(i => i.UpdatedAt).FirstOrDefault();
+            var fte = data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id)
+                .Include(i => i.Author)
+                .OrderByDescending(i => i.UpdatedAt)
+                .FirstOrDefault();
 
-            ltvm.UpdatedAt = fte.UpdatedAt;
-            ltvm.Title = fte.Title;
-            ltvm.PostNumber = fte.PostNumber;
-            ltvm.Author = GetAuthor(fte.AuthorId);
+            ltvm.InjectFrom(fte);
+            ltvm.Author = new ApplicationUserViewModel();
+            ltvm.Author.InjectFrom(fte.Author);
+
             bool rootNotFound = true;
             if (fte.ParentId != null)
                 while (rootNotFound)
                 {
-                    fte = db.ForumThreadEntries.Find(fte.ParentId);
+                    fte = data.ForumThreadEntries.Find(fte.ParentId);
                     if (fte.ParentId == null)
                         rootNotFound = false;
                 }
-            ltvm.PostRoot = fte.ForumThreadEntryId;
+            ltvm.PostRoot = fte.Id;
             return ltvm;
         }
 
-        public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(int forumId)
+        public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, IContext data)
         {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
             LastThreadViewModel ltvm = new LastThreadViewModel();
 
-            ForumThreadEntry fte = await db.ForumThreadEntries.Where(i => i.ForumId == forumId).OrderByDescending(i => i.UpdatedAt).FirstOrDefaultAsync();
+            var fte = await data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id)
+                .Include(i => i.Author)
+                .OrderByDescending(i => i.UpdatedAt)
+                .FirstOrDefaultAsync();
 
-            ltvm.UpdatedAt = fte.UpdatedAt;
-            ltvm.Title = fte.Title;
-            ltvm.PostNumber = fte.PostNumber;
-            ltvm.Author = GetAuthor(fte.AuthorId);
-            ltvm.ForumId = fte.ForumId;
+            ltvm.InjectFrom(fte);
+            ltvm.Author = new ApplicationUserViewModel();
+            ltvm.Author.InjectFrom(fte.Author);
+
             bool rootNotFound = true;
             if (fte.ParentId != null)
                 while (rootNotFound)
                 {
-                    fte = await db.ForumThreadEntries.FindAsync(fte.ParentId);
+                    fte = await data.ForumThreadEntries.FindAsync(fte.ParentId);
                     if (fte.ParentId == null)
                         rootNotFound = false;
                 }
-            ltvm.PostRoot = fte.ForumThreadEntryId;
+            ltvm.PostRoot = fte.Id;
             return ltvm;
         }
 
-        public static string GetParentAuthor(int? parentId)
+        public static ApplicationUser GetParentAuthor(int? parentId, IContext data)
         {
             if (parentId != null)
             {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                var parent = db.ForumThreadEntries.Find((int)parentId);
-                return GetAuthor(parent.AuthorId);
+                var parent = data.ForumThreadEntries.Find((int)parentId);
+                return parent.Author;
             }
             else
                 return null;
         }
 
-        public static async Task<string> GetParentAuthorAsync(int? parentId)
+        public static async Task<ApplicationUser> GetParentAuthorAsync(int? parentId, IContext data)
         {
             if (parentId != null)
             {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                var parent = await db.ForumThreadEntries.FindAsync((int)parentId);
-                return await GetAuthorAsync(parent.AuthorId);
+                var parent = await data.ForumThreadEntries.FindAsync((int)parentId);
+                return parent.Author;
             }
             else
                 return null;
         }
 
-        public static string GetForumName(int forumId)
-        {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+        //public static string GetForumName(int forumId, IContext data)
+        //{
+        //    return data.Forums.Find(forumId).Title;
+        //}
 
-            return db.Forums.Find(forumId).Title;
-        }
-
-        public static async Task<string> GetForumNameAsync(int forumId)
-        {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            var forumName = await db.Forums.FindAsync(forumId);
-            return forumName.Title;
-        }
+        //public static async Task<string> GetForumNameAsync(int forumId, IContext data)
+        //{
+        //    var forumName = await data.Forums.FindAsync(forumId);
+        //    return forumName.Title;
+        //}
 
         public static async Task<RssFeedViewModel> UpdateRssAsync()
         {

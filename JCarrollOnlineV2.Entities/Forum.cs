@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.Entities
 {
+    [Table("Fora")]
     public class Forum
     {
-        [Key]
         [Required]
-        public int ForumId { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [StringLength(255)]
@@ -26,7 +27,7 @@ namespace JCarrollOnlineV2.Entities
         [DataType(DataType.DateTime)]
         public DateTime UpdatedAt { get; set; } //:null => false
 
-        public List<ForumThreadEntry> ForumThreads { get; set; }
-        public List<ForumModerator> ForumModerators { get; set; }
+        public virtual List<ForumThreadEntry> ForumThreadEntries { get; set; }
+        public virtual List<ForumModerator> ForumModerators { get; set; }
     }
 }

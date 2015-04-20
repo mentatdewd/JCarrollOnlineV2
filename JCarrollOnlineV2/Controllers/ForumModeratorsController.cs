@@ -15,12 +15,22 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles="Administrators")]
     public class ForumModeratorsController : Controller
     {
-        private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+        private IContext _data { get; set; }
+
+        public ForumModeratorsController() : this(null)
+        {
+
+        }
+
+        public ForumModeratorsController(IContext dataContext)
+        {
+            _data = dataContext ?? new JCarrollOnlineV2Db();
+        }
 
         // GET: ForumModerators
         public async Task<ActionResult> Index()
         {
-            return View(await db.ForumModerators.ToListAsync());
+            return View(await _data.ForumModerators.ToListAsync());
         }
 
         // GET: ForumModerators/Details/5
@@ -30,7 +40,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumModerator forumModerator = await db.ForumModerators.FindAsync(id);
+            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
             if (forumModerator == null)
             {
                 return HttpNotFound();
@@ -49,12 +59,12 @@ namespace JCarrollOnlineV2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,ForumId,CreatedAt,UpdatedAt")] ForumModerator forumModerator)
+        public async Task<ActionResult> Create([Bind(Include = "Id,Id,CreatedAt,UpdatedAt")] ForumModerator forumModerator)
         {
             if (ModelState.IsValid)
             {
-                db.ForumModerators.Add(forumModerator);
-                await db.SaveChangesAsync();
+                _data.ForumModerators.Add(forumModerator);
+                await _data.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
@@ -68,7 +78,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumModerator forumModerator = await db.ForumModerators.FindAsync(id);
+            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
             if (forumModerator == null)
             {
                 return HttpNotFound();
@@ -81,12 +91,12 @@ namespace JCarrollOnlineV2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,ForumId,CreatedAt,UpdatedAt")] ForumModerator forumModerator)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Id,CreatedAt,UpdatedAt")] ForumModerator forumModerator)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(forumModerator).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                _data.Entry(forumModerator).State = EntityState.Modified;
+                await _data.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
             return View(forumModerator);
@@ -99,7 +109,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumModerator forumModerator = await db.ForumModerators.FindAsync(id);
+            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
             if (forumModerator == null)
             {
                 return HttpNotFound();
@@ -112,9 +122,9 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            ForumModerator forumModerator = await db.ForumModerators.FindAsync(id);
-            db.ForumModerators.Remove(forumModerator);
-            await db.SaveChangesAsync();
+            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
+            _data.ForumModerators.Remove(forumModerator);
+            await _data.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
@@ -122,7 +132,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _data.Dispose();
             }
             base.Dispose(disposing);
         }

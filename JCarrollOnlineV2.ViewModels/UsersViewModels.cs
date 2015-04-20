@@ -31,7 +31,7 @@ namespace JCarrollOnlineV2.ViewModels
 
     public class UserIndexItemViewModel : UserViewModelBase
     {
-
+        public bool Followed { get; set; }
     }
 
     public class UserDetailViewModel : UserViewModelBase

@@ -17,15 +17,14 @@
         <h4>ForumThread</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.ForumThreadEntryId)
-        @Html.HiddenFor(model => model.Author)
-        @Html.HiddenFor(model => model.CreatedAt)
-        @Html.HiddenFor(model => model.ForumId)
-        @Html.HiddenFor(model => model.Locked)
+        @Html.HiddenFor(model => model.Id)
         @Html.HiddenFor(model => model.ParentId)
-        @Html.HiddenFor(model => model.PostNumber)
         @Html.HiddenFor(model => model.RootId)
+        @Html.HiddenFor(model => model.ForumId)
         @Html.HiddenFor(model => model.AuthorId)
+        @Html.HiddenFor(model => model.CreatedAt)
+        @Html.HiddenFor(model => model.Locked)
+        @Html.HiddenFor(model => model.PostNumber)
 
         <div class="form-group">
             @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -52,7 +51,7 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.ForumId, forumThreadEntryId = Model.RootId }, null);
+    @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.ForumId, id = Model.RootId }, null);
 </div>
 
 @section Scripts {

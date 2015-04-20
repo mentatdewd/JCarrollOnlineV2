@@ -11,7 +11,17 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class UsersController : Controller
     {
-        private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+        private IContext _data { get; set; }
+
+        public UsersController() : this(null)
+        {
+
+        }
+
+        public UsersController(IContext dataContext)
+        {
+            _data = dataContext ?? new JCarrollOnlineV2Db();
+        }
 
         // GET: Users
         public async Task<ActionResult> Index()
@@ -21,7 +31,7 @@ namespace JCarrollOnlineV2.Controllers
 
             vm.PageTitle = "Users";
 
-            var users = await db.Users.ToListAsync();
+            var users = await _data.Users.Include("Followed").Include("Follower").ToListAsync();
 
             foreach(var user in users)
             {
@@ -114,6 +124,15 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View();
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _data.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

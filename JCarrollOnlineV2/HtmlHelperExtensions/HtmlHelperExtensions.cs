@@ -19,37 +19,6 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 {
     public static class HtmlHelperExtensions
     {
-        public static async Task<int> GetPostCountAsync(this HtmlHelper helper, string author)
-        {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            int count = await db.ForumThreadEntries.Where(i => i.AuthorId == author).AsQueryable().CountAsync();
-            return count;
-        }
-        public static async Task<int> GetParentPostNumberAsync(this HtmlHelper helper, int? forumThreadEntryId)
-        {
-            JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-            if (forumThreadEntryId != null)
-            {
-                ForumThreadEntry fte = await db.ForumThreadEntries.FindAsync(forumThreadEntryId);
-                return fte.PostNumber;
-            }
-            else
-                return 1;
-        }
-        public static async Task<DateTime> GetLatestThreadPostDateAsync(this HtmlHelper helper, int? rootId)
-        {
-            if (rootId != null)
-            {
-                JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-
-                ForumThreadEntry fte = await db.ForumThreadEntries.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
-                return fte.UpdatedAt;
-            }
-            else return DateTime.Now;
-        }
-
         public static string ExternalLink(this HtmlHelper helper, string URI, string label)
         {
             return string.Format("<a href='{0}'>{1}</a>", URI, label);

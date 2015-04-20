@@ -13,7 +13,17 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class ForaController : Controller
     {
-        private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+        private IContext _data { get; set; }
+
+        public ForaController() : this(null)
+        {
+
+        }
+
+        public ForaController(IContext dataContext = null)
+        {
+            _data = dataContext ?? new JCarrollOnlineV2Db();
+        }
 
         // GET: Fora
         public async Task<ActionResult> Index()
@@ -21,14 +31,14 @@ namespace JCarrollOnlineV2.Controllers
             ForaIndexViewModel fvm = new ForaIndexViewModel();
             fvm.ForaIndexItems = new List<ForaIndexItemViewModel>();
 
-            var dlist = await db.Forums.ToListAsync();
+            var dlist = await _data.Forums.ToListAsync();
             foreach(var item in dlist)
             {
                 var fitem = new ForaIndexItemViewModel();
-                fitem.InjectFrom<FilterId>(item);
-                fitem.ThreadCount = await ControllerHelpers.GetThreadCountAsync(fitem.ForumId);
+                fitem.InjectFrom(item);
+                fitem.ThreadCount = await ControllerHelpers.GetThreadCountAsync(item, _data);
                 if(fitem.ThreadCount > 0)
-                    fitem.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(fitem.ForumId);
+                    fitem.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(item, _data);
 
                 fvm.ForaIndexItems.Add(fitem);
             }
@@ -42,7 +52,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Forum forum = await db.Forums.FindAsync(id);
+            Forum forum = await _data.Forums.FindAsync(id);
             if (forum == null)
             {
                 return HttpNotFound();
@@ -72,8 +82,8 @@ namespace JCarrollOnlineV2.Controllers
                 forum.InjectFrom(forumViewModel);
                 forum.CreatedAt = DateTime.Now;
                 forum.UpdatedAt = DateTime.Now;
-                db.Forums.Add(forum);
-                await db.SaveChangesAsync();
+                _data.Forums.Add(forum);
+                await _data.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
@@ -88,7 +98,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Forum forum = await db.Forums.FindAsync(id);
+            Forum forum = await _data.Forums.FindAsync(id);
             if (forum == null)
             {
                 return HttpNotFound();
@@ -106,8 +116,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(forum).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                _data.Entry(forum).State = EntityState.Modified;
+                await _data.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
             return View(forum);
@@ -121,7 +131,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Forum forum = await db.Forums.FindAsync(id);
+            Forum forum = await _data.Forums.FindAsync(id);
             if (forum == null)
             {
                 return HttpNotFound();
@@ -135,9 +145,9 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Forum forum = await db.Forums.FindAsync(id);
-            db.Forums.Remove(forum);
-            await db.SaveChangesAsync();
+            Forum forum = await _data.Forums.FindAsync(id);
+            _data.Forums.Remove(forum);
+            await _data.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
@@ -145,7 +155,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _data.Dispose();
             }
             base.Dispose(disposing);
         }

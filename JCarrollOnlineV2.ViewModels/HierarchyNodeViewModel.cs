@@ -22,5 +22,7 @@ namespace JCarrollOnlineV2.ViewModels
         
         [Required]
         public T Parent { get; set; }
+
+        public List<string> ImageList { get; set; }
     }
 }

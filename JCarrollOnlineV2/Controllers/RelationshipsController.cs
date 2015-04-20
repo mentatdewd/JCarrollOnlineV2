@@ -15,7 +15,17 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class RelationshipsController : Controller
     {
-        private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+        private IContext _data { get; set; }
+
+        public RelationshipsController() : this(null)
+        {
+
+        }
+
+        public RelationshipsController(IContext dataContext)
+        {
+            _data = dataContext ?? new JCarrollOnlineV2Db();
+        }
 
     //    // GET: Relationships
     //    public async Task<ActionResult> Index()

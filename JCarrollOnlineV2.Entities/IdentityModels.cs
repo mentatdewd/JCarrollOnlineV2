@@ -8,7 +8,7 @@ using JCarrollOnlineV2.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace JCarrollOnlineV2.ViewModels
+namespace JCarrollOnlineV2.Entities
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
@@ -20,23 +20,28 @@ namespace JCarrollOnlineV2.ViewModels
             // Add custom user claims here
             return userIdentity;
         }
+        // Navigation Property
         public virtual ICollection<ForumThreadEntry> ForumThreadEntries { get; set; }
 
         public virtual ICollection<Relationship> Follower { get; set; }
-
         public virtual ICollection<Relationship> Followed { get; set; }
     }
 
-    //public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-    //{
-    //    public ApplicationDbContext()
-    //        : base("DefaultConnection", throwIfV1Schema: false)
-    //    {
-    //    }
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    {
+        public ApplicationDbContext(string nameOrConnectionString)
+            : base(nameOrConnectionString)
+        {
+        }
+        
+        public ApplicationDbContext()
+            : base("DefaultConnection", throwIfV1Schema: false)
+        {
+        }
 
-    //    public static ApplicationDbContext Create()
-    //    {
-    //        return new ApplicationDbContext();
-    //    }
-    //}
+        public static ApplicationDbContext Create()
+        {
+            return new ApplicationDbContext();
+        }
+    }
 }

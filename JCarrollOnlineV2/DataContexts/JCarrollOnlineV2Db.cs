@@ -10,7 +10,7 @@ using JCarrollOnlineV2.Migrations;
 
 namespace JCarrollOnlineV2.DataContexts
 {
-    public class JCarrollOnlineV2Db : DbContext
+    public class JCarrollOnlineV2Db : DbContext, IContext
     {
         public JCarrollOnlineV2Db()
             : base("DefaultConnection")
@@ -24,14 +24,21 @@ namespace JCarrollOnlineV2.DataContexts
         }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-//#if !DEBUG
-//            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
-//#endif
+#if !DEBUG
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
+#endif
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<IdentityUserLogin>().HasKey<string>(l => l.UserId);
             modelBuilder.Entity<IdentityRole>().HasKey<string>(r => r.Id);
             modelBuilder.Entity<IdentityUserRole>().HasKey(r => new { r.RoleId, r.UserId });
+
+
+            //modelBuilder.Entity<ForumThreadEntry>()
+            //    .HasRequired<ApplicationUser>(s => s.Author)
+            //    .WithMany(t => t.ForumThreadEntries).HasForeignKey(m => m.AuthorId)
+            //.WillCascadeOnDelete(false);
+
         }
         public virtual DbSet<IdentityRole> Roles { get; set; }
         public virtual DbSet<ApplicationUser> Users { get; set; }
@@ -40,13 +47,9 @@ namespace JCarrollOnlineV2.DataContexts
         public virtual DbSet<IdentityUserRole> UserRoles { get; set; }
 
         public DbSet<Forum> Forums { get; set; }
-
         public DbSet<ForumModerator> ForumModerators { get; set; }
-
         public DbSet<ForumThreadEntry> ForumThreadEntries { get; set; }
-
         public DbSet<Micropost> Microposts { get; set; }
-
         public DbSet<Relationship> Relationships { get; set; }
     }
 }

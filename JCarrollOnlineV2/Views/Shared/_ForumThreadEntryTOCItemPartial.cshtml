@@ -1,7 +1,7 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.Entities
 @using JCarrollOnlineV2.HtmlHelperExtensions
-@model HierarchyNode<ForumThreadEntryTOCItemViewModel>
+@model HierarchyNodesViewModel<ForumThreadEntryDetailsItemViewModel>
 
 <td id="TOCTableData">
     @{
@@ -26,11 +26,11 @@
     }
     else
     {
-        @Html.ActionLink(Model.Entity.Title, "Details", "ForumThreadEntries", null, null, "post" + Model.Entity.PostNumber, new { forumId = Model.Entity.ForumId, forumThreadEntryId = Model.Entity.RootId }, null)
+        @Html.ActionLink(Model.Entity.Title, "Details", "ForumThreadEntries", null, null, "post" + Model.Entity.PostNumber, new { forumId = Model.Entity.Forum.Id, id = Model.Entity.RootId }, null)
     }
 </td>
 <td id="TOCTableData">
-    @Model.Entity.Author
+    @Model.Entity.Author.UserName
 </td>
 <td id="TOCTableData">
     @Model.Entity.CreatedAt

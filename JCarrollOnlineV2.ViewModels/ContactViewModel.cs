@@ -8,6 +8,5 @@ namespace JCarrollOnlineV2.ViewModels
 {
     public class ContactViewModel : ViewModelBase
     {
-        public string Message { get; set; }
     }
 }

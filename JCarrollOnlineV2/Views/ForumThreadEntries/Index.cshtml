@@ -3,43 +3,43 @@
 @model ForumThreadEntryIndexViewModel
 
 @{
-    Model.PageTitle = Model.ForumTitle;
+    Model.PageTitle = Model.Forum.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="text-center">@Model.ForumTitle</h1>
+<h1 class="text-center">@Model.Forum.Title</h1>
 
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Title)
+            @Html.DisplayNameFor(model => model.ForumThreadEntryIndex.First().Title)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Replies)
+            @Html.DisplayNameFor(model => model.ForumThreadEntryIndex.First().Replies)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Author)
+            @Html.DisplayNameFor(model => model.ForumThreadEntryIndex.First().Author)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().CreatedAt)
+            @Html.DisplayNameFor(model => model.ForumThreadEntryIndex.First().CreatedAt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().LastReply)
+            @Html.DisplayNameFor(model => model.ForumThreadEntryIndex.First().LastReply)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Recs)
+            @Html.DisplayNameFor(model => model.ForumThreadEntryIndex.First().Recs)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ForumThreadIndexEntries.First().Views)
+            @Html.DisplayNameFor(model => model.ForumThreadEntryIndex.First().Views)
         </th>
         <th></th>
     </tr>
 
-    @foreach (var item in Model.ForumThreadIndexEntries)
+    @foreach (var item in Model.ForumThreadEntryIndex)
     {
         <tr>
             <td>
-                @Html.ActionLink(item.Title, "Details", new { forumId = item.ForumId, forumThreadEntryId = item.ForumThreadEntryId })
+                @Html.ActionLink(item.Title, "Details", new { forumId = item.Forum.Id, id = item.Id })
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Replies)
@@ -63,5 +63,5 @@
     }
 </table>
 <p class="text-center">
-    @Html.ActionLink("Create New", "Create", "ForumThreadEntries", new { forumId = Model.ForumId }, new { @class = "btn btn-large btn-primary" })
+    @Html.ActionLink("Create New", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
 </p>

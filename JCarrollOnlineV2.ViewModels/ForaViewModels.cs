@@ -1,5 +1,4 @@
-﻿using JCarrollOnlineV2.Entities;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,10 +11,15 @@ namespace JCarrollOnlineV2.ViewModels
 {
     public class ForaViewModelBase : ViewModelBase
     {
-
+        public int Id { get; set; }
     }
 
-    public class ForumViewModel : ForaViewModelBase
+    public class ForaIndexViewModel : ForaViewModelBase
+    {
+        public List<ForaIndexItemViewModel> ForaIndexItems { get; set; }
+    }
+
+    public class ForaViewModel
     {
         [Required]
         public int Id { get; set; }
@@ -24,23 +28,19 @@ namespace JCarrollOnlineV2.ViewModels
         [StringLength(255)]
         public string Title { get; set; }
 
-        [Required]
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
-        [Required]
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; } // :null => false
 
-        [Required]
         [DataType(DataType.DateTime)]
         public DateTime UpdatedAt { get; set; } //:null => false
+
+        public List<ForumThreadEntryViewModel> ForumThreadEntries { get; set; }
+        public List<ForumModeratorsViewModel> ForumModerators { get; set; }
     }
 
-    public class ForaIndexViewModel : ForaViewModelBase
-    {
-        public List<ForaIndexItemViewModel> ForaIndexItems { get; set; }
-    }
 
     public class ForaIndexItemViewModel : ForaViewModelBase
     {
@@ -55,19 +55,34 @@ namespace JCarrollOnlineV2.ViewModels
 
         [Display(Name = "Last Thread")]
         public LastThreadViewModel LastThread { get; set; }
+    }
 
-        [Display(Name = "Forum Id")]
-        public int ForumId { get; set; }
+    public class ForaDetailsViewModel : ForaViewModelBase
+    {
+        [Required]
+        [StringLength(255)]
+        public string Title { get; set; }
+
+        [DataType(DataType.MultilineText)]
+        public string Description { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedAt { get; set; } // :null => false
+
+        [DataType(DataType.DateTime)]
+        public DateTime UpdatedAt { get; set; } //:null => false
+
+        public List<ForumThreadEntryViewModel> ForumThreadEntries { get; set; }
+        public List<ForumModeratorsViewModel> ForumModerators { get; set; }
     }
 
     public class LastThreadViewModel : ForaViewModelBase
     {
         public DateTime UpdatedAt { get; set; }
         public string Title { get; set; }
-        public int ForumId { get; set; }
         public int PostRoot { get; set; }
         public int PostNumber { get; set; }
-        public string Author { get; set; }
+        public ApplicationUserViewModel Author { get; set; }
     }
 
     public class ForaCreateViewModel : ForaViewModelBase

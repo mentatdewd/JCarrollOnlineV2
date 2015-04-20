@@ -18,12 +18,22 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class MicropostsController : Controller
     {
-        private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
+        private IContext _data { get; set; }
+
+        public MicropostsController() : this(null)
+        {
+
+        }
+
+        public MicropostsController(IContext dataContext)
+        {
+            _data = dataContext ?? new JCarrollOnlineV2Db();
+        }
 
         // GET: Microposts
         public async Task<ActionResult> Index()
         {
-            return View(await db.Microposts.ToListAsync());
+            return View(await _data.Microposts.ToListAsync());
         }
 
         // GET: Microposts/Details/5
@@ -33,7 +43,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Micropost micropost = await db.Microposts.FindAsync(id);
+            Micropost micropost = await _data.Microposts.FindAsync(id);
             if (micropost == null)
             {
                 return HttpNotFound();
@@ -61,8 +71,8 @@ namespace JCarrollOnlineV2.Controllers
                 domModel.CreatedAt = DateTime.Now;
                 domModel.UpdatedAt = DateTime.Now;
                 domModel.UserId = User.Identity.GetUserId();
-                db.Microposts.Add(domModel);
-                await db.SaveChangesAsync();
+                _data.Microposts.Add(domModel);
+                await _data.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");
             }
 
@@ -76,7 +86,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Micropost micropost = await db.Microposts.FindAsync(id);
+            Micropost micropost = await _data.Microposts.FindAsync(id);
             if (micropost == null)
             {
                 return HttpNotFound();
@@ -93,8 +103,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(micropost).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                _data.Entry(micropost).State = EntityState.Modified;
+                await _data.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
             return View(micropost);
@@ -107,7 +117,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Micropost micropost = await db.Microposts.FindAsync(id);
+            Micropost micropost = await _data.Microposts.FindAsync(id);
             if (micropost == null)
             {
                 return HttpNotFound();
@@ -120,9 +130,9 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Micropost micropost = await db.Microposts.FindAsync(id);
-            db.Microposts.Remove(micropost);
-            await db.SaveChangesAsync();
+            Micropost micropost = await _data.Microposts.FindAsync(id);
+            _data.Microposts.Remove(micropost);
+            await _data.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
@@ -130,7 +140,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _data.Dispose();
             }
             base.Dispose(disposing);
         }

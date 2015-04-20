@@ -15,11 +15,21 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class HomeController : Controller
     {
-        private JCarrollOnlineV2Db db = new JCarrollOnlineV2Db();
-        
+        private IContext _data { get; set; }
+
+        public HomeController() : this(null)
+        {
+        }
+
+        public HomeController(IContext dataContext = null)
+        {
+            _data = dataContext ?? new JCarrollOnlineV2Db();
+        }
+
         public async Task<ActionResult> Index()
         {
             HomeViewModel vm = new HomeViewModel();
+            vm.Message = "JCarrollOnlineV2 Home - Index";
             vm.MicropostCreateVM = new MicropostCreateViewModel();
             vm.MicropostFeedVM = new MicropostFeedViewModel();
             vm.UserStatsVM = new UserStatsViewModel();
@@ -27,9 +37,9 @@ namespace JCarrollOnlineV2.Controllers
 
             Task<RssFeedViewModel> rss = ControllerHelpers.UpdateRssAsync();
 
-            if (User.Identity.IsAuthenticated == true)
+            if (User !=  null && User.Identity.IsAuthenticated == true)
             {
-                var user = await db.Users.FindAsync(User.Identity.GetUserId());
+                var user = await _data.Users.FindAsync(User.Identity.GetUserId());
 
                 vm.UserInfoVM.InjectFrom(user);
 
@@ -37,15 +47,15 @@ namespace JCarrollOnlineV2.Controllers
 
                 vm.MicropostFeedVM.MicropostFeedItems = new List<MicropostFeedItemViewModel>();
 
-                var microposts = await db.Microposts.Include("FollowedIds").Where(m => m.UserId == userId).ToListAsync();
+                var microposts = await _data.Microposts.Include("FollowedIds").Where(m => m.UserId == userId).ToListAsync();
 
                 foreach (var item in microposts)
                 {
                     MicropostFeedItemViewModel itemVm = new MicropostFeedItemViewModel();
 
                     itemVm.InjectFrom(item);
-                    var emailTask = await db.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.Email = prevTask.Result.Email);
-                    var userNameTask = await db.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.UserName = prevTask.Result.UserName);
+                    var emailTask = await _data.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.Email = prevTask.Result.Email);
+                    var userNameTask = await _data.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.UserName = prevTask.Result.UserName);
                     
                     vm.MicropostFeedVM.MicropostFeedItems.Add(itemVm);
                 }
@@ -59,7 +69,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             AboutViewModel vm = new AboutViewModel();
 
-            vm.Message = "Your application description page.";
+            vm.Message = "About JCarrollOnlineV2";
             vm.PageContainer = "AboutPage";
             return View(vm);
         }
@@ -68,14 +78,15 @@ namespace JCarrollOnlineV2.Controllers
         {
             ContactViewModel vm = new ContactViewModel();
 
-            vm.Message = "Your contact page.";
+            vm.Message = "JCarrollOnlineV2 Contact";
             vm.PageContainer = "ContactPater";
             return View(vm);
         }
 
-        public ActionResult Welcome()
+        public async Task<ActionResult> Welcome()
         {
             HomeViewModel vm = new HomeViewModel();
+            vm.Message = "JCarrollOnlineV2 Home - Welcome";
             vm.PageContainer = "Welcome";
             if (Request.IsAuthenticated)
             {

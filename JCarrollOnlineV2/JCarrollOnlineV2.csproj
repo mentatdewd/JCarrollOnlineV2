@@ -244,6 +244,7 @@
     <Compile Include="Controllers\SandboxController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomLinqExtensions\LinqToObjectsExtensionMethods.cs" />
+    <Compile Include="DataContexts\IContext.cs" />
     <Compile Include="DataContexts\JCarrollOnlineV2Db.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Global.asax.cs">

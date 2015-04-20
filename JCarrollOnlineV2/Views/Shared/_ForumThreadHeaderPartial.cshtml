@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="userinfo">
-                    @Html.ActionLink(Model.Author, "Details", "Users", null, null, null, new { userId = Model.AuthorId }, null)
+                    @Html.ActionLink(Model.Author.UserName, "Details", "Users", null, null, null, new { userId = Model.Author.Id }, null)
                     @Html.Raw("(")
                     @Model.PostCount
                     @Html.Raw(" posts)")
@@ -30,7 +30,7 @@
                             {
                                 @Html.Raw("Response to ");
 
-                                @Html.ActionLink(Model.ParentAuthor + "(Reply #" + Model.ParentPostNumber + ")", "Details", "ForumThreadEntries", null, null, "post" + Model.ParentPostNumber, new { forumId = Model.ForumId, forumThreadEntryId = Model.RootId }, null);
+                                @Html.ActionLink(Model.ParentAuthor + "(Reply #" + Model.ParentPostNumber + ")", "Details", "ForumThreadEntries", null, null, "post" + Model.ParentPostNumber, new { forumId = Model.Forum.Id, id = Model.RootId }, null);
                             }
                         }
                         <div class="created_at">

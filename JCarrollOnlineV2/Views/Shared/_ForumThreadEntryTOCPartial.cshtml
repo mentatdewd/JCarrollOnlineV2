@@ -2,7 +2,7 @@
 @using JCarrollOnlineV2.Entities
 @using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.HtmlHelperExtensions
-@model ForumThreadEntryTOCItemsViewModel
+@model ForumThreadEntryDetailItemsViewModel
 
 <table id="TOCTable">
     <tr id="TOCTableRow">
@@ -10,15 +10,15 @@
             @Html.Raw(@Model.NumberOfReplies + " replies")
         </th>
         <th id="TOCTableHeader">
-            @Html.DisplayNameFor(model => model.ForumThreadEntriesToc.First().Entity.Author)
+            @Html.DisplayNameFor(model => model.ForumThreadEntries.First().Entity.Author)
         </th>
         <th id="TOCTableHeader">
-            @Html.DisplayNameFor(model => model.ForumThreadEntriesToc.First().Entity.CreatedAt)
+            @Html.DisplayNameFor(model => model.ForumThreadEntries.First().Entity.CreatedAt)
         </th>
         <th id="TOCTableHeader">
-            @Html.DisplayNameFor(model => model.ForumThreadEntriesToc.First().Entity.PostNumber)
+            @Html.DisplayNameFor(model => model.ForumThreadEntries.First().Entity.PostNumber)
         </th>
     </tr>
 
-    @Html.Raw(Html.HierarchicalListView1("forumTOCThreads", Model.ForumThreadEntriesToc, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadEntryTOCItemPartial", l)).ToString()))
+    @Html.Raw(Html.HierarchicalListView1("forumThreads", Model.ForumThreadEntries, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadEntryTOCItemPartial", l)).ToString()))
 </table>

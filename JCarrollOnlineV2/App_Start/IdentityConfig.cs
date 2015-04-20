@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
+﻿using JCarrollOnlineV2.DataContexts;
+using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using JCarrollOnlineV2.ViewModels;
-using JCarrollOnlineV2.DataContexts;
+using System;
 using System.Net.Mail;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2
 {
@@ -60,7 +57,7 @@ namespace JCarrollOnlineV2
         {
         }
 
-        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
+        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
             var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2Db>()));
             // Configure validation logic for usernames

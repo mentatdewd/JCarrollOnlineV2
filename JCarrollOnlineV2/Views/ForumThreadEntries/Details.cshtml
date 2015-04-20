@@ -5,7 +5,7 @@
 
 
 @{
-    Model.PageTitle = Model.ForumTitle;
+    Model.PageTitle = Model.Forum.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -14,6 +14,7 @@
 @Html.Partial("_ForumThreadPartial", Model.ForumThreadEntryDetailItems.ForumThreadEntries.First())
 @{
     <h2>Replies to this post</h2>
-@Html.Partial("_ForumThreadEntryTOCPartial", Model.ForumThreadEntryTOCItems)
+@*@Html.Partial("_ForumThreadEntryTOCPartial", Model.ForumThreadEntryTOCItems)*@
+    @Html.Partial("_ForumThreadEntryTOCPartial", Model.ForumThreadEntryDetailItems)
 }
 @Html.Raw(Html.TreeView("forumThreads", Model.ForumThreadEntryDetailItems.ForumThreadEntries.First().ChildNodes, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadPartial", l)).ToString()))

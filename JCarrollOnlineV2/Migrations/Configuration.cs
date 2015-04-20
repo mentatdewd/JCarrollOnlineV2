@@ -54,15 +54,15 @@ namespace JCarrollOnlineV2.Migrations
                 System.Diagnostics.Trace.WriteLine(string.Format("Added userId: {0}", userId));
             }
 
-            context.Forums.AddOrUpdate(x => x.ForumId,
+            context.Forums.AddOrUpdate(x => x.Id,
                 new Forum
                 {
-                    ForumId = 1,
+                    Id = 1,
                     Title = "Forum 1",
                     Description = "Forum 1 Description",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
-                    ForumThreads = new List<ForumThreadEntry> 
+                    ForumThreadEntries = new List<ForumThreadEntry> 
                     {
 #region Forum 1 Forum Thread 1
                         
@@ -94,14 +94,14 @@ namespace JCarrollOnlineV2.Migrations
                 },
                 new Forum
                 {
-                    ForumId = 2,
+                    Id = 2,
                     Title = "Forum 2",
                     Description = "Forum 2 Description",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
-                    ForumThreads = new List<ForumThreadEntry>
+                    ForumThreadEntries = new List<ForumThreadEntry>
                     {
-                        new ForumThreadEntry { ForumThreadEntryId = 2, RootId=2, Title = "Second Original Thread Entry", CreatedAt=DateTime.Now, UpdatedAt=DateTime.Now, PostNumber=1, Content=loremIpsum, AuthorId=userIds["User1"], ForumId=2}
+                        new ForumThreadEntry { Id = 2, RootId=2, Title = "Second Original Thread Entry", CreatedAt=DateTime.Now, UpdatedAt=DateTime.Now, PostNumber=1, Content=loremIpsum, Author=userIds["User1"], ForumId=2}
                     }
                 },
                 new Forum
