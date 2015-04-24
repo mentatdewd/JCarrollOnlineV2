@@ -2,7 +2,7 @@
 @model LastThreadViewModel
 
 @{
-    @Html.ActionLink(Model.Title, "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.Id, id = Model.PostRoot }, null);
+    @Html.ActionLink(Model.Title, "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.Forum.Id, id = Model.PostRoot }, null);
     @Html.Raw(" by " + Model.Author.UserName);
     @Html.Raw("<br>" + Model.UpdatedAt);
 }

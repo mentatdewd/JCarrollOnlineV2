@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.ViewModels
 {
@@ -28,12 +25,21 @@ namespace JCarrollOnlineV2.ViewModels
 
     public class MicropostFeedViewModel : MicropostViewModelBase
     {
+        public MicropostFeedViewModel()
+        {
+            MicropostFeedItems = new List<MicropostFeedItemViewModel>();
+        }
         public List<MicropostFeedItemViewModel> MicropostFeedItems { get; set; }
     }
 
     public class MicropostFeedItemViewModel : MicropostViewModelBase
     {
+        public MicropostFeedItemViewModel()
+        {
+            Author = new ApplicationUserViewModel();
+        }
+        public ApplicationUserViewModel Author { get; set; }
         public string Content { get; set; }
-        public string UserName { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

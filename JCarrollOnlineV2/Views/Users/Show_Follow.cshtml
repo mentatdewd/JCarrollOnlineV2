@@ -1,0 +1,45 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model UserDetailViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <aside class="col-md-4">
+            <section>
+                @Html.Partial("_UserInfoPartial", Model.UserInfoVM)
+            </section>
+            <section>
+                @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
+            </section>
+        </aside>
+        <aside class="col-md-4">
+            @{
+                <section>
+                    @Html.Raw("<h1>" + Model.PageTitle + "</h1>");
+                </section>
+                <section>
+                    <ul>
+                        @if (Model.PageTitle == "Following")
+                        {
+                            foreach (var user in Model.UserStatsVM.UsersFollowing.Users)
+                            {
+                                @Html.Partial("_UserInfoPartial", user)
+                            }
+                        }
+                        else
+                        {
+                            foreach (var user in Model.UserStatsVM.UserFollowers.Users)
+                            {
+                                @Html.Partial("_UserInfoPartial", user)
+                            }
+
+                        }
+                    </ul>
+                </section>
+            }
+        </aside>
+    </div>
+</div>

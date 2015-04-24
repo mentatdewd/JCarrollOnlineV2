@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
-using JCarrollOnlineV2.DataContexts;
+﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
-using Omu.ValueInjecter;
 using Microsoft.AspNet.Identity;
+using Omu.ValueInjecter;
+using System;
+using System.Data.Entity;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -70,7 +66,9 @@ namespace JCarrollOnlineV2.Controllers
                 domModel.InjectFrom(micropostVM);
                 domModel.CreatedAt = DateTime.Now;
                 domModel.UpdatedAt = DateTime.Now;
-                domModel.UserId = User.Identity.GetUserId();
+                string currentUserId = User.Identity.GetUserId();
+                ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
+                domModel.Author = currentUser;
                 _data.Microposts.Add(domModel);
                 await _data.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");

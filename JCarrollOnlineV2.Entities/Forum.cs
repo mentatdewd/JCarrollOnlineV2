@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.Entities
 {
@@ -22,9 +19,11 @@ namespace JCarrollOnlineV2.Entities
         public string Description { get; set; }
 
         [DataType(DataType.DateTime)]
+        [Required]
         public DateTime CreatedAt { get; set; } // :null => false
 
         [DataType(DataType.DateTime)]
+        [Required]
         public DateTime UpdatedAt { get; set; } //:null => false
 
         public virtual List<ForumThreadEntry> ForumThreadEntries { get; set; }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace JCarrollOnlineV2.ViewModels
@@ -17,7 +13,6 @@ namespace JCarrollOnlineV2.ViewModels
         public IEnumerable<HierarchyNodesViewModel<T>> ChildNodes { get; set; }
         
         [Required]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public int Depth { get; set; }
         
         [Required]

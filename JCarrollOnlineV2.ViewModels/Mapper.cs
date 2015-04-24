@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Omu.ValueInjecter;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Omu.ValueInjecter;
 
 namespace JCarrollOnlineV2.ViewModels
 {

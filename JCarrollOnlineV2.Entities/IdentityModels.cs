@@ -1,12 +1,8 @@
-﻿using System.Data.Entity;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Collections.Generic;
-using JCarrollOnlineV2.Entities;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.Entities
 {
@@ -23,8 +19,10 @@ namespace JCarrollOnlineV2.Entities
         // Navigation Property
         public virtual ICollection<ForumThreadEntry> ForumThreadEntries { get; set; }
 
-        public virtual ICollection<Relationship> Follower { get; set; }
-        public virtual ICollection<Relationship> Followed { get; set; }
+        public virtual ICollection<Micropost> Microposts { get; set; }
+
+        public virtual ICollection<ApplicationUser> Following { get; set; }
+        public virtual ICollection<ApplicationUser> Followers { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -35,7 +33,7 @@ namespace JCarrollOnlineV2.Entities
         }
         
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("JCarrollOnlineV2Connection", throwIfV1Schema: false)
         {
         }
 

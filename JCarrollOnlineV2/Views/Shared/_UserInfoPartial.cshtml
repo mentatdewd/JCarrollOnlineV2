@@ -2,21 +2,19 @@
 @using System.Web.Security
 @using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.HtmlHelperExtensions
-@model UserInfoViewModel
+@model UserItemViewModel
 
 <div class="user_info">
-    <a href='@Url.Action("Details", "Users", new { userId = Model.Id })' />
-    @{
-        @Html.Gravatar(Model.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" });
-    }
+    <a href='@Url.Action("Details", "Users", new { userId = Model.User.Id })' >
+        @Html.Gravatar(Model.User.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" });
     </a>
     <span class="user_name">
-        <h1>@User.Identity.Name</h1>
+        <h1>@Model.User.UserName</h1>
     </span>
     <span>
-        @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.Id }, null)
+        @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.User.Id }, null)
     </span>
     <span class="microposts" id="user_info">
-        @Html.Raw(Model.Microposts + " " + @Html.Pluralize(Model.Microposts, "Post"))
+        @Html.Raw(Model.MicropostsAuthored + " " + @Html.Pluralize(Model.MicropostsAuthored, "Post"))
     </span>
 </div>

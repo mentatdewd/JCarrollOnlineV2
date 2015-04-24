@@ -1,17 +1,9 @@
-﻿using JCarrollOnlineV2.DataContexts;
-using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.ViewModels;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.Design.PluralizationServices;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -41,10 +33,11 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             anchor.MergeAttributes(new RouteValueDictionary(htmlAttributes));
             return MvcHtmlString.Create(anchor.ToString());
         }
-        public static string Pluralize(this HtmlHelper html, int count, string word)
+        public static string Pluralize(this HtmlHelper html, int? count, string word)
         {
             string retWord = word;
-            if (count == 0 || count > 1)
+            var cnt = count ?? 0;
+            if (cnt == 0 || cnt > 1)
             {
                 PluralizationService ps = PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-us"));
                 retWord = ps.Pluralize(word);

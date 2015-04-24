@@ -1,8 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Omu.ValueInjecter;
 using System;
 using System.Collections.Generic;
@@ -137,6 +135,8 @@ namespace JCarrollOnlineV2
             ltvm.InjectFrom(fte);
             ltvm.Author = new ApplicationUserViewModel();
             ltvm.Author.InjectFrom(fte.Author);
+            ltvm.Forum = new ForaViewModel();
+            ltvm.Forum.InjectFrom(fte.Forum);
 
             bool rootNotFound = true;
             if (fte.ParentId != null)
@@ -200,6 +200,13 @@ namespace JCarrollOnlineV2
             return rssFeedVM;
         }
 
+        public static bool Following(ApplicationUser user, IContext data)
+        {
+            var result = data.Users
+                .Where(m => m.Following == user);
+
+            return result == null ? false : true;
+        }
     }
 
 }

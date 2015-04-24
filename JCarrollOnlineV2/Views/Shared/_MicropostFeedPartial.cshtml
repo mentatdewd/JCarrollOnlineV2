@@ -6,7 +6,7 @@
 @if (Model.MicropostFeedItems != null)
 {
     @Html.Raw("<ul>")
-    foreach (MicropostFeedItemViewModel micropost in Model.MicropostFeedItems)
+    foreach (MicropostFeedItemViewModel micropost in Model.MicropostFeedItems.OrderByDescending(i => i.CreatedAt))
     {
         @Html.Partial("_MicropostFeedItemPartial", micropost)
     }

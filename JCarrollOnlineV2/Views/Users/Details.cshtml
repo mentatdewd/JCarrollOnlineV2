@@ -6,5 +6,25 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-
+<div class="row">
+    <aside class="span4">
+        <div class="user_info">
+            <a href='@Url.Action("Details", "Users", new { userId = Model.User.Id })' />
+            @{
+                @Html.Gravatar(Model.User.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" });
+            }
+            <span class="user_name">
+                <h1 class="user_name">@Model.User.UserName</h1>
+            </span>
+            <section>
+                @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
+            </section>
+        </div>
+    </aside>
+    <div class="span4">
+        @Html.Partial("_FollowFormPartial", Model)
+    </div>
+    <div class="span4">
+        <h3>Moderated Forums</h3>
+    </div>
+</div>

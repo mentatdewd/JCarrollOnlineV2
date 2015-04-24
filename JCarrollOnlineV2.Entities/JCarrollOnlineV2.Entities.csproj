@@ -91,7 +91,6 @@
     <Compile Include="IdentityModels.cs" />
     <Compile Include="Micropost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Relationship.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

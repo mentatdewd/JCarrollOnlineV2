@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.ViewModels
 {
@@ -83,6 +78,7 @@ namespace JCarrollOnlineV2.ViewModels
         public int PostRoot { get; set; }
         public int PostNumber { get; set; }
         public ApplicationUserViewModel Author { get; set; }
+        public ForaViewModel Forum { get; set; }
     }
 
     public class ForaCreateViewModel : ForaViewModelBase

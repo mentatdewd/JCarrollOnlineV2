@@ -1,12 +1,8 @@
 ﻿using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.DataContexts
@@ -26,8 +22,6 @@ namespace JCarrollOnlineV2.DataContexts
         DbSet<ForumThreadEntry> ForumThreadEntries { get; set; }
 
         DbSet<Micropost> Microposts { get; set; }
-
-        DbSet<Relationship> Relationships { get; set; }
 
         int SaveChanges();
         Task<int> SaveChangesAsync();

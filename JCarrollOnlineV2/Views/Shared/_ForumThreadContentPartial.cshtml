@@ -3,7 +3,7 @@
 @model ForumThreadEntryDetailsItemViewModel
 
 <div class="gravataruser">
-    @Html.Gravatar(User.Identity.Name, 52, new { Title = "My Gravatar", Alt = "Gravatar" })
+    @Html.Gravatar(Model.Author.Email, 52, new { Title = "My Gravatar", Alt = "Gravatar" })
 </div>
 <div class="forum_thread_content">
     @Model.Content

@@ -1,23 +1,23 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.HtmlHelperExtensions
-@model UserIndexItemViewModel
+@model UserItemViewModel
 
 <li>
     <div class="user_item">
-        <a href='@Url.Action("Details", "Users", new { userId = Model.Id })'>
+        <a href='@Url.Action("Details", "Users", new { userId = Model.User.Id })'>
             @{
-                @Html.Gravatar(Model.Email, 52, new { Title = "My Gravatar", Alt = "Gravatar" });
+                @Html.Gravatar(Model.User.Email, 52, new { Title = "My Gravatar", Alt = "Gravatar" });
             }
         </a>
         <span>
-            @Html.ActionLink(Model.UserName, "Details", new { userId = Model.Id })
+            @Html.ActionLink(Model.User.UserName, "Details", new { userId = Model.User.Id })
         </span>
 
         @if (User.IsInRole("Administrator"))
         {
             @Html.Raw(" | ")
             <span>
-                @Html.ActionLink("Delete", "Delete", new { userId = Model.Id })
+                @Html.ActionLink("Delete", "Delete", new { userId = Model.User.Id })
             </span>
         }
     </div>

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.ViewModels;
+using Omu.ValueInjecter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using JCarrollOnlineV2.Entities;
 using System.Linq.Expressions;
-using Omu.ValueInjecter;
-using JCarrollOnlineV2.ViewModels;
 using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.Extensions
@@ -31,11 +30,12 @@ namespace JCarrollOnlineV2.Extensions
                 foreach (var item in dataModel)
                 {
                     HierarchyNodesViewModel<TView> hnvm = new HierarchyNodesViewModel<TView>();
-                    hnvm.ImageList = new List<string>();
-                    hnvm.ImageList.Add("/Content/images/reply-new.gif");
+                    //hnvm.ImageList = new List<string>();
+                    //hnvm.ImageList.Add("/Content/images/reply-new.gif");
+                    //hnvm.Parent = parent;
+                    //hnvm.Depth = item.Depth;
+                    hnvm.InjectFrom(item);
                     hnvm.Entity = new TView();
-                    hnvm.Parent = parent;
-                    hnvm.Depth = item.Depth;
                     hnvm.Entity.InjectFrom(item.Entity);
 
                     // Call injectordelegate here

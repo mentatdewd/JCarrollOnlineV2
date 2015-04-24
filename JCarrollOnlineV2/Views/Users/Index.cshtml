@@ -1,4 +1,5 @@
 ﻿@using JCarrollOnlineV2.ViewModels
+@using Microsoft.AspNet.Identity
 @model UsersIndexViewModel
 
 @{
@@ -10,7 +11,10 @@
     <ul>
         @foreach (var item in Model.Users)
         {
-            @Html.Partial("_UserItemPartial", item)
+            if (User.Identity.GetUserId() != item.User.Id)
+            {
+                @Html.Partial("_UserItemPartial", item)
+            }
         }
     </ul>
 </div>

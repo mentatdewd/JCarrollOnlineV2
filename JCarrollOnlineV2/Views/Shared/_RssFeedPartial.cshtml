@@ -4,7 +4,7 @@
 <h3> Mariners News </h3>
 
 <ul class="rss_ul">
-    @foreach (RssFeedItemViewModel rssItemVM in Model.RssFeedItems)
+    @foreach (RssFeedItemViewModel rssItemVM in Model.RssFeedItems.Take(10))
     {
         @Html.Partial("_RssFeedItemPartial", rssItemVM)
     }

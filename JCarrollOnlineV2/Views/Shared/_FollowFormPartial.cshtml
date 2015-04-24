@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNet.Identity
+@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2
+@model UserDetailViewModel
+
+@{
+    if(User.Identity.GetUserId() != Model.User.Id)
+    {
+        if(Model.UserStatsVM.UserFollowers.Users.Exists(x => x.User.Id == Model.CurrentUser.Id) == true)
+        {
+            @Html.Partial("_UnfollowPartial", Model.User)
+        }
+        else
+        {
+            @Html.Partial("_FollowPartial", Model.User)
+        }
+    }
+}
+@*@<div id="follow_form">
+    <% if current_user.following?(@user) %>
+    <%= render 'unfollow' %>
+    <% else %>
+    <%= render 'follow' %>
+    <% end %>
+</div>
+<% end %>*@

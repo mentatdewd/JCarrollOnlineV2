@@ -1,15 +1,15 @@
-﻿using JCarrollOnlineV2;
-using JCarrollOnlineV2.DataContexts;
+﻿using JCarrollOnlineV2.DataContexts;
+using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
 using Omu.ValueInjecter;
-using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
-using System.Data.Entity;
+using PagedList;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -17,7 +17,8 @@ namespace JCarrollOnlineV2.Controllers
     {
         private IContext _data { get; set; }
 
-        public HomeController() : this(null)
+        public HomeController()
+            : this(null)
         {
         }
 
@@ -33,31 +34,49 @@ namespace JCarrollOnlineV2.Controllers
             vm.MicropostCreateVM = new MicropostCreateViewModel();
             vm.MicropostFeedVM = new MicropostFeedViewModel();
             vm.UserStatsVM = new UserStatsViewModel();
-            vm.UserInfoVM = new UserInfoViewModel();
+            vm.UserInfoVM = new UserItemViewModel();
+
+            vm.UserStatsVM.UserFollowers = new UserFollowersViewModel();
+            vm.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
 
             Task<RssFeedViewModel> rss = ControllerHelpers.UpdateRssAsync();
 
-            if (User !=  null && User.Identity.IsAuthenticated == true)
+            if (User != null && User.Identity.IsAuthenticated == true)
             {
-                var user = await _data.Users.FindAsync(User.Identity.GetUserId());
+                string currentUserId = User.Identity.GetUserId();
+                ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(u => u.Id == currentUserId);
 
-                vm.UserInfoVM.InjectFrom(user);
-
-                var userId = User.Identity.GetUserId();
-
-                vm.MicropostFeedVM.MicropostFeedItems = new List<MicropostFeedItemViewModel>();
-
-                var microposts = await _data.Microposts.Include("FollowedIds").Where(m => m.UserId == userId).ToListAsync();
-
-                foreach (var item in microposts)
+                vm.UserInfoVM.User.InjectFrom(user);
+                vm.UserInfoVM.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == currentUserId).Select(u => u.Microposts).CountAsync();
+                vm.UserStatsVM.User.InjectFrom(user);
+               
+                foreach(ApplicationUser item in user.Following)
                 {
-                    MicropostFeedItemViewModel itemVm = new MicropostFeedItemViewModel();
+                    UserItemViewModel uivm = new UserItemViewModel();
+                    uivm.InjectFrom(item);
+                    vm.UserStatsVM.UsersFollowing.Users.Add(uivm);
 
-                    itemVm.InjectFrom(item);
-                    var emailTask = await _data.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.Email = prevTask.Result.Email);
-                    var userNameTask = await _data.Users.FindAsync(item.UserId).ContinueWith((prevTask) => itemVm.UserName = prevTask.Result.UserName);
-                    
-                    vm.MicropostFeedVM.MicropostFeedItems.Add(itemVm);
+                    foreach(var micropost in item.Microposts)
+                    {
+                        MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
+                        mpVM.InjectFrom(micropost);
+                        mpVM.Author.InjectFrom(micropost.Author);
+                        vm.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
+                    }
+                }
+                foreach(var item in user.Followers)
+                {
+                    UserItemViewModel uivm = new UserItemViewModel();
+                    uivm.InjectFrom(item);
+                    uivm.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
+                    vm.UserStatsVM.UserFollowers.Users.Add(uivm);
+                }
+                foreach(var micropost in user.Microposts)
+                {
+                    MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
+                    mpVM.InjectFrom(micropost);
+                    mpVM.Author.InjectFrom(micropost.Author);
+                    vm.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
                 }
                 vm.RssFeedVM = await rss;
             }
@@ -97,5 +116,5 @@ namespace JCarrollOnlineV2.Controllers
                 return View("Welcome", "_LayoutWelcome", vm);
             }
         }
-   }
+    }
 }

@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
-using JCarrollOnlineV2.DataContexts;
+﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.Extensions;
 using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
-using JCarrollOnlineV2.Extensions;
 using Omu.ValueInjecter;
-using JCarrollOnlineV2;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -36,7 +33,6 @@ namespace JCarrollOnlineV2.Controllers
         {
             viewModel.Author = new ApplicationUserViewModel();
             viewModel.Author.InjectFrom(domModel.Author);
-            viewModel.Author.Id = domModel.Author.Id;
             viewModel.Forum = new ForaViewModel();
             viewModel.Forum.InjectFrom(domModel.Forum);
             if(domModel.ParentId != null)
@@ -54,6 +50,8 @@ namespace JCarrollOnlineV2.Controllers
             Forum forum = _data.Forums.Find(forumId);
             fvm.Forum = new ForaViewModel();
             fvm.Forum.InjectFrom(forum);
+
+            var forumThreads = _data.ForumThreadEntries.ToList();
 
             // Create the view model
             fvm.ForumThreadEntryIndex = new List<ForumThreadEntryIndexItemViewModel>();
@@ -81,14 +79,12 @@ namespace JCarrollOnlineV2.Controllers
         public async Task<ActionResult> Details(int forumId, int id)
         {
             // Retreive the Detail data
-            var d2 = new IEnumerableExtensions.InjectorDelegate<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(DetailItemInjector);
-            IEnumerable<HierarchyNodesViewModel<ForumThreadEntryDetailsItemViewModel>> fteHierarchy = await _data.ForumThreadEntries.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(d2);
+            var detailItemInjector = new IEnumerableExtensions.InjectorDelegate<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(DetailItemInjector);
 
             // Create the details view model
             ForumThreadEntryDetailsViewModel vm = new ForumThreadEntryDetailsViewModel();
             vm.ForumThreadEntryDetailItems = new ForumThreadEntryDetailItemsViewModel();
-            vm.ForumThreadEntryDetailItems.ForumThreadEntries = fteHierarchy;
-
+            vm.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntries.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
 
             vm.Forum = new ForaDetailsViewModel();
             vm.Forum.InjectFrom(_data.Forums.Find(forumId));

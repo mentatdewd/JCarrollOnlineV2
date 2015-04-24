@@ -4,6 +4,6 @@
 @model UserStatsViewModel
 
 <div class="stats">
-    @Html.MultiLineActionLink(Model.Following + "<br/>following", "Following", "Users", new { userId = User.Identity.GetUserId() }, null)
-    @Html.MultiLineActionLink(Model.Followed + "<br/>followed", "Followed", "Users", new { userId = User.Identity.GetUserId() }, null)
+    @Html.MultiLineActionLink(Model.UsersFollowing.Users.Count() + "<br/>following", "Following", "Users", new { userId = Model.User.Id }, null)
+    @Html.MultiLineActionLink(Model.UserFollowers.Users.Count() + "<br/>followers", "Followed", "Users", new { userId = Model.User.Id }, null)
 </div>

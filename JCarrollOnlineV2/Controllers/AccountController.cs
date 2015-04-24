@@ -16,7 +16,6 @@ namespace JCarrollOnlineV2.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private IContext _data;
 
         public AccountController()
         {
