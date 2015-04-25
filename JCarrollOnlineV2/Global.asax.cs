@@ -17,23 +17,23 @@ namespace JCarrollOnlineV2
 {
     public class MvcApplication : System.Web.HttpApplication
     {
-        const string adminRole = "Administrator";
-        string[] adminName = new string[1];
-        private bool AddRoleAndUser()
-        {
-            adminName[0] = "John";
-            JCarrollOnlineV2Db context = new JCarrollOnlineV2Db();
-            var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
-            var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
+        //const string adminRole = "Administrator";
+        //string[] adminName = new string[1];
+        //private bool AddRoleAndUser()
+        //{
+        //    adminName[0] = "John";
+        //    JCarrollOnlineV2Db context = new JCarrollOnlineV2Db();
+        //    var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+        //    var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
 
-            if (!Roles.RoleExists(adminRole))
-            {
-                Roles.CreateRole(adminRole);
-                Roles.AddUsersToRole(adminName, adminRole);
-            }
+        //    if (!Roles.RoleExists(adminRole))
+        //    {
+        //        Roles.CreateRole(adminRole);
+        //        Roles.AddUsersToRole(adminName, adminRole);
+        //    }
             
-            return true;
-        }
+        //    return true;
+        //}
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -41,7 +41,7 @@ namespace JCarrollOnlineV2
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            AddRoleAndUser();
+            //AddRoleAndUser();
         }
     }
 }

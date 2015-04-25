@@ -31,8 +31,26 @@ namespace JCarrollOnlineV2.Migrations
             AutomaticMigrationDataLossAllowed = true;
         }
 
+        const string adminRole = "Administrator";
+        string[] adminName = new string[1];
+        private bool AddRoleAndUser(DbContext context)
+        {
+            adminName[0] = "John";
+            //JCarrollOnlineV2Db context = new JCarrollOnlineV2Db();
+            var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+            var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
+
+            if (!Roles.RoleExists(adminRole))
+            {
+                Roles.CreateRole(adminRole);
+                Roles.AddUsersToRole(adminName, adminRole);
+            }
+
+            return true;
+        }
         protected override void Seed(JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db context)
         {
+            AddRoleAndUser(context);
             //System.Diagnostics.Debugger.Launch();
 #if DEBUG
 
