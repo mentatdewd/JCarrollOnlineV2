@@ -8,6 +8,7 @@ using JCarrollOnlineV2.DataContexts;
 using System.Data.Entity.Migrations;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
+using System.Web.Security;
 
 namespace JCarrollOnlineV2.Migrations
 {
@@ -19,6 +20,7 @@ namespace JCarrollOnlineV2.Migrations
         public string Email { get; set; }
         public List<string> Roles { get; set; }
     }
+
 
     internal sealed class Configuration : DbMigrationsConfiguration<JCarrollOnlineV2Db>
     {
@@ -32,7 +34,9 @@ namespace JCarrollOnlineV2.Migrations
 
         protected override void Seed(JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db context)
         {
-#if DEBUG
+            //System.Diagnostics.Debugger.Launch();
+#if !DEBUG
+
             // Deletes all data, from all tables, except for __MigrationHistory
             context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
             context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
@@ -40,7 +44,6 @@ namespace JCarrollOnlineV2.Migrations
             context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
             context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
 
-            System.Diagnostics.Debugger.Launch();
             List<ApplicationUser> users = new List<ApplicationUser>();
 
             for (int i = 0; i < 4; i++)
@@ -65,7 +68,7 @@ namespace JCarrollOnlineV2.Migrations
                     UpdatedAt = DateTime.Now,
                     ForumThreadEntries = new List<ForumThreadEntry> 
                     {
-#region Forum 1 Forum Thread 1
+            #region Forum 1 Forum Thread 1
                         
                         new ForumThreadEntry { Id = 0, RootId=0, Title = "ThreadId = 0, ParentId = null", CreatedAt=DateTime.Now, UpdatedAt=DateTime.Now, PostNumber = 1, Content=loremIpsum, Author=users[0]},
                         new ForumThreadEntry { Id = 4, RootId=0, Title = "ThreadId = 4, ParentId = 0", ParentId = 0, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now, PostNumber= 3, Content=loremIpsum, Author=users[1]},
@@ -86,10 +89,10 @@ namespace JCarrollOnlineV2.Migrations
                         new ForumThreadEntry { Id = 16, RootId=0, Title = "ThreadId = 16, ParentId = 8", ParentId = 8, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now, PostNumber=14, Content=loremIpsum, Author=users[1]},
                         new ForumThreadEntry { Id = 17, RootId=0, Title = "ThreadId = 17, ParentId = 8", ParentId = 8, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now, PostNumber=15, Content=loremIpsum, Author=users[2]},
 #endregion
-#region Forum 1 Forum Thread 2
+            #region Forum 1 Forum Thread 2
                         new ForumThreadEntry { Id = 18, RootId=18, Title = "Second Original Thread Entry", CreatedAt=DateTime.Now, UpdatedAt=DateTime.Now, PostNumber= 1, Content=loremIpsum, Author=users[3]},
                         new ForumThreadEntry { Id = 19, RootId=18, Title = "First child of Second Original Thread Entry", ParentId = 18, CreatedAt=DateTime.Now, UpdatedAt=DateTime.Now, PostNumber=2, Content=loremIpsum, Author=users[0]}
-#endregion
+            #endregion
                     }
 
                 },
