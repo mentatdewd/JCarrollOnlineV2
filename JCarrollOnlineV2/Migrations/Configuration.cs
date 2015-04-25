@@ -29,13 +29,12 @@ namespace JCarrollOnlineV2.Migrations
         {
             AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = true;
-            //CheckForPendingMigrations(this);
         }
 
         protected override void Seed(JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db context)
         {
             //System.Diagnostics.Debugger.Launch();
-#if !DEBUG
+#if DEBUG
 
             // Deletes all data, from all tables, except for __MigrationHistory
             context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
