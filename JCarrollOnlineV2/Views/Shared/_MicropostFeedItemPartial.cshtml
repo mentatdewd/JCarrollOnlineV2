@@ -9,13 +9,13 @@
     <span class="gravatar">
         <a href='@Url.Action("Details", "Users", new { userId =  Model.Author.Id })' />
         @{
-            @Html.Gravatar(Model.Author.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" });
+            @Html.Gravatar(Model.Author.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" })
         }
         </a>
     </span>
     <div class="micropost">
         <span class="user">
-            @Html.ActionLink(@Model.Author.UserName, "Details", new { userId = Model.Author.Id });
+            @Html.ActionLink(@Model.Author.UserName, "Details", new { userId = Model.Author.Id })
         </span>
 
 
