@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using JCarrollOnlineV2.DataContexts;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -25,21 +26,21 @@ namespace JCarrollOnlineV2.Entities
         public virtual ICollection<ApplicationUser> Followers { get; set; }
     }
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-    {
-        public ApplicationDbContext(string nameOrConnectionString)
-            : base(nameOrConnectionString)
-        {
-        }
+    //public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IContext
+    //{
+    //    public ApplicationDbContext(string nameOrConnectionString)
+    //        : base(nameOrConnectionString)
+    //    {
+    //    }
         
-        public ApplicationDbContext()
-            : base("JCarrollOnlineV2Connection", throwIfV1Schema: false)
-        {
-        }
+    //    public ApplicationDbContext()
+    //        : base("JCarrollOnlineV2Connection", throwIfV1Schema: false)
+    //    {
+    //    }
 
-        public static ApplicationDbContext Create()
-        {
-            return new ApplicationDbContext();
-        }
-    }
+    //    public static ApplicationDbContext Create()
+    //    {
+    //        return new ApplicationDbContext();
+    //    }
+    //}
 }

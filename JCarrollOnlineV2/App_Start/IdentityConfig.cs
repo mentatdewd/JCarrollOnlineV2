@@ -59,6 +59,7 @@ namespace JCarrollOnlineV2
 
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
+            var cnt = context.Get<JCarrollOnlineV2Db>();
             var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2Db>()));
             // Configure validation logic for usernames
             manager.UserValidator = new UserValidator<ApplicationUser>(manager)

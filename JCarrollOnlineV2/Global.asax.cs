@@ -1,4 +1,5 @@
 ﻿using JCarrollOnlineV2.DataContexts;
+using JCarrollOnlineV2.Entities;
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -62,7 +63,7 @@ namespace JCarrollOnlineV2
                         }
                     }
 
-                    WebSecurity.InitializeDatabaseConnection("DefaultConnection", "UserProfile", "UserId", "UserName", autoCreateTables: true);
+                    WebSecurity.InitializeDatabaseConnection("JCarrollOnlineV2Connection", "ApplicationUsers", "Id", "UserName", autoCreateTables: true);
                 }
                 catch (Exception ex)
                 {

@@ -88,6 +88,7 @@
     <Compile Include="ForumModerator.cs" />
     <Compile Include="ForumThreadEntry.cs" />
     <Compile Include="HierarchyNode.cs" />
+    <Compile Include="IContext.cs" />
     <Compile Include="IdentityModels.cs" />
     <Compile Include="Micropost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
