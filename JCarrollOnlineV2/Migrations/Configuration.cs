@@ -45,12 +45,11 @@ namespace JCarrollOnlineV2.Migrations
                 Roles.CreateRole(adminRole);
                 Roles.AddUsersToRole(adminName, adminRole);
             }
-
             return true;
         }
         protected override void Seed(JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db context)
         {
-            //AddRoleAndUser(context);
+            AddRoleAndUser(context);
             //System.Diagnostics.Debugger.Launch();
 #if DEBUG
 
