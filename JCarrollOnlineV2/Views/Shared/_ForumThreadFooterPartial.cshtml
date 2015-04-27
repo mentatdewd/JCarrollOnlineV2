@@ -9,21 +9,21 @@
                 @Html.ActionLink("Back to top", "Details", "ForumThreadEntries", null, null, "post1", new { forumId = Model.Forum.Id, id = Model.RootId }, null)
             </div>
             <div class="col-md-6">
-                @if (User.Identity.GetUserId() != null)
-                {
-                    <div class="threadinfo">
-                        @if (Model.Author.Id == User.Identity.GetUserId())
+                <div class="threadinfo">
+                    @if (User.Identity.GetUserId() != null)
+                    {
+                        if (Model.Author.Id == User.Identity.GetUserId())
                         {
                             <div>
                                 @Html.ActionLink("Edit", "Edit", "ForumThreadEntries", new { id = Model.Id }, null)
                             </div>
                         }
-                        <div>
-                            @Html.ActionLink("Reply", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id, parentId = Model.Id, rootId = Model.RootId }, null)
-                        </div>
+                    }
+                    <div>
+                        @Html.ActionLink("Reply", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id, parentId = Model.Id, rootId = Model.RootId }, null)
                     </div>
-                }
+                </div>
+                </div>
             </div>
-        </div>
-    </footer>
-</div>
+        </footer>
+    </div>

@@ -42,7 +42,7 @@ namespace JCarrollOnlineV2
 
         public static async Task<int> GetThreadCountAsync(Forum forum, IContext data)
         {
-                //return await data.ForumThreadEntries.Where(i => i.ForumId == forumId && i.ParentId == null).CountAsync();
+            //return await data.ForumThreadEntries.Where(i => i.ForumId == forumId && i.ParentId == null).CountAsync();
             return await data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync();
         }
 
@@ -132,22 +132,27 @@ namespace JCarrollOnlineV2
                 .OrderByDescending(i => i.UpdatedAt)
                 .FirstOrDefaultAsync();
 
-            ltvm.InjectFrom(fte);
-            ltvm.Author = new ApplicationUserViewModel();
-            ltvm.Author.InjectFrom(fte.Author);
-            ltvm.Forum = new ForaViewModel();
-            ltvm.Forum.InjectFrom(fte.Forum);
+            if (fte != null)
+            {
+                ltvm.InjectFrom(fte);
+                ltvm.Author = new ApplicationUserViewModel();
+                ltvm.Author.InjectFrom(fte.Author);
+                ltvm.Forum = new ForaViewModel();
+                ltvm.Forum.InjectFrom(fte.Forum);
 
-            bool rootNotFound = true;
-            if (fte.ParentId != null)
-                while (rootNotFound)
-                {
-                    fte = await data.ForumThreadEntries.FindAsync(fte.ParentId);
-                    if (fte.ParentId == null)
-                        rootNotFound = false;
-                }
-            ltvm.PostRoot = fte.Id;
-            return ltvm;
+                bool rootNotFound = true;
+                if (fte.ParentId != null)
+                    while (rootNotFound)
+                    {
+                        fte = await data.ForumThreadEntries.FindAsync(fte.ParentId);
+                        if (fte != null)
+                            if (fte.ParentId == null)
+                                rootNotFound = false;
+                    }
+                ltvm.PostRoot = fte.Id;
+                return ltvm;
+            }
+            return null;
         }
 
         public static ApplicationUser GetParentAuthor(int? parentId, IContext data)

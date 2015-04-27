@@ -76,9 +76,11 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: ForumOriginalPost/Details/5
-        public async Task<ActionResult> Details(int forumId, int id)
+        public async Task<ActionResult> Details(int forumId, int? id)
         {
             // Retreive the Detail data
+            if (id == null)
+                return RedirectToAction("index", new { forumId = forumId });
             var detailItemInjector = new IEnumerableExtensions.InjectorDelegate<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(DetailItemInjector);
 
             // Create the details view model
