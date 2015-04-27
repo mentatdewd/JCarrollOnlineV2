@@ -23,6 +23,8 @@ namespace JCarrollOnlineV2
 
             var jqueryBundle = new ScriptBundle("~/bundles/jquery");
             jqueryBundle.Include("~/Scripts/jquery-{version}.js");
+            jqueryBundle.Include("~/Scripts/moment.js");
+            jqueryBundle.Include("~/Scripts/livestamp.js");
             jqueryBundle.Transforms.Add(jsTransformer);
             jqueryBundle.Orderer = nullOrderer;
             bundles.Add(jqueryBundle);

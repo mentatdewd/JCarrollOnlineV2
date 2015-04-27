@@ -7,7 +7,8 @@
     <meta name="description" content="JCarrollOnlineV2 Website" />
     @Styles.Render("~/bundles/css")
     @Scripts.Render("~/bundles/modernizr")
-
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -40,8 +41,6 @@
             @Html.Partial("_FooterPartial")
         </div>
 
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
         @RenderSection("scripts", required: false)
     </div>
 </body>

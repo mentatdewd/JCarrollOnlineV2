@@ -1,8 +1,12 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @model RssFeedViewModel
 
-<h3> Mariners News </h3>
-
+<section>
+    <row>
+        <img src="~/Content/images/feed-icon-28x28.png" class="rsslogo"/>
+        <h3> Mariners News </h3>
+    </row>
+</section>
 <ul class="rss_ul">
     @foreach (RssFeedItemViewModel rssItemVM in Model.RssFeedItems.Take(10))
     {

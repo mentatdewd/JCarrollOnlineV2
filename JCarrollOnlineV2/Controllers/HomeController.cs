@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using PagedList;
+using System;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -61,6 +62,7 @@ namespace JCarrollOnlineV2.Controllers
                         MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
                         mpVM.InjectFrom(micropost);
                         mpVM.Author.InjectFrom(micropost.Author);
+                        mpVM.TimeAgo = mpVM.CreatedAt.ToUniversalTime().ToString("o");
                         vm.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
                     }
                 }
@@ -76,6 +78,7 @@ namespace JCarrollOnlineV2.Controllers
                     MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
                     mpVM.InjectFrom(micropost);
                     mpVM.Author.InjectFrom(micropost.Author);
+                    mpVM.TimeAgo = mpVM.CreatedAt.ToUniversalTime().ToString("o");
                     vm.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
                 }
                 vm.RssFeedVM = await rss;

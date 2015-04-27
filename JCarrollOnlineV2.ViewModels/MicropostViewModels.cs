@@ -41,5 +41,6 @@ namespace JCarrollOnlineV2.ViewModels
         public ApplicationUserViewModel Author { get; set; }
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string TimeAgo { get; set; }
     }
 }

@@ -3,7 +3,9 @@
 @using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.HtmlHelperExtensions
 @model MicropostFeedItemViewModel
-
+<script src="jquery.js"></script>
+<script src="moment.js"></script>
+<script src="livestamp.js"></script>
 
 <li class="micropost">
     <span class="gravatar">
@@ -23,6 +25,7 @@
             @Model.Content
         </span>
         <span class="timestamp">
+            Posted <span data-livestamp="@Model.TimeAgo"></span>
         </span>
     </div>
 </li>

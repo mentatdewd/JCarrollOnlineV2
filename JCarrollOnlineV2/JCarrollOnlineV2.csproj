@@ -317,6 +317,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\images\Deception_Pass_Bridge_in_fog.jpg" />
     <Content Include="Content\images\Deception_Pass_Bridge_in_fog2.jpg" />
+    <Content Include="Content\images\feed-icon-28x28.png" />
     <Content Include="Content\images\reply-new.gif" />
     <Content Include="Content\images\reply-old.gif" />
     <Content Include="Content\images\rtable-fork.gif" />
@@ -403,6 +404,7 @@
     <Content Include="Content\bootstrap\alerts.less" />
     <Content Include="ClassDiagram1.cd" />
     <Content Include="ClassDiagram2.cd" />
+    <Content Include="Content\games\WebPlayer.unity3d" />
     <None Include="Scripts\jquery-2.1.3.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -414,7 +416,9 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\livestamp.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
