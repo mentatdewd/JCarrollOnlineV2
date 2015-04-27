@@ -50,7 +50,7 @@ namespace JCarrollOnlineV2.Migrations
         protected override void Seed(JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db context)
         {
            AddRoleAndUser(context);
- #if !DEBUG
+ #if DEBUG
             //System.Diagnostics.Debugger.Launch();
 
             // Deletes all data, from all tables, except for __MigrationHistory
