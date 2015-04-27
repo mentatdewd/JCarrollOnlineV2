@@ -5,21 +5,18 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1><title>Unity Web Player | 3dViewer</title></h1>
+<title>Unity Web Player | 3dViewer</title>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | 3dViewer</title>
     <script type='text/javascript' src='https://ssl-webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/jquery.min.js'></script>
     <script type="text/javascript">
-		<!--
 		var unityObjectUrl = "http://webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/UnityObject2.js";
 		if (document.location.protocol == 'https:')
 			unityObjectUrl = unityObjectUrl.replace("http://", "https://ssl-");
 		document.write('<script type="text\/javascript" src="' + unityObjectUrl + '"><\/script>');
-		-->
     </script>
     <script type="text/javascript">
-		<!--
 			var config = {
 				width: 960,
 				height: 600,
@@ -62,9 +59,8 @@
 						break;
 					}
 				});
-				u.initPlugin(jQuery("#unityPlayer")[0], "/games/WebPlayer.unity3d");
+				u.initPlugin(jQuery("#unityPlayer")[0], "@Url.Content("~/Content/games/WebPlayer.unity3d")");
 			});
-		-->
     </script>
     <style type="text/css">
         <!--
