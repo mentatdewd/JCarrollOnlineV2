@@ -11,6 +11,7 @@ namespace JCarrollOnlineV2.Entities
         [StringLength(255)]
         public string Title { get; set; }
 
+        [DataType(DataType.MultilineText)]
         public string Content { get; set; }
 
         public bool Locked { get; set; }

@@ -140,6 +140,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string Title { get; set; }
 
         [Display(Name = "Content")]
+        [DataType(DataType.MultilineText)]
         public string Content { get; set; }
 
         [Display(Name = "Author")]
