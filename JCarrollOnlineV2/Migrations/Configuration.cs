@@ -49,6 +49,7 @@ namespace JCarrollOnlineV2.Migrations
         }
         protected override void Seed(JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db context)
         {
+           AddRoleAndUser(context);
  #if !DEBUG
             //System.Diagnostics.Debugger.Launch();
 
@@ -58,9 +59,6 @@ namespace JCarrollOnlineV2.Migrations
             context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
             context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
             context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
-#endif
-#if DEBUG
-           AddRoleAndUser(context);
             List<ApplicationUser> users = new List<ApplicationUser>();
 
             for (int i = 0; i < 4; i++)
