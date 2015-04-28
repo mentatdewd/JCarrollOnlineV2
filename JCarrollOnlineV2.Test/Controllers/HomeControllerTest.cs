@@ -28,17 +28,17 @@ namespace JCarrollOnlineV2.Tests.Controllers
             Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.Message);
         }
 
-        [TestMethod]
-        public async Task IndexWithOutUser()
-        {
-            HomeController controller = new HomeController();
+        //[TestMethod]
+        //public async Task IndexWithOutUser()
+        //{
+        //    HomeController controller = new HomeController();
 
-            var result = await controller.Welcome() as ViewResult;
-            HomeViewModel vm = (HomeViewModel)result.Model;
+        //    var result = await controller.Welcome() as ViewResult;
+        //    HomeViewModel vm = (HomeViewModel)result.Model;
 
-            Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.PageTitle);
+        //    Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.PageTitle);
 
-        }
+        //}
 
         [TestMethod]
         public void About()
