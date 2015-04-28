@@ -17,21 +17,6 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 	/// </summary>
     public static partial class MarkdownHelper
     {
-        //static Markdown markdownTransformer = new Markdown();
-
-        ///// <summary>
-        ///// Static constructor to set MarkdownHelper options.
-        ///// </summary>
-        //static MarkdownHelper()
-        //{
-        //    // Override code formatting to support syntax highlighting.
-        //    markdownTransformer.FormatCodeBlock = FormatCodeBlock;
-        //}	
-        /// <summary>
-        /// <summary>
-        /// Overrides the Markdown formatting for code blocks to inject "prettyprint" classes for syntax highlighting.
-        /// </summary>
-
         public static string Language { get; set; }
 
         public static string FormatCodeBlock(Markdown md, string code)
