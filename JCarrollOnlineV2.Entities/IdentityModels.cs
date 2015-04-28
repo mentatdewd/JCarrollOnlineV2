@@ -24,6 +24,8 @@ namespace JCarrollOnlineV2.Entities
 
         public virtual ICollection<ApplicationUser> Following { get; set; }
         public virtual ICollection<ApplicationUser> Followers { get; set; }
+
+        public virtual ICollection<Blog> BlogItems { get; set; }
     }
 
     //public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IContext

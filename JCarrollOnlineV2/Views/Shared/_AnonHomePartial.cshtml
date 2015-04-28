@@ -1,0 +1,13 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model AnonHomePageViewModel
+
+<div class="container">
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <aside class="col-md-4">
+
+        </aside>
+        <section>
+            @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
+        </section>
+    </div>
+</div>

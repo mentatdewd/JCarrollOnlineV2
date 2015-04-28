@@ -10,6 +10,7 @@ namespace JCarrollOnlineV2.ViewModels
         public UserItemViewModel UserInfoVM { get; set; }
         public RssFeedViewModel RssFeedVM { get; set; }
         public int Microposts { get; set; }
+        public BlogFeedViewModel BlogFeed { get; set; }
 
         public int? MicropostPage { get; set; }
         public List<MicropostFeedItemViewModel> OnePageOfMicroposts { get; set; }

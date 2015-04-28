@@ -12,18 +12,24 @@
                 <div class="threadinfo">
                     @if (User.Identity.GetUserId() != null)
                     {
-                        if (Model.Author.Id == User.Identity.GetUserId())
+                        if (Model.Author.Id == User.Identity.GetUserId() || (User.IsInRole("Administrator")))
                         {
-                            <div>
-                                @Html.ActionLink("Edit", "Edit", "ForumThreadEntries", new { id = Model.Id }, null)
-                            </div>
+                            if (Model.Locked != true)
+                            {
+                                <div>
+                                    @Html.ActionLink("Edit", "Edit", "ForumThreadEntries", new { id = Model.Id }, null) | @Html.ActionLink("Delete", "Delete", "ForumThreadEntries", new { id = Model.Id }, null)
+                                </div>
+                            }
                         }
                     }
                     <div>
-                        @Html.ActionLink("Reply", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id, parentId = Model.Id, rootId = Model.RootId }, null)
+                        @if (Model.Locked != true)
+                        {
+                            @Html.ActionLink("Reply", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id, parentId = Model.Id, rootId = Model.RootId }, null)
+                        }
                     </div>
                 </div>
-                </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </footer>
+</div>

@@ -11,6 +11,7 @@
     @Scripts.Render("~/bundles/bootstrap")
 </head>
 <body>
+    @Scripts.Render("~/bundles/myjsbundle")
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -30,6 +31,11 @@
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                     <li>@Html.ActionLink("Sandbox", "Index", "Sandbox")</li>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                         <li>@Html.ActionLink("Blog", "Index", "Blog")</li>
+                    }
+
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

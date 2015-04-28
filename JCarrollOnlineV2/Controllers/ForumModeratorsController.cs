@@ -7,7 +7,7 @@ using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Controllers
 {
-    [Authorize(Roles="Administrators")]
+    [Authorize(Roles="Administrator")]
     public class ForumModeratorsController : Controller
     {
         private IContext _data { get; set; }

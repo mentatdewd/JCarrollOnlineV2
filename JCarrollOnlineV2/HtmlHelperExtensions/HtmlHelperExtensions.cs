@@ -1,19 +1,93 @@
-﻿using System;
+﻿using MarkdownDeep;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Design.PluralizationServices;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace JCarrollOnlineV2.HtmlHelperExtensions
 {
+
+	/// <summary>
+	/// Helper class for transforming Markdown.
+	/// </summary>
+    public static partial class MarkdownHelper
+    {
+        //static Markdown markdownTransformer = new Markdown();
+
+        ///// <summary>
+        ///// Static constructor to set MarkdownHelper options.
+        ///// </summary>
+        //static MarkdownHelper()
+        //{
+        //    // Override code formatting to support syntax highlighting.
+        //    markdownTransformer.FormatCodeBlock = FormatCodeBlock;
+        //}	
+        /// <summary>
+        /// <summary>
+        /// Overrides the Markdown formatting for code blocks to inject "prettyprint" classes for syntax highlighting.
+        /// </summary>
+
+        public static string Language { get; set; }
+
+        public static string FormatCodeBlock(Markdown md, string code)
+        {
+            // Wrap the code in <pre><code> as the default MarkdownDeep.NET implementation does, but add a class of
+            // "prettyprint" which is what Google Code Prettify uses to identify code blocks.
+            // http://google-code-prettify.googlecode.com/svn/trunk/README.html
+            var sb = new StringBuilder();
+            var fixedString = String.Format("<pre><code class=\"language-{0}\">", Language);
+            sb.Append(fixedString);
+            sb.Append(code);
+            sb.Append("</code></pre>\n\n");
+            return sb.ToString();
+        }
+    }
     public static class HtmlHelperExtensions
     {
         public static string ExternalLink(this HtmlHelper helper, string URI, string label)
         {
             return string.Format("<a href='{0}'>{1}</a>", URI, label);
+        }
+
+        public static Regex rxExtractLanguage = new Regex("^({{(.+)}}[\r\n])", RegexOptions.Compiled);
+        public static MvcHtmlString Markdown(this HtmlHelper helper, string input)
+        {
+            // Try to extract the language from the first line
+            var match = rxExtractLanguage.Match(input);
+            string language = null;
+
+            if (match.Success)
+            {
+                // Save the language
+                var g = (Group)match.Groups[2];
+                language = g.ToString();
+
+                // Remove the first line
+                input = input.Substring(match.Groups[1].Length);
+            }
+            if(language != null)
+                MarkdownHelper.Language = language.Replace("{{","").Replace("}}","");
+
+            var md = new MarkdownDeep.Markdown();
+            md.FormatCodeBlock = MarkdownHelper.FormatCodeBlock;
+            md.ExtraMode = true;
+            return new MvcHtmlString(md.Transform(input));
+        }
+        private static string FormatCodeBlock(MarkdownDeep.Markdown md, string code)
+        {
+            // Wrap the code in <pre><code> as the default MarkdownDeep.NET implementation does, but add a class of
+            // "prettyprint" which is what Google Code Prettify uses to identify code blocks.
+            // http://google-code-prettify.googlecode.com/svn/trunk/README.html
+            var sb = new StringBuilder();
+            sb.Append("<pre class=\"prettyprint\"><code>");
+            sb.Append(code);
+            sb.Append("</code></pre>\n\n");
+            return sb.ToString();
         }
 
         public static MvcHtmlString MultiLineActionLink(

@@ -84,6 +84,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blog.cs" />
     <Compile Include="Forum.cs" />
     <Compile Include="ForumModerator.cs" />
     <Compile Include="ForumThreadEntry.cs" />

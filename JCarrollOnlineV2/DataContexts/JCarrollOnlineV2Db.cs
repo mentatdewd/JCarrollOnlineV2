@@ -57,5 +57,6 @@ namespace JCarrollOnlineV2.DataContexts
         public DbSet<ForumModerator> ForumModerators { get; set; }
         public DbSet<ForumThreadEntry> ForumThreadEntries { get; set; }
         public DbSet<Micropost> Microposts { get; set; }
+        public DbSet<Blog> BlogItems { get; set; }
     }
 }

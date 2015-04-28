@@ -1,0 +1,11 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model BlogIndexViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ 
+    <h1>Blog Posts</h1>
+
+@Html.Partial("_BlogFeedPartial", Model.BlogFeedItems)
+@Html.ActionLink("Create New", "Create")

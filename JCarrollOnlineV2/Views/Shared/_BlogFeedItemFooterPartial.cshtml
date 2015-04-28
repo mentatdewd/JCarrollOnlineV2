@@ -1,0 +1,22 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model BlogFeedItemViewModel
+
+<div class="blog_post_footer">
+    <footer>
+        <div class="row">
+            <div class="col-md-6">
+             Posted by: @Html.ActionLink(@Model.Author.UserName, "Details", "Users", null, null, null, new { userId = Model.Author.Id }, null)
+             on @Model.CreatedAt
+            </div>
+            <div class="col-md-6">
+                @if (User.IsInRole("Administrator"))
+                {
+                    @Html.Raw(" | ")
+                    <span>
+                        @Html.ActionLink("Edit", "Edit", "Blog", new { blogItemId = Model.Id }, null)
+                    </span>
+                }             
+            </div>
+        </div>
+    </footer>
+</div>

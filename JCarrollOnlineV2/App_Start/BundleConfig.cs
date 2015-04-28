@@ -16,7 +16,7 @@ namespace JCarrollOnlineV2
             var nullOrderer = new NullOrderer();
 
             var cssBundle = new StyleBundle("~/bundles/css");
-            cssBundle.Include("~/Content/Site.less", "~/Content/bootstrap/bootstrap.less");
+            cssBundle.Include("~/Content/Site.less", "~/Content/bootstrap/bootstrap.less", "~/Content/Prism.less", "~/Content/PagedList.less");
             cssBundle.Transforms.Add(cssTransformer);
             cssBundle.Orderer = nullOrderer;
             bundles.Add(cssBundle);
@@ -25,6 +25,7 @@ namespace JCarrollOnlineV2
             jqueryBundle.Include("~/Scripts/jquery-{version}.js");
             jqueryBundle.Include("~/Scripts/moment.js");
             jqueryBundle.Include("~/Scripts/livestamp.js");
+            jqueryBundle.Include("~/Scripts/jquery.unobtrusive-ajax.min.js");
             jqueryBundle.Transforms.Add(jsTransformer);
             jqueryBundle.Orderer = nullOrderer;
             bundles.Add(jqueryBundle);
@@ -35,6 +36,12 @@ namespace JCarrollOnlineV2
             jqueryvalBundle.Orderer = nullOrderer;
             bundles.Add(jqueryvalBundle);
 
+            var myjsbundle = new ScriptBundle("~/bundles/myjsbundle");
+            myjsbundle.Include("~/Scripts/prism.js");
+            myjsbundle.Transforms.Add(jsTransformer);
+            myjsbundle.Orderer = nullOrderer;
+            bundles.Add(myjsbundle);
+            
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
 

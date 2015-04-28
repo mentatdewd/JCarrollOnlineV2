@@ -1,0 +1,7 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model BlogFeedViewModel
+
+@foreach(var item in Model.BlogFeedItemVMs)
+{
+    @Html.Partial("_BlogFeedItemPartial", item)
+}

@@ -25,7 +25,7 @@
         <div class="form-group">
             <div class="col-md-10">
                 <div align="center">
-                    <input type="submit" value="Post" class="btn btn-large btn-primary" formaction='@Url.Action("Create", "Microposts")' />
+                    <input id="submitbutton" disabled type="submit" value="Post" class="btn btn-large btn-primary" formaction='@Url.Action("Create", "Microposts")' />
                 </div>
             </div>
         </div>
@@ -39,6 +39,14 @@
 			return false;
 		} else {
 			countfield.value = maxlimit - field.value.length;
+		}
+		if(countfield.value == 140)
+		{
+		    document.getElementById("submitbutton").disabled = true;
+		}
+		else
+		{
+		    document.getElementById("submitbutton").disabled = false;
 		}
 	}
 </script>

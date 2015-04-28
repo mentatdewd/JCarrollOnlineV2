@@ -15,12 +15,17 @@
             </section>
         </aside>
         <div class="col-md-5">
-            <h1>Posts</h1>
+            <h2>Posts</h2>
             @Html.Partial("_MicropostFeedPartial", Model.MicropostFeedVM)
         </div>
         <aside class="col-md-3">
                 @Html.Partial("_RssFeedPartial", Model.RssFeedVM)
         </aside>
+    </div>
+    <hr />
+   <div class="blogFeed">
+        <h1>Blog</h1>
+        @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
     </div>
 </div>
 

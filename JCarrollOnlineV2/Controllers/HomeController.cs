@@ -28,7 +28,7 @@ namespace JCarrollOnlineV2.Controllers
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }
 
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int? micropostPage)
         {
             HomeViewModel vm = new HomeViewModel();
             vm.Message = "JCarrollOnlineV2 Home - Index";
@@ -36,6 +36,7 @@ namespace JCarrollOnlineV2.Controllers
             vm.MicropostFeedVM = new MicropostFeedViewModel();
             vm.UserStatsVM = new UserStatsViewModel();
             vm.UserInfoVM = new UserItemViewModel();
+            vm.BlogFeed = new BlogFeedViewModel();
 
             vm.UserStatsVM.UserFollowers = new UserFollowersViewModel();
             vm.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
@@ -45,19 +46,27 @@ namespace JCarrollOnlineV2.Controllers
             if (User != null && User.Identity.IsAuthenticated == true)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(u => u.Id == currentUserId);
+                ApplicationUser user = await _data.Users.Include("Following").Include("Followers").Include("Microposts").SingleAsync(u => u.Id == currentUserId);
 
                 vm.UserInfoVM.User.InjectFrom(user);
-                vm.UserInfoVM.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == currentUserId).Select(u => u.Microposts).CountAsync();
+                vm.UserInfoVM.MicropostsAuthored = user.Microposts.Count();
                 vm.UserStatsVM.User.InjectFrom(user);
-               
-                foreach(ApplicationUser item in user.Following)
+
+                foreach (var item in user.BlogItems)
+                {
+                    BlogFeedItemViewModel bfi = new BlogFeedItemViewModel();
+                    bfi.InjectFrom(item);
+                    bfi.Author.InjectFrom(item.Author);
+                    vm.BlogFeed.BlogFeedItemVMs.Add(bfi);
+                }
+
+                foreach (ApplicationUser item in user.Following)
                 {
                     UserItemViewModel uivm = new UserItemViewModel();
                     uivm.InjectFrom(item);
                     vm.UserStatsVM.UsersFollowing.Users.Add(uivm);
 
-                    foreach(var micropost in item.Microposts)
+                    foreach (var micropost in item.Microposts)
                     {
                         MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
                         mpVM.InjectFrom(micropost);
@@ -66,14 +75,14 @@ namespace JCarrollOnlineV2.Controllers
                         vm.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
                     }
                 }
-                foreach(var item in user.Followers)
+                foreach (var item in user.Followers)
                 {
                     UserItemViewModel uivm = new UserItemViewModel();
                     uivm.InjectFrom(item);
                     uivm.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
                     vm.UserStatsVM.UserFollowers.Users.Add(uivm);
                 }
-                foreach(var micropost in user.Microposts)
+                foreach (var micropost in user.Microposts)
                 {
                     MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
                     mpVM.InjectFrom(micropost);
@@ -81,6 +90,9 @@ namespace JCarrollOnlineV2.Controllers
                     mpVM.TimeAgo = mpVM.CreatedAt.ToUniversalTime().ToString("o");
                     vm.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
                 }
+                var micropostPageNumber = micropostPage ?? 1;
+                vm.MicropostFeedVM.OnePageOfMicroposts = vm.MicropostFeedVM.MicropostFeedItems.ToPagedList(micropostPageNumber, 5);
+
                 vm.RssFeedVM = await rss;
             }
             vm.PageContainer = "Home";

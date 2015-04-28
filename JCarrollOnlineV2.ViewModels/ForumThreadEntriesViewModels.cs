@@ -83,6 +83,12 @@ namespace JCarrollOnlineV2.ViewModels
 
     public class ForumThreadEntryDetailsItemViewModel : ForumThreadEntriesViewModelBase
     {
+        public ForumThreadEntryDetailsItemViewModel()
+        {
+            Author = new ApplicationUserViewModel();
+            Forum = new ForaViewModel();
+        }
+
         public int? ParentId { get; set; }
         public int? RootId { get; set; }
         public int? ParentPostNumber { get; set; }
@@ -112,6 +118,8 @@ namespace JCarrollOnlineV2.ViewModels
 
         [Display(Name = "Post Number")]
         public int PostNumber { get; set; }
+
+        public bool Locked { get; set; }
     }
 
     public class ForumThreadEntryDetailsViewModel : ForumThreadEntriesViewModelBase
@@ -170,6 +178,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string Title { get; set; }
 
         [Display(Name = "Content")]
+        [DataType(DataType.MultilineText)]
         public string Content { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using PagedList;
 
 namespace JCarrollOnlineV2.ViewModels
 {
@@ -30,6 +31,7 @@ namespace JCarrollOnlineV2.ViewModels
             MicropostFeedItems = new List<MicropostFeedItemViewModel>();
         }
         public List<MicropostFeedItemViewModel> MicropostFeedItems { get; set; }
+        public IPagedList<MicropostFeedItemViewModel> OnePageOfMicroposts { get; set; }
     }
 
     public class MicropostFeedItemViewModel : MicropostViewModelBase
