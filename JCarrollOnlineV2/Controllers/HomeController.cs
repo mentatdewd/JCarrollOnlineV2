@@ -41,7 +41,7 @@ namespace JCarrollOnlineV2.Controllers
             vm.UserStatsVM.UserFollowers = new UserFollowersViewModel();
             vm.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
 
-            var blogItems = await _data.BlogItems.ToListAsync();
+            var blogItems = await _data.BlogItems.OrderByDescending(m => m.UpdatedAt).ToListAsync();
 
             foreach (var item in blogItems)
             {

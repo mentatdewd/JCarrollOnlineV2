@@ -36,7 +36,7 @@ namespace JCarrollOnlineV2.Controllers
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser user = await _data.Users.Include("BlogItems").SingleAsync(u => u.Id == currentUserId);
 
-            foreach(var item in user.BlogItems)
+            foreach(var item in user.BlogItems.OrderByDescending(m => m.UpdatedAt))
             {
                 BlogFeedItemViewModel bfi = new BlogFeedItemViewModel();
                 bfi.InjectFrom(item);
