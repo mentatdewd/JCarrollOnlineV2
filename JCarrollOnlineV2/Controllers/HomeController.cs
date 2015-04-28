@@ -41,6 +41,16 @@ namespace JCarrollOnlineV2.Controllers
             vm.UserStatsVM.UserFollowers = new UserFollowersViewModel();
             vm.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
 
+            var blogItems = await _data.BlogItems.ToListAsync();
+
+            foreach (var item in blogItems)
+            {
+                BlogFeedItemViewModel bfi = new BlogFeedItemViewModel();
+                bfi.InjectFrom(item);
+                bfi.Author.InjectFrom(item.Author);
+                vm.BlogFeed.BlogFeedItemVMs.Add(bfi);
+            }
+
             Task<RssFeedViewModel> rss = ControllerHelpers.UpdateRssAsync();
 
             if (User != null && User.Identity.IsAuthenticated == true)
@@ -51,14 +61,6 @@ namespace JCarrollOnlineV2.Controllers
                 vm.UserInfoVM.User.InjectFrom(user);
                 vm.UserInfoVM.MicropostsAuthored = user.Microposts.Count();
                 vm.UserStatsVM.User.InjectFrom(user);
-
-                foreach (var item in user.BlogItems)
-                {
-                    BlogFeedItemViewModel bfi = new BlogFeedItemViewModel();
-                    bfi.InjectFrom(item);
-                    bfi.Author.InjectFrom(item.Author);
-                    vm.BlogFeed.BlogFeedItemVMs.Add(bfi);
-                }
 
                 foreach (ApplicationUser item in user.Following)
                 {

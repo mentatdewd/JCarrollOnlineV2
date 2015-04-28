@@ -1,24 +1,13 @@
-﻿
+﻿@using JCarrollOnlineV2.ViewModels
+@model HomeViewModel
+
 <div class="text-center">
     <h1>Welcome to JCarrollOnline</h1>
     <h2> This is the home page for JCarrollOnline </h2>
 </div>
-<div class="text-center jumbotron">
-    <h3> The <a href="https://play.google.com/store/apps/details?id=com.mentatware.ringbuddy&feature=search_result#?t=W251bGwsMSwyLDEsImNvbS5tZW50YXR3YXJlLnJpbmdidWRkeSJd">Ringbuddy</a> application for Android has launched! </h3>
+<div class="blogFeed">
+    @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
 </div>
 <div>
-    <p>
-        With Ringbuddy you can create a ringtone schedule for each of your contacts. For example, at 8am Tina's ringtone will switch to an appropriate daytime ringtone, at 5pm Tina's ringtone will switch to a different ringtone of your choosing, and at 11pm Tina's ringtone will switch to silent. Create a custom ringtone schedule for each of your contacts, or with the handy All Contacts button set a custom schedule for all.
-    </p>
-    <br>
-    <div class="text-center">
-        <h3>
-            It's ringtone management
-            done right!
-        </h3>
-    </div>
-    <br>
-    <br>
-    <p class="text-center">Visit the @Html.ActionLink("Ringbuddy", "Index", "Home") forum!</p>
     <p class="text-center">@Html.ActionLink("Sign up now!", "Index", "Home", new { @class = "btn btn-large btn-primary" })</p>
 </div>
