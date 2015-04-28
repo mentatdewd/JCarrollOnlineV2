@@ -39,7 +39,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             return string.Format("<a href='{0}'>{1}</a>", URI, label);
         }
 
-        public static Regex rxExtractLanguage = new Regex("^({{(.+)}}[\r\n])", RegexOptions.Compiled);
+        public static Regex rxExtractLanguage = new Regex("({{(.+)}}[\r\n])", RegexOptions.Compiled);
         public static MvcHtmlString Markdown(this HtmlHelper helper, string input)
         {
             // Try to extract the language from the first line
@@ -53,7 +53,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
                 language = g.ToString();
 
                 // Remove the first line
-                input = input.Substring(match.Groups[1].Length);
+                input = input.Replace(match.ToString(), "");// (match.Groups[1].Length);
             }
             if(language != null)
                 MarkdownHelper.Language = language.Replace("{{","").Replace("}}","");
