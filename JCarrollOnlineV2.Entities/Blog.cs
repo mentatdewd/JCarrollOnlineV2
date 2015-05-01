@@ -8,19 +8,21 @@ using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Entities
 {
-    public class Blog
+    public class BlogItem
     {
         [Key]
         public int Id { get; set; }
 
-       //public ApplicationUser Author { get; set; }
-        public string Title { get; set; }
-
         [AllowHtml]
+        [Required]
         public string Content { get; set; }
+        [Required]
         public DateTime CreatedAt { get; set; }
+        [Required]
         public DateTime UpdatedAt { get; set; }
 
+        [Required]
         public virtual ApplicationUser Author { get; set; }
+        public virtual List<BlogItemComment> BlogItemComments { get; set; }
     }
 }

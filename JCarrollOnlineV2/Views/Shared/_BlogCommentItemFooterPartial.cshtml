@@ -1,0 +1,16 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@using JCarrollOnlineV2.HtmlHelperExtensions
+@model BlogCommentItemViewModel
+<div class="blog_post_footer">
+    <footer>
+        <div class="footerContainer">
+            @*Posted by: @Model.Author on @Model.CreatedAt*@
+            <span class="user">
+                Posted by @Model.Author
+                </span>
+            <span class="timestamp">
+                <span data-livestamp="@Model.TimeAgo"></span>
+            </span>
+        </div>
+    </footer>
+</div>

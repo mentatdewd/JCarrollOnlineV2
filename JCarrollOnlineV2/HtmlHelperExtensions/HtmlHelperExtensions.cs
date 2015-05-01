@@ -32,8 +32,44 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             return sb.ToString();
         }
     }
+
     public static class HtmlHelperExtensions
     {
+        public static MvcHtmlString BlogShowCommentsButton(this HtmlHelper helper, int blogItemId)
+        {
+            //<button id="blogCommentsButton" class="commentButton">Comments</button>
+            var builder = new TagBuilder("button");
+
+            builder.MergeAttribute("class", "showCommentsButton");
+            builder.MergeAttribute("id", "showCommentsButton" + blogItemId);
+            builder.MergeAttribute("data-BlogItemId", "commentId" + blogItemId);
+            builder.SetInnerText("Comments");
+            return new MvcHtmlString(builder.ToString());
+        }
+
+        public static MvcHtmlString BlogShowCommentsDialogButton(this HtmlHelper helper, int blogItemId)
+        {
+            //<button id="blogCommentsButton" class="commentButton">Comments</button>
+            var builder = new TagBuilder("button");
+
+            builder.MergeAttribute("class", "ShowCommentsDialogButton btn btn-large btn-primary");
+            builder.MergeAttribute("id", "showCommentsDialogButton" + blogItemId);
+            builder.MergeAttribute("data-BlogItemId", blogItemId.ToString());
+            builder.SetInnerText("Add Comment");
+            return new MvcHtmlString(builder.ToString());
+        }
+
+        public static MvcHtmlString BlogCommentsDivTag(this HtmlHelper helper, int blogItemId)
+        {
+            var builder = new StringBuilder("<div id= \"");
+
+            builder.Append("commentId" + blogItemId);
+            builder.Append("\" class=\"");
+            builder.Append("blogComments");
+            builder.Append("\">");
+            return new MvcHtmlString(builder.ToString());
+        }
+
         public static string ExternalLink(this HtmlHelper helper, string URI, string label)
         {
             return string.Format("<a href='{0}'>{1}</a>", URI, label);

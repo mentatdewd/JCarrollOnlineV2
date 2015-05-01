@@ -5,6 +5,9 @@
     <h1>Welcome to JCarrollOnline</h1>
     <hr width="35%" />
 </div>
+<div>
+    <p class="text-center">@Html.ActionLink("Sign up now!", "Register", "Account", null, new { @class = "btn btn-large btn-primary", @id = "registerLink"})</p>
+</div>
 <section class="blogFeed">
     @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
 </section>

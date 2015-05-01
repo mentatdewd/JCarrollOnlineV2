@@ -9,10 +9,10 @@ namespace JCarrollOnlineV2.Controllers
         // GET: Sandbox
         public async Task<ActionResult> Index()
         {
-            SandboxViewModel vm = new SandboxViewModel();
+            SandboxViewModel sbVM = new SandboxViewModel();
 
-            vm.PageTitle = "Sandbox";
-            return View(vm);
+            sbVM.PageTitle = "Sandbox";
+            return View(sbVM);
         }
 
         // GET: Sandbox/Details/5

@@ -30,115 +30,115 @@ namespace JCarrollOnlineV2.Controllers
         // GET: Users
         public async Task<ActionResult> Index()
         {
-            UsersIndexViewModel vm = new UsersIndexViewModel();
+            UsersIndexViewModel uiVM = new UsersIndexViewModel();
 
-            vm.PageTitle = "Users";
+            uiVM.PageTitle = "Users";
 
             var users = await _data.Users.Include("Following").Include("Followers").ToListAsync();
 
             foreach (var user in users)
             {
                 UserItemViewModel uivm = new UserItemViewModel();
-                //uivm.User = new ApplicationUserViewModel();
+                //uiVM.User = new ApplicationUserViewModel();
 
                 uivm.User.InjectFrom(user);
                 uivm.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == user.Id).Select(u => u.Microposts).CountAsync();
-                vm.Users.Add(uivm);
+                uiVM.Users.Add(uivm);
             }
 
-            return View(vm);
+            return View(uiVM);
         }
 
         // GET: Users/Details/5
         public async Task<ActionResult> Details(string userId)
         {
-            UserDetailViewModel vm = new UserDetailViewModel();
+            UserDetailViewModel udVM = new UserDetailViewModel();
 
-            vm.CurrentUser = new ApplicationUserViewModel();
+            udVM.CurrentUser = new ApplicationUserViewModel();
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
-            vm.CurrentUser.InjectFrom(currentUser);
+            udVM.CurrentUser.InjectFrom(currentUser);
 
             ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
-            vm.User.InjectFrom(user);
+            udVM.User.InjectFrom(user);
 
-            vm.UserStatsVM = new UserStatsViewModel();
-            vm.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
-            vm.UserStatsVM.User.InjectFrom(user);
+            udVM.UserStatsVM = new UserStatsViewModel();
+            udVM.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
+            udVM.UserStatsVM.User.InjectFrom(user);
             foreach (var item in user.Following)
             {
-                UserItemViewModel auvm = new UserItemViewModel();
-                auvm.User.InjectFrom(item);
-                auvm.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
-                vm.UserStatsVM.UsersFollowing.Users.Add(auvm);
+                UserItemViewModel uiVM = new UserItemViewModel();
+                uiVM.User.InjectFrom(item);
+                uiVM.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
+                udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
             }
-            vm.UserStatsVM.UserFollowers = new UserFollowersViewModel();
+            udVM.UserStatsVM.UserFollowers = new UserFollowersViewModel();
             foreach (var item in user.Followers)
             {
-                UserItemViewModel auvm = new UserItemViewModel();
-                auvm.User.InjectFrom(item);
-                auvm.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
-                vm.UserStatsVM.UserFollowers.Users.Add(auvm);
+                UserItemViewModel uiVM = new UserItemViewModel();
+                uiVM.User.InjectFrom(item);
+                uiVM.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
+                udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
             }
-            return View(vm);
+            return View(udVM);
         }
 
         public async Task<ActionResult> Following(string userId)
         {
-            UserDetailViewModel vm = new UserDetailViewModel();
-            vm.PageTitle = "Following";
-            vm.UserInfoVM = new UserItemViewModel();
+            UserDetailViewModel udVM = new UserDetailViewModel();
+            udVM.PageTitle = "Following";
+            udVM.UserInfoVM = new UserItemViewModel();
 
             ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
-            vm.UserStatsVM = new UserStatsViewModel();
-            vm.User.InjectFrom(user);
-            vm.UserInfoVM.User.InjectFrom(user);
-            vm.UserStatsVM.User.InjectFrom(user);
+            udVM.UserStatsVM = new UserStatsViewModel();
+            udVM.User.InjectFrom(user);
+            udVM.UserInfoVM.User.InjectFrom(user);
+            udVM.UserStatsVM.User.InjectFrom(user);
 
             foreach (var item in user.Following)
             {
-                UserItemViewModel auvm = new UserItemViewModel();
-                auvm.User.InjectFrom(item);
-                auvm.MicropostsAuthored = item.Microposts.Count();
-                vm.UserStatsVM.UsersFollowing.Users.Add(auvm);
+                UserItemViewModel uiVM = new UserItemViewModel();
+                uiVM.User.InjectFrom(item);
+                uiVM.MicropostsAuthored = item.Microposts.Count();
+                udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
             }
             foreach (var item in user.Followers)
             {
-                UserItemViewModel uivm = new UserItemViewModel();
-                uivm.InjectFrom(item);
-                uivm.MicropostsAuthored = item.Microposts.Count();
-                vm.UserStatsVM.UserFollowers.Users.Add(uivm);
+                UserItemViewModel uiVM = new UserItemViewModel();
+                uiVM.InjectFrom(item);
+                uiVM.MicropostsAuthored = item.Microposts.Count();
+                udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
             }
-            return View("Show_Follow", vm);
+            return View("Show_Follow", udVM);
         }
 
         public async Task<ActionResult> Followed(string userId)
         {
-            UserDetailViewModel vm = new UserDetailViewModel();
-            vm.PageTitle = "Followers";
-            vm.UserInfoVM = new UserItemViewModel();
+            UserDetailViewModel udVM = new UserDetailViewModel();
+            udVM.PageTitle = "Followers";
+            udVM.UserInfoVM = new UserItemViewModel();
 
             ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
-            vm.UserStatsVM = new UserStatsViewModel();
-            vm.User.InjectFrom(user);
-            vm.UserInfoVM.User.InjectFrom(user);
-            vm.UserStatsVM.User.InjectFrom(user);
+            udVM.UserStatsVM = new UserStatsViewModel();
+            udVM.User.InjectFrom(user);
+            udVM.UserInfoVM.User.InjectFrom(user);
+            udVM.UserStatsVM.User.InjectFrom(user);
 
             foreach (var item in user.Following)
             {
-                UserItemViewModel auvm = new UserItemViewModel();
-                auvm.User.InjectFrom(item);
-                auvm.MicropostsAuthored = item.Microposts.Count();
-                vm.UserStatsVM.UsersFollowing.Users.Add(auvm);
+                UserItemViewModel uiVM = new UserItemViewModel();
+                uiVM.User.InjectFrom(item);
+                uiVM.MicropostsAuthored = item.Microposts.Count();
+                udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
             }
             foreach (var item in user.Followers)
             {
-                UserItemViewModel uivm = new UserItemViewModel();
-                uivm.User.InjectFrom(item);
-                uivm.MicropostsAuthored = item.Microposts.Count();
-                vm.UserStatsVM.UserFollowers.Users.Add(uivm);
+                UserItemViewModel uiVM = new UserItemViewModel();
+                uiVM.User.InjectFrom(item);
+                uiVM.MicropostsAuthored = item.Microposts.Count();
+                udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
             }
-            return View("Show_Follow", vm);
+            return View("Show_Follow", udVM);
         }
 
         public async Task<ActionResult> Follow([Bind(Include = "Id,UserName")]  ApplicationUserViewModel followUser)

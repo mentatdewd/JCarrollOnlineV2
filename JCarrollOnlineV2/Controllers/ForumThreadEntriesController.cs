@@ -47,17 +47,17 @@ namespace JCarrollOnlineV2.Controllers
         // GET: ForumOriginalPost
         public async Task<ActionResult> Index(int forumId)
         {
-            ForumThreadEntryIndexViewModel fvm = new ForumThreadEntryIndexViewModel();
+            ForumThreadEntryIndexViewModel fteiVM = new ForumThreadEntryIndexViewModel();
 
             // Retrieve forum data
             Forum forum = _data.Forums.Find(forumId);
-            fvm.Forum = new ForaViewModel();
-            fvm.Forum.InjectFrom(forum);
+            fteiVM.Forum = new ForaViewModel();
+            fteiVM.Forum.InjectFrom(forum);
 
             var forumThreads = _data.ForumThreadEntries.ToList();
 
             // Create the view model
-            fvm.ForumThreadEntryIndex = new List<ForumThreadEntryIndexItemViewModel>();
+            fteiVM.ForumThreadEntryIndex = new List<ForumThreadEntryIndexItemViewModel>();
             var forumThreadList = await _data.ForumThreadEntries.Where(p => p.Forum.Id == forumId && p.ParentId == null)
                 .Include(p => p.Author)
                 .Include(p => p.Forum)
@@ -73,9 +73,9 @@ namespace JCarrollOnlineV2.Controllers
                 fitem.Forum.InjectFrom(item.Forum);
                 fitem.Replies = await ControllerHelpers.GetThreadPostCountAsync(item.Id, _data);
                 fitem.LastReply = await ControllerHelpers.GetLastReplyAsync(item.RootId, _data);
-                fvm.ForumThreadEntryIndex.Add(fitem);
+                fteiVM.ForumThreadEntryIndex.Add(fitem);
             }
-            return View(fvm);
+            return View(fteiVM);
         }
 
         // GET: ForumOriginalPost/Details/5
@@ -87,28 +87,28 @@ namespace JCarrollOnlineV2.Controllers
             var detailItemInjector = new IEnumerableExtensions.InjectorDelegate<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(DetailItemInjector);
 
             // Create the details view model
-            ForumThreadEntryDetailsViewModel vm = new ForumThreadEntryDetailsViewModel();
-            vm.ForumThreadEntryDetailItems = new ForumThreadEntryDetailItemsViewModel();
-            vm.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntries.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
+            ForumThreadEntryDetailsViewModel ftedVM = new ForumThreadEntryDetailsViewModel();
+            ftedVM.ForumThreadEntryDetailItems = new ForumThreadEntryDetailItemsViewModel();
+            ftedVM.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntries.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
 
-            vm.Forum = new ForaDetailsViewModel();
-            vm.Forum.InjectFrom(_data.Forums.Find(forumId));
+            ftedVM.Forum = new ForaDetailsViewModel();
+            ftedVM.Forum.InjectFrom(_data.Forums.Find(forumId));
             
-            vm.ForumThreadEntryDetailItems.NumberOfReplies = _data.ForumThreadEntries.Where(b => b.RootId == id).Count();
-            return View(vm);
+            ftedVM.ForumThreadEntryDetailItems.NumberOfReplies = _data.ForumThreadEntries.Where(b => b.RootId == id).Count();
+            return View(ftedVM);
         }
 
         // GET: ForumOriginalPost/Create
         [Authorize]
         public  ActionResult Create(int forumId, int? parentId, int? rootId)
         {
-            ForumThreadEntriesCreateViewModel vm = new ForumThreadEntriesCreateViewModel();
+            ForumThreadEntriesCreateViewModel ftecVM = new ForumThreadEntriesCreateViewModel();
 
-            vm.ForumId = forumId;
-            vm.ParentId = parentId;
-            vm.RootId = rootId;
+            ftecVM.ForumId = forumId;
+            ftecVM.ParentId = parentId;
+            ftecVM.RootId = rootId;
 
-            return View(vm);
+            return View(ftecVM);
         }
 
         // POST: ForumOriginalPost/Create
@@ -163,7 +163,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumThreadEntriesEditViewModel vm = new ForumThreadEntriesEditViewModel();
+            ForumThreadEntriesEditViewModel fteeVM = new ForumThreadEntriesEditViewModel();
 
             var forumThread = await _data.ForumThreadEntries.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
 
@@ -171,11 +171,11 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return HttpNotFound();
             }
-            vm.InjectFrom(forumThread);
-            vm.ForumId = forumThread.Forum.Id;
-            vm.AuthorId = forumThread.Author.Id;
+            fteeVM.InjectFrom(forumThread);
+            fteeVM.ForumId = forumThread.Forum.Id;
+            fteeVM.AuthorId = forumThread.Author.Id;
 
-            return View(vm);
+            return View(fteeVM);
         }
 
         // POST: ForumOriginalPost/Edit/5
@@ -211,17 +211,17 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             ForumThreadEntry forumThread = await _data.ForumThreadEntries.Include("Author").Include("Forum").Where(m => m.Id == id).SingleOrDefaultAsync();
-            ForumThreadEntryDetailsItemViewModel fteditvm = new ForumThreadEntryDetailsItemViewModel();
+            ForumThreadEntryDetailsItemViewModel ftediVM = new ForumThreadEntryDetailsItemViewModel();
 
-            fteditvm.InjectFrom(forumThread);
-            fteditvm.Author.InjectFrom(forumThread.Author);
-            fteditvm.Forum.InjectFrom(forumThread.Forum);
+            ftediVM.InjectFrom(forumThread);
+            ftediVM.Author.InjectFrom(forumThread.Author);
+            ftediVM.Forum.InjectFrom(forumThread.Forum);
      
             if (forumThread == null)
             {
                 return HttpNotFound();
             }
-            return View(fteditvm);
+            return View(ftediVM);
         }
 
         // POST: ForumOriginalPost/Delete/5

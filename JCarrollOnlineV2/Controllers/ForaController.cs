@@ -28,21 +28,21 @@ namespace JCarrollOnlineV2.Controllers
         // GET: Fora
         public async Task<ActionResult> Index()
         {
-            ForaIndexViewModel fvm = new ForaIndexViewModel();
-            fvm.ForaIndexItems = new List<ForaIndexItemViewModel>();
+            ForaIndexViewModel fiVM = new ForaIndexViewModel();
+            fiVM.ForaIndexItems = new List<ForaIndexItemViewModel>();
 
             var dlist = await _data.Forums.ToListAsync();
             foreach(var item in dlist)
             {
-                var fitem = new ForaIndexItemViewModel();
-                fitem.InjectFrom(item);
-                fitem.ThreadCount = await ControllerHelpers.GetThreadCountAsync(item, _data);
-                if(fitem.ThreadCount > 0)
-                    fitem.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(item, _data);
+                var fiiVM = new ForaIndexItemViewModel();
+                fiiVM.InjectFrom(item);
+                fiiVM.ThreadCount = await ControllerHelpers.GetThreadCountAsync(item, _data);
+                if(fiiVM.ThreadCount > 0)
+                    fiiVM.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(item, _data);
 
-                fvm.ForaIndexItems.Add(fitem);
+                fiVM.ForaIndexItems.Add(fiiVM);
             }
-            return View(fvm);
+            return View(fiVM);
         }
 
         // GET: Fora/Details/5
@@ -64,8 +64,8 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize]
         public ActionResult Create()
         {
-            ForaCreateViewModel vm = new ForaCreateViewModel();
-            return View(vm);
+            ForaCreateViewModel fcVM = new ForaCreateViewModel();
+            return View(fcVM);
         }
 
         // POST: Fora/Create

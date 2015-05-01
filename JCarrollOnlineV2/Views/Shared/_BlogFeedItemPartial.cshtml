@@ -1,7 +1,9 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @model BlogFeedItemViewModel
 
-<div class="blogEntryContainer">
+<div class="blogEntryContainer" style="position: relative">
     @Html.Partial("_BlogFeedItemContentPartial")
     @Html.Partial("_BlogFeedItemFooterPartial")
+    @Html.Partial("_BlogCommentsPartial", Model.Comments)
 </div>
+

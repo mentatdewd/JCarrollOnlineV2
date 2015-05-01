@@ -100,16 +100,16 @@ namespace JCarrollOnlineV2
 
         public static LastThreadViewModel GetLatestThreadData(Forum forum, IContext data)
         {
-            LastThreadViewModel ltvm = new LastThreadViewModel();
+            LastThreadViewModel ltVM = new LastThreadViewModel();
 
             var fte = data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id)
                 .Include(i => i.Author)
                 .OrderByDescending(i => i.UpdatedAt)
                 .FirstOrDefault();
 
-            ltvm.InjectFrom(fte);
-            ltvm.Author = new ApplicationUserViewModel();
-            ltvm.Author.InjectFrom(fte.Author);
+            ltVM.InjectFrom(fte);
+            ltVM.Author = new ApplicationUserViewModel();
+            ltVM.Author.InjectFrom(fte.Author);
 
             bool rootNotFound = true;
             if (fte.ParentId != null)
@@ -119,13 +119,13 @@ namespace JCarrollOnlineV2
                     if (fte.ParentId == null)
                         rootNotFound = false;
                 }
-            ltvm.PostRoot = fte.Id;
-            return ltvm;
+            ltVM.PostRoot = fte.Id;
+            return ltVM;
         }
 
         public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, IContext data)
         {
-            LastThreadViewModel ltvm = new LastThreadViewModel();
+            LastThreadViewModel ltVM = new LastThreadViewModel();
 
             var fte = await data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id)
                 .Include(i => i.Author)
@@ -134,11 +134,11 @@ namespace JCarrollOnlineV2
 
             if (fte != null)
             {
-                ltvm.InjectFrom(fte);
-                ltvm.Author = new ApplicationUserViewModel();
-                ltvm.Author.InjectFrom(fte.Author);
-                ltvm.Forum = new ForaViewModel();
-                ltvm.Forum.InjectFrom(fte.Forum);
+                ltVM.InjectFrom(fte);
+                ltVM.Author = new ApplicationUserViewModel();
+                ltVM.Author.InjectFrom(fte.Author);
+                ltVM.Forum = new ForaViewModel();
+                ltVM.Forum.InjectFrom(fte.Forum);
 
                 bool rootNotFound = true;
                 if (fte.ParentId != null)
@@ -149,8 +149,8 @@ namespace JCarrollOnlineV2
                             if (fte.ParentId == null)
                                 rootNotFound = false;
                     }
-                ltvm.PostRoot = fte.Id;
-                return ltvm;
+                ltVM.PostRoot = fte.Id;
+                return ltVM;
             }
             return null;
         }

@@ -34,9 +34,9 @@ namespace JCarrollOnlineV2.Tests.Controllers
         //    HomeController controller = new HomeController();
 
         //    var result = await controller.Welcome() as ViewResult;
-        //    HomeViewModel vm = (HomeViewModel)result.Model;
+        //    HomeViewModel bfiVM = (HomeViewModel)result.Model;
 
-        //    Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.PageTitle);
+        //    Assert.AreEqual("JCarrollOnlineV2 Home - Index", bfiVM.PageTitle);
 
         //}
 

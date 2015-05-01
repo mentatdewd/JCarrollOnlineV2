@@ -29,24 +29,24 @@ namespace JCarrollOnlineV2.Extensions
             {
                 foreach (var item in dataModel)
                 {
-                    HierarchyNodesViewModel<TView> hnvm = new HierarchyNodesViewModel<TView>();
-                    //hnvm.ImageList = new List<string>();
-                    //hnvm.ImageList.Add("/Content/images/reply-new.gif");
-                    //hnvm.Parent = parent;
-                    //hnvm.Depth = item.Depth;
-                    hnvm.InjectFrom(item);
-                    hnvm.Entity = new TView();
-                    hnvm.Entity.InjectFrom(item.Entity);
+                    HierarchyNodesViewModel<TView> hnVM = new HierarchyNodesViewModel<TView>();
+                    //hnVM.ImageList = new List<string>();
+                    //hnVM.ImageList.Add("/Content/images/reply-new.gif");
+                    //hnVM.Parent = parent;
+                    //hnVM.Depth = item.Depth;
+                    hnVM.InjectFrom(item);
+                    hnVM.Entity = new TView();
+                    hnVM.Entity.InjectFrom(item.Entity);
 
                     // Call injectordelegate here
                     var handler = new InjectorDelegate<TDom, TView>(EntityInjector);
-                    handler.Invoke(item.Entity, hnvm.Entity);
+                    handler.Invoke(item.Entity, hnVM.Entity);
 
-                    viewList.Add(hnvm);
-                    hnvm.ChildNodes = new List<HierarchyNodesViewModel<TView>>();
+                    viewList.Add(hnVM);
+                    hnVM.ChildNodes = new List<HierarchyNodesViewModel<TView>>();
                     if (item.ChildNodes.Count > 0)
                     {
-                        await AppendChildrenAsync(item.ChildNodes, (List<HierarchyNodesViewModel<TView>>)hnvm.ChildNodes, hnvm.Entity, false, handler);
+                        await AppendChildrenAsync(item.ChildNodes, (List<HierarchyNodesViewModel<TView>>)hnVM.ChildNodes, hnVM.Entity, false, handler);
                     }
                 }
             }
@@ -62,37 +62,37 @@ namespace JCarrollOnlineV2.Extensions
 
             foreach (var item in dataModel)
             {
-                HierarchyNodesViewModel<TView> hnvm = new HierarchyNodesViewModel<TView>();
-                hnvm.ImageList = new List<string>();
+                HierarchyNodesViewModel<TView> hnVM = new HierarchyNodesViewModel<TView>();
+                hnVM.ImageList = new List<string>();
 
-                hnvm.ImageList.Add("/Content/images/reply-new.gif");
+                hnVM.ImageList.Add("/Content/images/reply-new.gif");
 
                 if (item == dataModel.Last())
                 {
                     hasSibbs = false;
-                    hnvm.ImageList.Insert(0, "/Content/images/rtable-turn.gif");
+                    hnVM.ImageList.Insert(0, "/Content/images/rtable-turn.gif");
                 }
                 else
-                    hnvm.ImageList.Insert(0, "/Content/images/rtable-fork.gif");
+                    hnVM.ImageList.Insert(0, "/Content/images/rtable-fork.gif");
 
                 for (int i = 0; i < item.Depth - 2; i++)
                 {
                     if (hasSibblings)
-                        hnvm.ImageList.Insert(0, "/Content/images/rtable-line.gif");
+                        hnVM.ImageList.Insert(0, "/Content/images/rtable-line.gif");
                     else
-                        hnvm.ImageList.Insert(0, "/Content/images/rtable-space.gif");
+                        hnVM.ImageList.Insert(0, "/Content/images/rtable-space.gif");
                 }
-                hnvm.Entity = new TView();
-                hnvm.Parent = parent;
-                hnvm.Depth = item.Depth;
-                hnvm.Entity.InjectFrom(item.Entity);
-                handler.Invoke(item.Entity, hnvm.Entity);
-                viewList.Add(hnvm);
-                hnvm.ChildNodes = new List<HierarchyNodesViewModel<TView>>();
+                hnVM.Entity = new TView();
+                hnVM.Parent = parent;
+                hnVM.Depth = item.Depth;
+                hnVM.Entity.InjectFrom(item.Entity);
+                handler.Invoke(item.Entity, hnVM.Entity);
+                viewList.Add(hnVM);
+                hnVM.ChildNodes = new List<HierarchyNodesViewModel<TView>>();
                 if (item.ChildNodes.Count > 0)
                 {
-                    //hnvm.ImageList.Insert(0, "/Content/images/rtable-space.gif");
-                    await AppendChildrenAsync(item.ChildNodes, (List<HierarchyNodesViewModel<TView>>)hnvm.ChildNodes, hnvm.Entity, hasSibbs, handler);
+                    //hnVM.ImageList.Insert(0, "/Content/images/rtable-space.gif");
+                    await AppendChildrenAsync(item.ChildNodes, (List<HierarchyNodesViewModel<TView>>)hnVM.ChildNodes, hnVM.Entity, hasSibbs, handler);
                 }
             }
         }
