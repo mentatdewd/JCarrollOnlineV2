@@ -152,6 +152,7 @@ namespace JCarrollOnlineV2.Controllers
             }
             bfiVM.InjectFrom(blogItem);
             bfiVM.Author.InjectFrom(blogItem.Author);
+            bfiVM.AuthorId = bfiVM.Author.Id;
 
             return View(bfiVM);
         }
@@ -165,12 +166,12 @@ namespace JCarrollOnlineV2.Controllers
                 BlogItem domModel = new BlogItem();
 
                 domModel.InjectFrom(blogItemVM);
-                domModel.Author = await _data.Users.FindAsync(blogItemVM.Author.Id);
+                domModel.Author = await _data.Users.FindAsync(blogItemVM.AuthorId);
                 domModel.UpdatedAt = DateTime.Now;
 
                 _data.Entry(domModel).State = EntityState.Modified;
                 await _data.SaveChangesAsync();
-                return Redirect(Url.RouteUrl(new { controller = "BlogItemId", action = "Index"}));
+                return Redirect(Url.RouteUrl(new { controller = "Blog", action = "Index"}));
             }
             return View(blogItemVM);
         }

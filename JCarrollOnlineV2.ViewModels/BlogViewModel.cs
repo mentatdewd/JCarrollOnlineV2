@@ -40,6 +40,9 @@ namespace JCarrollOnlineV2.ViewModels
         }
         public int Id { get; set; }
         public ApplicationUserViewModel Author { get; set; }
+
+        public string AuthorId { get; set; }
+
         [Display(Name="Title")]
         public string Title { get; set; }
 
