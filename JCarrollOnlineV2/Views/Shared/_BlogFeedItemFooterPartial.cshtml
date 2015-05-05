@@ -16,6 +16,6 @@
                 </span>
             }
         </div>
-        @Html.BlogShowCommentsButton(Model.Id)
+        @Html.BlogShowCommentsButton(Model.Id) (@Model.Comments.BlogComments.Count())
     </footer>
 </div>

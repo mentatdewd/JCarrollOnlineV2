@@ -6,7 +6,7 @@
 @if (Model.MicropostFeedItems != null)
 {
     <ul class="micropostfeed">
-        @foreach (MicropostFeedItemViewModel micropost in Model.OnePageOfMicroposts.OrderByDescending(i => i.CreatedAt))
+        @foreach (MicropostFeedItemViewModel micropost in Model.OnePageOfMicroposts)
         {
             @Html.Partial("_MicropostFeedItemPartial", micropost)
         }

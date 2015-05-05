@@ -1,12 +1,22 @@
-﻿
-@using JCarrollOnlineV2.ViewModels
+﻿@using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.HtmlHelperExtensions
 @model ForumThreadEntryDetailItemsViewModel
 
+<script>
+    $(document).ready(function () {
+        $('#postDownArrow').click(function () {
+            $(this)
+               .closest('tbody')
+               .next('.section')
+            $(".section").toggle(400);
+            return false;
+        });
+    });
+</script>
 <table id="TOCTable">
     <tr id="TOCTableRow">
         <th id="TOCTableHeader">
-            @Html.Raw(@Model.NumberOfReplies + " replies")
+            <img id="postDownArrow" src="~/Content/images/post-downarrow.gif" /> @Html.Raw(@Model.NumberOfReplies - 1 + " replies")
         </th>
         <th id="TOCTableHeader">
             @Html.DisplayNameFor(model => model.ForumThreadEntries.First().Entity.Author)
@@ -18,6 +28,7 @@
             @Html.DisplayNameFor(model => model.ForumThreadEntries.First().Entity.PostNumber)
         </th>
     </tr>
-
-    @Html.Raw(Html.HierarchicalListView1("forumThreads", Model.ForumThreadEntries, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadEntryTOCItemPartial", l)).ToString()))
+    <tbody id="#tocTableBody" class="section">
+        @Html.Raw(Html.HierarchicalListView1("forumThreads", Model.ForumThreadEntries, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadEntryTOCItemPartial", l)).ToString()))
+    </tbody>
 </table>

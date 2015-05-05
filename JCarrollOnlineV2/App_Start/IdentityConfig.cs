@@ -6,7 +6,11 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
+using SendGrid;
 using System;
+using System.Configuration;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,31 +19,48 @@ namespace JCarrollOnlineV2
 {
     public class EmailService : IIdentityMessageService
     {
-        public Task SendAsync(IdentityMessage message)
+        public async Task SendAsync(IdentityMessage message)
         {
-            var mailMessage = new MailMessage(
-                "JCarrollOnline@jcarrollonline.apphb.com",
-                message.Destination,
-                message.Subject,
-                message.Body
-                );
+            var mailMessage = new MailMessage("jcarrollonline@gmail.com", message.Destination, message.Subject, message.Body);
+            mailMessage.IsBodyHtml = true;
 
-            // Send the message
-            SmtpClient client = new SmtpClient();
+            using(var smtpClient = new SmtpClient())
+            {
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+        }
 
-            client.Host = "smtp.gmail.com";
-            client.Port = 587;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new System.Net.NetworkCredential
-            ("jcarrollonline", "");// Enter seders User name and password  
-            client.EnableSsl = true;
+        // Use NuGet to install SendGrid (Basic C# client lib) 
+        private async Task configSendGridasync(IdentityMessage message)
+        {
+            var myMessage = new SendGridMessage();
+            myMessage.AddTo(message.Destination);
+            myMessage.From = new System.Net.Mail.MailAddress(
+                                "Joe@contoso.com", "Joe S.");
+            myMessage.Subject = message.Subject;
+            myMessage.Text = message.Body;
+            myMessage.Html = message.Body;
 
-            client.SendAsync(mailMessage, null);
+            var credentials = new NetworkCredential(
+                       ConfigurationManager.AppSettings["mailAccount"],
+                       ConfigurationManager.AppSettings["mailPassword"]
+                       );
 
-            return Task.FromResult(true);
+            // Create a Web transport for sending email.
+            var transportWeb = new Web(credentials);
+
+            // Send the email.
+            if (transportWeb != null)
+            {
+                await transportWeb.DeliverAsync(myMessage);
+            }
+            else
+            {
+                Trace.TraceError("Failed to create Web transport.");
+                await Task.FromResult(0);
+            }
         }
     }
-
     public class SmsService : IIdentityMessageService
     {
         public Task SendAsync(IdentityMessage message)
@@ -99,7 +120,7 @@ namespace JCarrollOnlineV2
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = 
+                manager.UserTokenProvider =
                     new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
             return manager;

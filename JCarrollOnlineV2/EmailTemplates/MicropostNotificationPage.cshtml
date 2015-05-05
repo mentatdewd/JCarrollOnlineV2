@@ -1,0 +1,33 @@
+﻿@using JCarrollOnlineV2.EmailModels
+@model MicropostNotification
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>New Micropost</title>
+</head>
+<body>
+    <p>
+        Hi @Model.Name,
+    </p>
+    <p>
+        @Model.Author has added the following micropost:
+        <br />
+    </p>
+    <p style="background-color:lightgrey; margin-left:40px; margin-right:80px">
+        @Model.Content
+    </p>
+
+    @*@if (!Model.IsPremiumUser)
+        {
+            <p>
+                To make the most of it, <a href="http://awesomesite.com/upgrade">upgrade to our premium package now</a>!
+            </p>
+        }*@
+
+    <a href="http://JCarrollOnline.com">JCarrollOnline</a>
+
+</body>
+</html>  

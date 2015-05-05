@@ -1,11 +1,11 @@
 ﻿@using JCarrollOnlineV2.ViewModels
-@model ApplicationUserViewModel
+@model UserItemViewModel
 
 @using (Html.BeginForm("Unfollow", "Users", Model))
 {
     @Html.AntiForgeryToken()
-    @Html.HiddenFor(model => model.Id);
-    @Html.HiddenFor(m => m.UserName);
+    @Html.HiddenFor(model => model.UserId);
+    @*@Html.HiddenFor(m => m.UserName);*@
     <input type="submit" value="Unfollow" class="btn btn-large btn-primary" />
 }
 @section Scripts {

@@ -54,13 +54,15 @@ namespace JCarrollOnlineV2.Controllers
         {
             UserDetailViewModel udVM = new UserDetailViewModel();
 
-            udVM.CurrentUser = new ApplicationUserViewModel();
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
-            udVM.CurrentUser.InjectFrom(currentUser);
 
             ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
-            udVM.User.InjectFrom(user);
+            udVM.UserInfoVM.User.InjectFrom(user);
+
+            udVM.UserInfoVM.MicropostEmailNotifications = user.MicropostEmailNotifications;
+            udVM.UserInfoVM.MicropostSMSNotifications = user.MicropostSMSNotifications;
+            udVM.UserInfoVM.UserId = currentUserId;
 
             udVM.UserStatsVM = new UserStatsViewModel();
             udVM.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
@@ -141,34 +143,53 @@ namespace JCarrollOnlineV2.Controllers
             return View("Show_Follow", udVM);
         }
 
-        public async Task<ActionResult> Follow([Bind(Include = "Id,UserName")]  ApplicationUserViewModel followUser)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Follow([Bind(Include = "UserId")]  UserItemViewModel followUser)
         {
 
             if (ModelState.IsValid)
             {
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                var followingUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == followUser.Id);
+                var followingUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
 
                 currentUser.Following.Add(followingUser);
                 await _data.SaveChangesAsync();
             }
-            return RedirectToAction("Details", new { userid = followUser.Id });
+            return RedirectToAction("Details", new { userid = followUser.UserId });
         }
 
-        public async Task<ActionResult> Unfollow([Bind(Include = "Id,UserName")]  ApplicationUserViewModel followUser)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Unfollow([Bind(Include = "UserId")]  UserItemViewModel followUser)
         {
 
             if (ModelState.IsValid)
             {
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                var followingUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == followUser.Id);
+                var followingUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
 
                 currentUser.Following.Remove(followingUser);
                 await _data.SaveChangesAsync();
             }
-            return RedirectToAction("Details", new { userid = followUser.Id });
+            return RedirectToAction("Details", new { userid = followUser.UserId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UserSettings([Bind(Include = "UserId,MicropostEmailNotifications,MicropostSMSNotifications")] UserItemViewModel auVM)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser user = await _data.Users.FirstOrDefaultAsync(x => x.Id == auVM.UserId);
+
+                user.MicropostEmailNotifications = auVM.MicropostEmailNotifications;
+                user.MicropostSMSNotifications = auVM.MicropostSMSNotifications;
+                await _data.SaveChangesAsync();
+            }
+            return RedirectToAction("Details", new { userid = auVM.UserId });
         }
 
         // GET: Users/Create

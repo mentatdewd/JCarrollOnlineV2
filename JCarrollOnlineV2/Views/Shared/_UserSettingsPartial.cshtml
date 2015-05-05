@@ -1,0 +1,26 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model UserItemViewModel
+@{
+    Layout = "";
+}
+
+<div id="userSettings" class="userSettingsFormClassDiv" title="User Settings">
+    @using (Html.BeginForm("UserSettings", "Users", FormMethod.Post, new { }))
+    {
+        @Html.ValidationSummary(true)
+
+        @Html.AntiForgeryToken()
+
+        <span><span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 0 0;"></span>User Settings</span>
+        <div style="margin-left: 23px;">
+            @Html.HiddenFor(m=>m.UserId)
+
+            @Html.CheckBoxFor(m => m.MicropostEmailNotifications, new { @checked = Model.MicropostEmailNotifications })
+            @Html.LabelFor(m => m.MicropostEmailNotifications)
+            <br />
+            @Html.CheckBoxFor(m => m.MicropostSMSNotifications, new { @checked = Model.MicropostSMSNotifications })
+            @Html.LabelFor(m => m.MicropostSMSNotifications)
+            <button type="submit" class="btn btn-large btn-primary" value="UserSettings">Save User Settings</button>
+        </div>
+    }
+</div>

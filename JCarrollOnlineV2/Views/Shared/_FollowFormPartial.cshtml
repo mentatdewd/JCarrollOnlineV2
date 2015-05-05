@@ -4,15 +4,12 @@
 @model UserDetailViewModel
 
 @{
-    if(User.Identity.GetUserId() != Model.User.Id)
+    if (Model.UserStatsVM.UserFollowers.Users.Exists(x => x.User.Id == Model.UserInfoVM.UserId) == true)
     {
-        if(Model.UserStatsVM.UserFollowers.Users.Exists(x => x.User.Id == Model.CurrentUser.Id) == true)
-        {
-            @Html.Partial("_UnfollowPartial", Model.User)
-        }
-        else
-        {
-            @Html.Partial("_FollowPartial", Model.User)
-        }
+        @Html.Partial("_UnfollowPartial", Model.UserInfoVM)
+    }
+    else
+    {
+        @Html.Partial("_FollowPartial", Model.UserInfoVM)
     }
 }

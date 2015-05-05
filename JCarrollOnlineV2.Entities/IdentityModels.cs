@@ -17,6 +17,11 @@ namespace JCarrollOnlineV2.Entities
             // Add custom user claims here
             return userIdentity;
         }
+
+
+        public bool MicropostEmailNotifications { get; set; }
+        public bool MicropostSMSNotifications { get; set; }
+
         // Navigation Property
         public virtual ICollection<ForumThreadEntry> ForumThreadEntries { get; set; }
 

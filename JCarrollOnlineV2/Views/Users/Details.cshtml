@@ -1,4 +1,5 @@
 ﻿@using JCarrollOnlineV2.ViewModels
+@using Microsoft.AspNet.Identity
 @model UserDetailViewModel
 
 @{
@@ -7,24 +8,68 @@
 }
 
 <div class="row">
-    <aside class="span4">
-        <div class="user_info">
-            <a href='@Url.Action("Details", "Users", new { userId = Model.User.Id })' />
+    <aside class="col-md-4">
+        <section>
             @{
-                @Html.Gravatar(Model.User.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" });
+                Model.UserInfoVM.PageTitle = Model.PageTitle;
             }
-            <span class="user_name">
-                <h1 class="user_name">@Model.User.UserName</h1>
-            </span>
-            <section>
-                @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
-            </section>
-        </div>
+            @Html.Partial("_UserInfoPartial", Model.UserInfoVM)
+        </section>
+        <section>
+            @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
+        </section>
+        <section>
+            @if (@Model.UserInfoVM.UserId != @Model.UserInfoVM.User.Id)
+            {
+                @Html.Partial("_FollowFormPartial", Model)
+            }
+            else
+            {
+                @Html.Partial("_UserSettingsPartial", Model.UserInfoVM)
+            }
+        </section>
     </aside>
-    <div class="span4">
-        @Html.Partial("_FollowFormPartial", Model)
-    </div>
-    <div class="span4">
-        <h3>Moderated Forums</h3>
-    </div>
+    <aside class="col-md-4">
+        @{
+            <section>
+                @Html.Raw("<h1>" + Model.PageTitle + "</h1>")
+            </section>
+            <section>
+                <h2>Following</h2>
+                <ul>
+                    @if (Model.UserStatsVM.UsersFollowing.Users.Count > 0)
+                    {
+                        foreach (var user in Model.UserStatsVM.UsersFollowing.Users)
+                        {
+                            if (user.User.Id != Model.UserInfoVM.UserId)
+                            {
+                                @Html.Partial("_UserInfoPartial", user)
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <li>None</li>
+                    }
+                </ul>
+                <h2>Followers</h2>
+                <ul>
+                    @if (Model.UserStatsVM.UserFollowers.Users.Count > 0)
+                    {
+                        foreach (var user in Model.UserStatsVM.UserFollowers.Users)
+                        {
+                            if (user.User.Id != Model.UserInfoVM.UserId)
+                            {
+                                @Html.Partial("_UserInfoPartial", user)
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <li>None</li>
+                    }
+                </ul>
+            </section>
+        }
+    </aside>
 </div>

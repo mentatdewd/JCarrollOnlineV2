@@ -6,8 +6,13 @@ using Omu.ValueInjecter;
 using System;
 using System.Data.Entity;
 using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using RazorEngine.Templating;
+using JCarrollOnlineV2.EmailModels;
+using System.ComponentModel;
+using RazorEngine.Configuration;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -16,7 +21,8 @@ namespace JCarrollOnlineV2.Controllers
     {
         private IContext _data { get; set; }
 
-        public MicropostsController() : this(null)
+        public MicropostsController()
+            : this(null)
         {
 
         }
@@ -67,14 +73,58 @@ namespace JCarrollOnlineV2.Controllers
                 domModel.CreatedAt = DateTime.Now;
                 domModel.UpdatedAt = DateTime.Now;
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
+                ApplicationUser currentUser = await _data.Users.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId);
                 domModel.Author = currentUser;
                 _data.Microposts.Add(domModel);
                 await _data.SaveChangesAsync();
+
+                await SendMicropostNotification(domModel, currentUser);
+
                 return RedirectToAction("Index", "Home");
             }
-
             return View(micropostVM);
+        }
+
+        private static async Task SendMicropostNotification(Micropost domModel, ApplicationUser currentUser)
+        {
+            //var smtpClient = new SmtpClient("localhost", 25);
+            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicropostNotificationPage.cshtml");
+            var templateService = RazorEngineService.Create();
+
+            foreach (var user in currentUser.Followers)
+            {
+                if (user.MicropostEmailNotifications == true)
+                {
+                    await SendEmail(domModel, currentUser, templateFilePath, templateService, user);
+                }
+            }
+            if (currentUser.MicropostEmailNotifications == true)
+            {
+                await SendEmail(domModel, currentUser, templateFilePath, templateService, currentUser);
+            }
+        }
+
+        private static async Task SendEmail(Micropost domModel, ApplicationUser currentUser, string templateFilePath, IRazorEngineService templateService, ApplicationUser user)
+        {
+            var micropostNotification = new EmailModels.MicropostNotification();
+
+            micropostNotification.Email = user.Email;
+            micropostNotification.Name = user.UserName;
+            micropostNotification.Author = currentUser.UserName;
+            micropostNotification.Content = domModel.Content;
+
+            var emailHtmlBody = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "templatekey", null, micropostNotification);
+
+            var email = new IdentityMessage()
+            {
+                Body = emailHtmlBody,
+                Destination = user.Email,
+                Subject = currentUser.UserName + " has added a new micropost"
+            };
+            var emailService = new EmailService();
+
+            await emailService.SendAsync(email);
         }
 
         // GET: Microposts/Edit/5

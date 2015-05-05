@@ -32,14 +32,20 @@ namespace JCarrollOnlineV2.ViewModels
     }
     public class UserDetailViewModel : UserViewModelBase
     {
-        public ApplicationUserViewModel CurrentUser { get; set; }
+        public UserDetailViewModel()
+        {
+            UserInfoVM = new UserItemViewModel();
+            UserStatsVM = new UserStatsViewModel();
+        }
         public UserItemViewModel UserInfoVM { get; set; }
         public UserStatsViewModel UserStatsVM { get; set; }
     }
 
     public class UserItemViewModel : UserViewModelBase
     {
-        public bool Followed { get; set; }
+        public string UserId { get; set; }
+        public bool MicropostEmailNotifications { get; set; }
+        public bool MicropostSMSNotifications { get; set; }
         public int? MicropostsAuthored { get; set; }
         public List<MicropostFeedItemViewModel> Microposts { get; set; }
     }
