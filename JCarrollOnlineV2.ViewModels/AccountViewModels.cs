@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JCarrollOnlineV2.ViewModels
 {
-    public class ExternalLoginConfirmationViewModel
+    public class ExternalLoginConfirmationViewModel : ViewModelBase
     {
         [Required]
         public string SiteUserName { get; set; }
@@ -12,12 +12,12 @@ namespace JCarrollOnlineV2.ViewModels
         public string Email { get; set; }
     }
 
-    public class ExternalLoginListViewModel
+    public class ExternalLoginListViewModel : ViewModelBase
     {
         public string ReturnUrl { get; set; }
     }
 
-    public class SendCodeViewModel
+    public class SendCodeViewModel : ViewModelBase
     {
         public string SelectedProvider { get; set; }
         public ICollection<System.Web.Mvc.SelectListItem> Providers { get; set; }
@@ -25,7 +25,7 @@ namespace JCarrollOnlineV2.ViewModels
         public bool RememberMe { get; set; }
     }
 
-    public class VerifyCodeViewModel
+    public class VerifyCodeViewModel : ViewModelBase
     {
         [Required]
         public string Provider { get; set; }
@@ -41,11 +41,16 @@ namespace JCarrollOnlineV2.ViewModels
         public bool RememberMe { get; set; }
     }
 
-    public class ForgotViewModel
+    public class ForgotViewModel : ViewModelBase
     {
         [Required]
         [Display(Name = "Email")]
         public string Email { get; set; }
+    }
+
+    public class LoginConfirmationViewModel : ViewModelBase
+    {
+
     }
 
     public class LoginViewModel : ViewModelBase
@@ -69,7 +74,7 @@ namespace JCarrollOnlineV2.ViewModels
     public class RegisterViewModel : ViewModelBase
     {
         [Required]
-        [Display(Name="User Name")]
+        [Display(Name = "User Name")]
         public string UserName { get; set; }
 
         [Required]
@@ -89,7 +94,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string ConfirmPassword { get; set; }
     }
 
-    public class ResetPasswordViewModel
+    public class ResetPasswordViewModel : ViewModelBase
     {
         [Required]
         [EmailAddress]
@@ -110,7 +115,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string Code { get; set; }
     }
 
-    public class ForgotPasswordViewModel
+    public class ForgotPasswordViewModel : ViewModelBase
     {
         [Required]
         [EmailAddress]

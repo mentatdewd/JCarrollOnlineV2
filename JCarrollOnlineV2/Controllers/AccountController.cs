@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -67,6 +68,7 @@ namespace JCarrollOnlineV2.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [OutputCache(NoStore = true, Location = OutputCacheLocation.None)]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
             if (!ModelState.IsValid)
@@ -80,6 +82,12 @@ namespace JCarrollOnlineV2.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+                    if(!await UserManager.IsEmailConfirmedAsync((await UserManager.FindByNameAsync(model.UserName)).Id))
+                    {
+                        AuthenticationManager.SignOut();
+                        ModelState.AddModelError("", "You need to confirm your email");
+                        return View(model);
+                    }
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
@@ -158,15 +166,15 @@ namespace JCarrollOnlineV2.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    //await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Login", "Account");
                 }
                 AddErrors(result);
             }
@@ -184,8 +192,9 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View("Error");
             }
+            LoginConfirmationViewModel lcVM = new LoginConfirmationViewModel();
             var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            return View(result.Succeeded ? "ConfirmEmail" : "Error", lcVM);
         }
 
         //
