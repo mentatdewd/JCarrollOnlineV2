@@ -55,7 +55,10 @@
             </tr>
         }
     </table>
-    <p class="text-center">
-        @Html.ActionLink("Create New", "Create", "Fora", new { @class = "btn btn-large btn-primary" })
-    </p>
+    @if (User.IsInRole("Administrator"))
+    {
+        <p class="text-center">
+            @Html.ActionLink("Create New", "Create", "Fora", new { @class = "btn btn-large btn-primary" })
+        </p>
+    }
 </div>
