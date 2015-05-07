@@ -10,9 +10,9 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using RazorEngine.Templating;
-using JCarrollOnlineV2.EmailModels;
 using System.ComponentModel;
 using RazorEngine.Configuration;
+using JCarrollOnlineV2.EmailViewModels;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -68,59 +68,71 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                Micropost domModel = new Micropost();
-                domModel.InjectFrom(micropostVM);
-                domModel.CreatedAt = DateTime.Now;
-                domModel.UpdatedAt = DateTime.Now;
+                Micropost micropost = new Micropost();
+                micropost.InjectFrom(micropostVM);
+                micropost.CreatedAt = DateTime.Now;
+                micropost.UpdatedAt = DateTime.Now;
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser currentUser = await _data.Users.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId);
-                domModel.Author = currentUser;
-                _data.Microposts.Add(domModel);
+                micropost.Author = currentUser;
+                _data.Microposts.Add(micropost);
                 await _data.SaveChangesAsync();
 
-                await SendMicropostNotification(domModel, currentUser);
+                await SendMicropostNotification(micropost, currentUser);
 
                 return RedirectToAction("Index", "Home");
             }
             return View(micropostVM);
         }
 
-        private static async Task SendMicropostNotification(Micropost domModel, ApplicationUser currentUser)
+        private static async Task SendMicropostNotification(Micropost micropost, ApplicationUser currentUser)
         {
-            //var smtpClient = new SmtpClient("localhost", 25);
-            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicropostNotificationPage.cshtml");
-            var templateService = RazorEngineService.Create();
-
             foreach (var user in currentUser.Followers)
             {
                 if (user.MicropostEmailNotifications == true)
                 {
-                    await SendEmail(domModel, currentUser, templateFilePath, templateService, user);
+                    var mneVM = GenerateViewModel(micropost, currentUser, user);
+                    
+                    await SendEmail(mneVM);
                 }
             }
             if (currentUser.MicropostEmailNotifications == true)
             {
-                await SendEmail(domModel, currentUser, templateFilePath, templateService, currentUser);
+                var mneVM = GenerateViewModel(micropost, currentUser, currentUser);
+                await SendEmail(mneVM);
             }
         }
 
-        private static async Task SendEmail(Micropost domModel, ApplicationUser currentUser, string templateFilePath, IRazorEngineService templateService, ApplicationUser user)
+        private static MicropostNotificationEmailViewModel GenerateViewModel(Micropost micropost, ApplicationUser currentUser, ApplicationUser user)
         {
-            var micropostNotification = new EmailModels.MicropostNotification();
+            var mneVM = new MicropostNotificationEmailViewModel();
 
-            micropostNotification.Email = user.Email;
-            micropostNotification.Name = user.UserName;
-            micropostNotification.Author = currentUser.UserName;
-            micropostNotification.Content = domModel.Content;
+            mneVM.TargetUser = new ApplicationUserViewModel();
+            mneVM.TargetUser.InjectFrom(user);
+            mneVM.MicropostAuthor = new ApplicationUserViewModel();
+            mneVM.MicropostAuthor.InjectFrom(currentUser);
+            mneVM.MicropostContent = micropost.Content;
+            return mneVM;
+        }
 
-            var emailHtmlBody = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "templatekey", null, micropostNotification);
+        private static async Task SendEmail(MicropostNotificationEmailViewModel mneVM)
+        {
 
+            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicropostNotificationPage.cshtml");
+            var templateService = RazorEngineService.Create();
+            mneVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "micropostTemplatekey", null, mneVM);
+
+            await SendEmailAsync(mneVM);
+        }
+
+        public static async Task SendEmailAsync(MicropostNotificationEmailViewModel mneVM)
+        {
             var email = new IdentityMessage()
             {
-                Body = emailHtmlBody,
-                Destination = user.Email,
-                Subject = currentUser.UserName + " has added a new micropost"
+                Body = mneVM.Content,
+                Destination = mneVM.TargetUser.Email,
+                Subject = mneVM.MicropostAuthor.UserName + " has added a new micropost"
             };
             var emailService = new EmailService();
 

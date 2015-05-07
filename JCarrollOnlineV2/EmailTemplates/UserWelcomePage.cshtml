@@ -1,0 +1,26 @@
+﻿@using JCarrollOnlineV2.EmailViewModels
+@model UserWelcomeViewModel
+
+    <!DOCTYPE html>
+
+    <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" />
+        <title>Welcome</title>
+    </head>
+    <body>
+        <div class="headerimage">
+            <img src="https://www.dropbox.com/s/omuane2didx7rh0/DeceptionPassBridgeInFogHeader.jpg?raw=1" alt="Bridging the space between imagination and implementation..." style="max-height:100%; max-width:100%"><p>
+        </div>
+        Hi @Model.TargetUser.UserName,
+        </p>
+        <p>
+            Thanks for signing up to <a href="http://JCarrollOnline.com">JCarrollOnline.com</a>!
+        </p>
+        <p>
+            Confirm your account, Please confirm your account by clicking <a href="@Model.CallbackUrl">here</a>
+        </p>
+        <p>John, Founder</p>
+
+    </body>
+</html>  

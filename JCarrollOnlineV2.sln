@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.ViewModels
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.Test", "JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj", "{73819D1D-84B2-4E96-ACC8-0BBE815732BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailModels", "EmailModels\EmailModels.csproj", "{A5845C0D-2B3E-4109-9A02-04125CD49B08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailViewModels", "EmailModels\EmailViewModels.csproj", "{A5845C0D-2B3E-4109-9A02-04125CD49B08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

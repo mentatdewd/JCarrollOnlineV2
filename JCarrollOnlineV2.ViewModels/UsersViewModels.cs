@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace JCarrollOnlineV2.ViewModels
 {
@@ -44,8 +45,13 @@ namespace JCarrollOnlineV2.ViewModels
     public class UserItemViewModel : UserViewModelBase
     {
         public string UserId { get; set; }
+
+        [Display(Name="Micropost Email Notifications")]
         public bool MicropostEmailNotifications { get; set; }
+
+        [Display(Name="Micropost SMS Notifications")]
         public bool MicropostSMSNotifications { get; set; }
+
         public int? MicropostsAuthored { get; set; }
         public List<MicropostFeedItemViewModel> Microposts { get; set; }
     }

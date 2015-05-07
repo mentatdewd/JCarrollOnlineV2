@@ -1,5 +1,4 @@
 ﻿using JCarrollOnlineV2.DataContexts;
-using JCarrollOnlineV2.EmailModels;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
 using Omu.ValueInjecter;

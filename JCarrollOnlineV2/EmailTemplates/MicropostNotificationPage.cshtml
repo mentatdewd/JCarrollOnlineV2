@@ -1,5 +1,5 @@
-﻿@using JCarrollOnlineV2.EmailModels
-@model MicropostNotification
+﻿@using JCarrollOnlineV2.EmailViewModels
+@model MicropostNotificationEmailViewModel
 
 <!DOCTYPE html>
 
@@ -9,15 +9,18 @@
     <title>New Micropost</title>
 </head>
 <body>
+    <div class="headerimage">
+        <img src="https://www.dropbox.com/s/omuane2didx7rh0/DeceptionPassBridgeInFogHeader.jpg?raw=1" alt="Bridging the space between imagination and implementation..." style="max-height:100%; max-width:100%"><p>
+    </div>
     <p>
-        Hi @Model.Name,
+        Hi @Model.TargetUser.UserName,
     </p>
     <p>
-        @Model.Author has added the following micropost:
+        @Model.MicropostAuthor has added the following micropost:
         <br />
     </p>
     <p style="background-color:lightgrey; margin-left:40px; margin-right:80px">
-        @Model.Content
+        @Model.MicropostContent
     </p>
 
     @*@if (!Model.IsPremiumUser)

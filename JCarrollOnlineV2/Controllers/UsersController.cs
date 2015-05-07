@@ -71,7 +71,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 UserItemViewModel uiVM = new UserItemViewModel();
                 uiVM.User.InjectFrom(item);
-                uiVM.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
+                uiVM.MicropostsAuthored = await _data.Microposts.Where(u => u.Author.Id == item.Id).CountAsync();
                 udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
             }
             udVM.UserStatsVM.UserFollowers = new UserFollowersViewModel();
@@ -79,7 +79,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 UserItemViewModel uiVM = new UserItemViewModel();
                 uiVM.User.InjectFrom(item);
-                uiVM.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
+                uiVM.MicropostsAuthored = await _data.Microposts.Where(u => u.Author.Id == item.Id).CountAsync();
                 udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
             }
             return View(udVM);

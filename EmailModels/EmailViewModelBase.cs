@@ -7,9 +7,9 @@ using JCarrollOnlineV2.ViewModels;
 
 namespace JCarrollOnlineV2.EmailViewModels
 {
-    public class MicropostNotificationEmailViewModel : EmailViewModelBase
+    public class EmailViewModelBase
     {
-        public ApplicationUserViewModel MicropostAuthor { get; set; }
-        public string MicropostContent { get; set; }
+        public ApplicationUserViewModel TargetUser { get; set; }
+        public string Content { get; set; }
     }
 }

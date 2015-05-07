@@ -39,10 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EmailModelBase.cs" />
+    <Compile Include="EmailViewModelBase.cs" />
     <Compile Include="MicropostNotification.cs" />
-    <Compile Include="UserEmail.cs" />
+    <Compile Include="WelcomeUserEmail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JCarrollOnlineV2.ViewModels\JCarrollOnlineV2.ViewModels.csproj">
+      <Project>{a4675e34-6310-4fef-9ad8-498cdc8c7757}</Project>
+      <Name>JCarrollOnlineV2.ViewModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

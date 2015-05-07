@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using RazorEngine.Templating;
+using System;
+using Omu.ValueInjecter;
+using JCarrollOnlineV2.EmailViewModels;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -172,7 +176,11 @@ namespace JCarrollOnlineV2.Controllers
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    //await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    ApplicationUserViewModel auVM = new ApplicationUserViewModel();
+                    auVM.InjectFrom(user);
+
+                    await SendWelcomeEmail(auVM, callbackUrl);
 
                     return RedirectToAction("Login", "Account");
                 }
@@ -181,6 +189,45 @@ namespace JCarrollOnlineV2.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+        private static async Task SendWelcomeEmail(ApplicationUserViewModel user, string callbackUrl)
+        {
+                    var uwVM = GenerateViewModel(user, callbackUrl);
+
+                    await SendEmail(uwVM);
+        }
+
+        private static UserWelcomeViewModel GenerateViewModel(ApplicationUserViewModel user, string callbackUrl)
+        {
+            var uwVm = new UserWelcomeViewModel();
+
+            uwVm.TargetUser = user;
+            uwVm.CallbackUrl = callbackUrl;
+            return uwVm;
+        }
+
+        private static async Task SendEmail(UserWelcomeViewModel uwVM)
+        {
+
+            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
+            var templateService = RazorEngineService.Create();
+            uwVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, uwVM);
+
+            await SendEmailAsync(uwVM);
+        }
+
+        public static async Task SendEmailAsync(UserWelcomeViewModel uwVM)
+        {
+            var email = new IdentityMessage()
+            {
+                Body = uwVM.Content,
+                Destination = uwVM.TargetUser.Email,
+                Subject = "Welcome to JCarrollOnline"
+            };
+            var emailService = new EmailService();
+
+            await emailService.SendAsync(email);
         }
 
         //

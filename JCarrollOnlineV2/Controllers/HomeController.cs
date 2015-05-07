@@ -102,7 +102,7 @@ namespace JCarrollOnlineV2.Controllers
                     hVM.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
                 }
                 var micropostPageNumber = micropostPage ?? 1;
-                hVM.MicropostFeedVM.OnePageOfMicroposts = hVM.MicropostFeedVM.MicropostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 5);
+                hVM.MicropostFeedVM.OnePageOfMicroposts = hVM.MicropostFeedVM.MicropostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
 
                 hVM.RssFeedVM = await rss;
             }

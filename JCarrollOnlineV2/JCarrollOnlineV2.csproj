@@ -347,6 +347,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\images\DeceptionPassBridgeInFogHeader.jpg" />
     <Content Include="Content\images\Deception_Pass_Bridge_in_fog.jpg" />
     <Content Include="Content\images\Deception_Pass_Bridge_in_fog2.jpg" />
     <Content Include="Content\images\feed-icon-28x28.png" />
@@ -471,7 +472,7 @@
     <Content Include="Scripts\jcarrollonlinev2.js" />
     <Content Include="Content\games\WebPlayer.unity3d" />
     <Content Include="Content\Prism.less" />
-    <Content Include="EmailTemplates\UserEmailPage.cshtml">
+    <Content Include="EmailTemplates\UserWelcomePage.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="EmailTemplates\MicropostNotificationPage.cshtml">
@@ -624,9 +625,9 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EmailModels\EmailModels.csproj">
+    <ProjectReference Include="..\EmailModels\EmailViewModels.csproj">
       <Project>{a5845c0d-2b3e-4109-9a02-04125cd49b08}</Project>
-      <Name>EmailModels</Name>
+      <Name>EmailViewModels</Name>
     </ProjectReference>
     <ProjectReference Include="..\JCarrollOnlineV2.Entities\JCarrollOnlineV2.Entities.csproj">
       <Project>{5d0cbbda-1f49-4c1b-a508-fdab11b4d72f}</Project>
