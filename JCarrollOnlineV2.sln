@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2", "JCarrollOnlineV2\JCarrollOnlineV2.csproj", "{2835FDBA-96BA-4D5C-850D-A909BB12F4E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B389B68B-D69A-4791-9F47-F0F24205A247} = {B389B68B-D69A-4791-9F47-F0F24205A247}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.Entities", "JCarrollOnlineV2.Entities\JCarrollOnlineV2.Entities.csproj", "{5D0CBBDA-1F49-4C1B-A508-FDAB11B4D72F}"
 EndProject
@@ -12,6 +15,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.Test", "JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj", "{73819D1D-84B2-4E96-ACC8-0BBE815732BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailViewModels", "EmailModels\EmailViewModels.csproj", "{A5845C0D-2B3E-4109-9A02-04125CD49B08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.WCFService", "JCarrollOnlineV2.WCFService\JCarrollOnlineV2.WCFService.csproj", "{B389B68B-D69A-4791-9F47-F0F24205A247}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.WCFClient", "JCarrollOnlineV2.WCFClient\JCarrollOnlineV2.WCFClient.csproj", "{476EAE2B-0E40-4481-848A-84D494A50D80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +46,14 @@ Global
 		{A5845C0D-2B3E-4109-9A02-04125CD49B08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5845C0D-2B3E-4109-9A02-04125CD49B08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5845C0D-2B3E-4109-9A02-04125CD49B08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B389B68B-D69A-4791-9F47-F0F24205A247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B389B68B-D69A-4791-9F47-F0F24205A247}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B389B68B-D69A-4791-9F47-F0F24205A247}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B389B68B-D69A-4791-9F47-F0F24205A247}.Release|Any CPU.Build.0 = Release|Any CPU
+		{476EAE2B-0E40-4481-848A-84D494A50D80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{476EAE2B-0E40-4481-848A-84D494A50D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{476EAE2B-0E40-4481-848A-84D494A50D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{476EAE2B-0E40-4481-848A-84D494A50D80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
