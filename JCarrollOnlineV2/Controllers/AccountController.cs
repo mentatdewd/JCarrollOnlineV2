@@ -57,7 +57,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         //
-        // GET: /Account/Login
+        // GET: /Account/JCarrollOnlineV2Service
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -68,7 +68,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         //
-        // POST: /Account/Login
+        // POST: /Account/JCarrollOnlineV2Service
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -182,7 +182,7 @@ namespace JCarrollOnlineV2.Controllers
 
                     await SendWelcomeEmail(auVM, callbackUrl);
 
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("JCarrollOnlineV2Service", "Account");
                 }
                 AddErrors(result);
             }
@@ -384,7 +384,7 @@ namespace JCarrollOnlineV2.Controllers
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("JCarrollOnlineV2Service");
             }
 
             // Sign in the user with this external login provider if the user already has a login

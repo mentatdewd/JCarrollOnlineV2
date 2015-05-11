@@ -255,6 +255,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\ServiceConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -659,6 +660,10 @@
     <ProjectReference Include="..\JCarrollOnlineV2.ViewModels\JCarrollOnlineV2.ViewModels.csproj">
       <Project>{a4675e34-6310-4fef-9ad8-498cdc8c7757}</Project>
       <Name>JCarrollOnlineV2.ViewModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JCarrollOnlineV2.WCFService\JCarrollOnlineV2.WCFService.csproj">
+      <Project>{b389b68b-d69a-4791-9f47-f0f24205a247}</Project>
+      <Name>JCarrollOnlineV2.WCFService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

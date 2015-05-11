@@ -18,8 +18,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailViewModels", "EmailMod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.WCFService", "JCarrollOnlineV2.WCFService\JCarrollOnlineV2.WCFService.csproj", "{B389B68B-D69A-4791-9F47-F0F24205A247}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCarrollOnlineV2.WCFClient", "JCarrollOnlineV2.WCFClient\JCarrollOnlineV2.WCFClient.csproj", "{476EAE2B-0E40-4481-848A-84D494A50D80}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,10 +48,6 @@ Global
 		{B389B68B-D69A-4791-9F47-F0F24205A247}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B389B68B-D69A-4791-9F47-F0F24205A247}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B389B68B-D69A-4791-9F47-F0F24205A247}.Release|Any CPU.Build.0 = Release|Any CPU
-		{476EAE2B-0E40-4481-848A-84D494A50D80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{476EAE2B-0E40-4481-848A-84D494A50D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{476EAE2B-0E40-4481-848A-84D494A50D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{476EAE2B-0E40-4481-848A-84D494A50D80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

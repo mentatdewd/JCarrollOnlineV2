@@ -9,6 +9,11 @@ namespace JCarrollOnlineV2
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            //routes.Add(new ServiceRoute("Service", new ServiceHostFactory(), typeof(CalculatorService)));
+            //Extra ignores to support WCF in ASP.NET MVC
+            routes.IgnoreRoute("{resource}.svc/{*pathInfo}");
+            routes.IgnoreRoute("{resource}.svc");
+            
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
