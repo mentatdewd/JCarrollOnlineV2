@@ -13,7 +13,7 @@ namespace JCarrollOnlineV2.App_Start
         public static void StartService()
         {
             // Step 1 Create a URI to serve as the base address.
-            Uri baseAddress = new Uri("http://localhost:44306/Service/");
+            Uri baseAddress = new Uri("http://localhost:44306/WCFService/JCarrollOnlineV2Service");
 
             // Step 2 Create a ServiceHost instance
             ServiceHost selfHost = new ServiceHost(typeof(JCarrollOnlineV2Service), baseAddress);
@@ -21,7 +21,7 @@ namespace JCarrollOnlineV2.App_Start
             try
             {
                 // Step 3 Add a service endpoint.
-                selfHost.AddServiceEndpoint(typeof(JCarrollOnlineV2Service), new WSHttpBinding(), "CalculatorService");
+                selfHost.AddServiceEndpoint(typeof(JCarrollOnlineV2Service), new WSHttpBinding(), "JCarrollOnlineV2Service");
 
                 // Step 4 Enable metadata exchange.
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
@@ -30,7 +30,7 @@ namespace JCarrollOnlineV2.App_Start
                 selfHost.AddServiceEndpoint(
                             typeof(IMetadataExchange),
                             MetadataExchangeBindings.CreateMexHttpBinding(),
-                            "http://localhost:44306/Service/mex");
+                            "http://localhost:44306/WCFService/JCarrollOnlineV2Service/mex");
 
                 // Step 5 Start the service.
                 selfHost.Open();

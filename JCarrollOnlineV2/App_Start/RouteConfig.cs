@@ -11,8 +11,8 @@ namespace JCarrollOnlineV2
 
             //routes.Add(new ServiceRoute("Service", new ServiceHostFactory(), typeof(CalculatorService)));
             //Extra ignores to support WCF in ASP.NET MVC
-            routes.IgnoreRoute("{resource}.svc/{*pathInfo}");
-            routes.IgnoreRoute("{resource}.svc");
+            routes.IgnoreRoute("JCarrollOnlineV2.WCFService/{resource}.svc/{*pathInfo}");
+            routes.IgnoreRoute("JCarrollOnlineV2.WCFService/{resource}.svc");
             
             routes.MapRoute(
                 name: "Default",

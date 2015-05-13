@@ -114,7 +114,6 @@
     <Compile Include="ForumThreadEntriesViewModels.cs" />
     <Compile Include="HierarchyNodeViewModel.cs" />
     <Compile Include="HomeViewModel.cs" />
-    <Compile Include="ManageViewModels.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="MicropostViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="55GWv6LpVcvVQfWiHkBmHVPPDtc=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="wyg+WtRkMUHiOxizqzcTgqzzj4M=">
   <bindingConfigurations>
-    <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_IJCarrollOnlineV2Service">
+    <bindingConfiguration bindingType="basicHttpBinding" name="JCarrollOnlineV2Service">
       <properties>
         <property path="/name" isComplexType="false" isExplicitlyDefined="true" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>BasicHttpBinding_IJCarrollOnlineV2Service</serializedValue>
+          <serializedValue>JCarrollOnlineV2Service</serializedValue>
         </property>
         <property path="/closeTimeout" isComplexType="false" isExplicitlyDefined="true" clrType="System.TimeSpan, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_IJCarrollOnlineV2Service" contract="JCarrollOnlineV2Service.IJCarrollOnlineV2Service" bindingType="basicHttpBinding" address="http://localhost:8733/Design_Time_Addresses/JCarrollOnlineV2.WCFService/JCarrollOnlineV2Service/" bindingConfiguration="BasicHttpBinding_IJCarrollOnlineV2Service">
+    <endpoint name="JCarrollOnlineV2Service" contract="JCarrollOnlineV2Service.IJCarrollOnlineV2Service" bindingType="basicHttpBinding" address="http://localhost:44306/WCFService/JCarrollOnlineV2Service" bindingConfiguration="JCarrollOnlineV2Service">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://localhost:8733/Design_Time_Addresses/JCarrollOnlineV2.WCFService/JCarrollOnlineV2Service/</serializedValue>
+          <serializedValue>http://localhost:44306/WCFService/JCarrollOnlineV2Service</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
@@ -124,7 +124,7 @@
           <serializedValue>basicHttpBinding</serializedValue>
         </property>
         <property path="/bindingConfiguration" isComplexType="false" isExplicitlyDefined="true" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>BasicHttpBinding_IJCarrollOnlineV2Service</serializedValue>
+          <serializedValue>JCarrollOnlineV2Service</serializedValue>
         </property>
         <property path="/contract" isComplexType="false" isExplicitlyDefined="true" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue>JCarrollOnlineV2Service.IJCarrollOnlineV2Service</serializedValue>
@@ -187,7 +187,7 @@
           <serializedValue>False</serializedValue>
         </property>
         <property path="/name" isComplexType="false" isExplicitlyDefined="true" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>BasicHttpBinding_IJCarrollOnlineV2Service</serializedValue>
+          <serializedValue>JCarrollOnlineV2Service</serializedValue>
         </property>
         <property path="/kind" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />

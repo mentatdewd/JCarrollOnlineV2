@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="b9a1d6ba-79be-484d-b963-afdaf72c3a13" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="bc5ea7f8-8e7e-4ff5-86d7-d8d2234d6e17" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -19,12 +19,12 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://localhost:8733/Design_Time_Addresses/JCarrollOnlineV2.WCFService/JCarrollOnlineV2Service/mex" Protocol="mex" SourceId="1" />
+    <MetadataSource Address="http://localhost:44306/WCFService/JCarrollOnlineV2Service/mex" Protocol="mex" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="69f6ea69-6aeb-4928-8dc3-28cef9596d03" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/JCarrollOnlineV2.WCFService/JCarrollOnlineV2Service/mex" />
-    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="3759ad9e-16ad-4be0-859d-6dc248e3426d" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/JCarrollOnlineV2.WCFService/JCarrollOnlineV2Service/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="1456cf50-ea7c-4e6b-b0d6-240bbc6c0176" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/JCarrollOnlineV2.WCFService/JCarrollOnlineV2Service/mex" />
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="f8885e43-a390-41e8-a3ee-514360719e60" SourceId="1" SourceUrl="http://localhost:44306/WCFService/JCarrollOnlineV2Service/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="33c659ee-23d9-49bf-bb49-9696a28b3d7e" SourceId="1" SourceUrl="http://localhost:44306/WCFService/JCarrollOnlineV2Service/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="25b6bded-d14d-41c3-b9bb-fb0ff93782aa" SourceId="1" SourceUrl="http://localhost:44306/WCFService/JCarrollOnlineV2Service/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
