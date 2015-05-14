@@ -633,6 +633,7 @@
     <None Include="Service References\JCarrollOnlineV2.WCFService.Login\service1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Views\Account\RegistrationNotification.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

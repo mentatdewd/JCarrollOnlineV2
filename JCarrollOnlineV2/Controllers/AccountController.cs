@@ -206,13 +206,21 @@ namespace JCarrollOnlineV2.Controllers
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    var callbackUri = new Uri(callbackUrl);
+#if DEBUG
+                    var cleanUrl = callbackUrl;
+#else
+                    var cleanUrl = callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped);
+#endif
+
+                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
                     //await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
                     ApplicationUserViewModel auVM = new ApplicationUserViewModel();
                     auVM.InjectFrom(user);
 
-                    await SendWelcomeEmail(auVM, callbackUrl);
+                    await SendWelcomeEmail(auVM, cleanUrl);
 
-                    return RedirectToAction("JCarrollOnlineV2Service", "Account");
+                    return RedirectToAction("RegistrationNotification", "Account");
                 }
                 AddErrors(result);
             }
@@ -220,6 +228,16 @@ namespace JCarrollOnlineV2.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+
+
+        [AllowAnonymous]
+        public ActionResult RegistrationNotification()
+        {
+            RegistrationNotificationViewModel rnVM = new RegistrationNotificationViewModel();
+
+            return View(rnVM);
+        }
+
         private static async Task SendWelcomeEmail(ApplicationUserViewModel user, string callbackUrl)
         {
             var uwVM = GenerateViewModel(user, callbackUrl);

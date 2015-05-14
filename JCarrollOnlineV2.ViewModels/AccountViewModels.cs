@@ -138,4 +138,9 @@ namespace JCarrollOnlineV2.ViewModels
         [Display(Name="Email")]
         public string Email { get; set; }
     }
+
+    public class RegistrationNotificationViewModel : ViewModelBase
+    {
+
+    }
 }

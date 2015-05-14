@@ -1,0 +1,14 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model RegistrationNotificationViewModel
+
+@{
+    Model.PageTitle = "RegistrationNotification";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Please check your Email</h2>
+
+<p>Check your email for mail from JCarrollOnline, and click on the confirmation link. If you don't receive an email, check your spam/junkmail folder.</p>
+<p>
+    @Html.ActionLink("Home", "Index", "Home")
+</p>
