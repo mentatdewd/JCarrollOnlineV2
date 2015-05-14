@@ -616,6 +616,7 @@
     <Content Include="Views\Shared\_BlogCommentItemPartial.cshtml" />
     <Content Include="Views\Shared\_BlogCommentFormPartial.cshtml" />
     <Content Include="Views\Shared\_UserSettingsPartial.cshtml" />
+    <Content Include="Views\Account\DeleteUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

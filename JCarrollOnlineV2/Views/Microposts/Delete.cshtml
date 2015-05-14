@@ -1,7 +1,8 @@
-﻿@model JCarrollOnlineV2.Entities.Micropost
+﻿@using JCarrollOnlineV2.ViewModels
+@model MicropostDeleteViewModel
 
 @{
-    ViewBag.Title = "Delete";
+    //Model.PageTitle = "Delete";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -18,14 +19,6 @@
 
         <dd>
             @Html.DisplayFor(model => model.Content)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Author.Id)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Author.Id)
         </dd>
 
         <dt>

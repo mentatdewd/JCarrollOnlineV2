@@ -1,7 +1,8 @@
-﻿@model JCarrollOnlineV2.Entities.Micropost
+﻿@using JCarrollOnlineV2.ViewModels
+@model MicropostEditViewModel
 
 @{
-    ViewBag.Title = "Edit";
+    //Model.PageTitle = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -16,7 +17,7 @@
         <h4>Micropost</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.Author.Id)
 
         <div class="form-group">
             @Html.LabelFor(model => model.Content, htmlAttributes: new { @class = "control-label col-md-2" })

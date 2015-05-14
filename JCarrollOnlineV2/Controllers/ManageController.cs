@@ -53,18 +53,16 @@ namespace JCarrollOnlineV2.Controllers
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
+            var userId = User.Identity.GetUserId();
+            var model = new IndexViewModel
+            {
+                StatusMessage = message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
                 : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
-                : "";
-
-            var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
-            {
+                : "",
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
@@ -277,10 +275,6 @@ namespace JCarrollOnlineV2.Controllers
         // GET: /Manage/ManageLogins
         public async Task<ActionResult> ManageLogins(ManageMessageId? message)
         {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : "";
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
             if (user == null)
             {
@@ -288,9 +282,13 @@ namespace JCarrollOnlineV2.Controllers
             }
             var userLogins = await UserManager.GetLoginsAsync(User.Identity.GetUserId());
             var otherLogins = AuthenticationManager.GetExternalAuthenticationTypes().Where(auth => userLogins.All(ul => auth.AuthenticationType != ul.LoginProvider)).ToList();
-            ViewBag.ShowRemoveButton = user.PasswordHash != null || userLogins.Count > 1;
             return View(new ManageLoginsViewModel
             {
+                StatusMessage = 
+                message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
+                : message == ManageMessageId.Error ? "An error has occurred."
+                : "",
+                ShowRemoveButton = user.PasswordHash != null || userLogins.Count > 1,
                 CurrentLogins = userLogins,
                 OtherLogins = otherLogins
             });

@@ -99,11 +99,13 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Forum forum = await _data.Forums.FindAsync(id);
+            ForumEditViewModel forumEditVM = new ForumEditViewModel();
+            forumEditVM.InjectFrom(forum);
             if (forum == null)
             {
                 return HttpNotFound();
             }
-            return View(forum);
+            return View(forumEditVM);
         }
 
         // POST: Fora/Edit/5
@@ -132,11 +134,13 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Forum forum = await _data.Forums.FindAsync(id);
+            ForumDeleteViewModel forumDeleteVM = new ForumDeleteViewModel();
+            forumDeleteVM.InjectFrom(forum);
             if (forum == null)
             {
                 return HttpNotFound();
             }
-            return View(forum);
+            return View(forumDeleteVM);
         }
 
         // POST: Fora/Delete/5

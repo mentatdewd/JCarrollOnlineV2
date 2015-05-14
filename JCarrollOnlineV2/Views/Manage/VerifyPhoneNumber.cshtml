@@ -1,16 +1,16 @@
 ﻿@model JCarrollOnlineV2.ViewModels.VerifyPhoneNumberViewModel
 @{
-    ViewBag.Title = "Verify Phone Number";
+    Model.PageTitle = "Verify Phone Number";
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>@Model.PageTitle.</h2>
 
 @using (Html.BeginForm("VerifyPhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
     @Html.Hidden("phoneNumber", @Model.PhoneNumber)
     <h4>Enter verification code</h4>
-    <h5>@ViewBag.Status</h5>
+    <h5>@Model.Status</h5>
     <hr />
     @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">

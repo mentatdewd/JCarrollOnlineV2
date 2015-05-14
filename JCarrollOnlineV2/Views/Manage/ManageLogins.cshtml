@@ -1,12 +1,12 @@
 ﻿@model JCarrollOnlineV2.ViewModels.ManageLoginsViewModel
 @using Microsoft.Owin.Security
 @{
-    ViewBag.Title = "Manage your external logins";
+    Model.PageTitle = "Manage your external logins";
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>@Model.PageTitle.</h2>
 
-<p class="text-success">@ViewBag.StatusMessage</p>
+<p class="text-success">@Model.StatusMessage</p>
 @{
     var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
     if (loginProviders.Count() == 0) {
@@ -29,7 +29,7 @@
                         <tr>
                             <td>@account.LoginProvider</td>
                             <td>
-                                @if (ViewBag.ShowRemoveButton)
+                                @if (Model.ShowRemoveButton)
                                 {
                                     using (Html.BeginForm("RemoveLogin", "Manage"))
                                     {
