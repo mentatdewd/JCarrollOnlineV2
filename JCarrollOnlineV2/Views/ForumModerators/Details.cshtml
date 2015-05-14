@@ -1,7 +1,8 @@
-﻿@model JCarrollOnlineV2.Entities.ForumModerator
+﻿@using JCarrollOnlineV2.ViewModels
+@model ForumModeratorsDeleteViewModel
 
 @{
-    ViewBag.Title = "Details";
+    //Model.PageTitle = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -38,6 +39,6 @@
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Edit", "Edit", new { forumId = Model.ForumId }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

@@ -1,7 +1,7 @@
-﻿@model IEnumerable<JCarrollOnlineV2.Entities.ForumModerator>
+﻿@using JCarrollOnlineV2.ViewModels
+@model IEnumerable<ForumThreadEntryIndexItemViewModel>
 
 @{
-    ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -13,13 +13,13 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.ForumId)
+            @*@Html.DisplayNameFor(model => model.ForumId)*@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.CreatedAt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.UpdatedAt)
+            @*@Html.DisplayNameFor(model => model.UpdatedAt)*@
         </th>
         <th></th>
     </tr>
@@ -27,13 +27,13 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.ForumId)
+            @*@Html.DisplayFor(modelItem => item.ForumId)*@
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.CreatedAt)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.UpdatedAt)
+            @*@Html.DisplayFor(modelItem => item.UpdatedAt)*@
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

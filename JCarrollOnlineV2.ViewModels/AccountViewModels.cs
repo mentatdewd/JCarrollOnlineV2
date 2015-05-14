@@ -10,6 +10,8 @@ namespace JCarrollOnlineV2.ViewModels
         [Required]
         [Display(Name = "Email")]
         public string Email { get; set; }
+        public string ReturnUrl { get; set; }
+        public string LoginProvider { get; set; }
     }
 
     public class ExternalLoginListViewModel : ViewModelBase
@@ -39,13 +41,6 @@ namespace JCarrollOnlineV2.ViewModels
         public bool RememberBrowser { get; set; }
 
         public bool RememberMe { get; set; }
-    }
-
-    public class ForgotViewModel : ViewModelBase
-    {
-        [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
     }
 
     public class LoginConfirmationViewModel : ViewModelBase
@@ -120,6 +115,27 @@ namespace JCarrollOnlineV2.ViewModels
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
+        public string Email { get; set; }
+    }
+
+    public class ForgotPasswordConfirmationViewModel : ViewModelBase
+    {
+
+    }
+
+    public class ResetPasswordConfirmationViewModel : ViewModelBase
+    {
+
+    }
+
+    public class DeleteUserViewModel : ViewModelBase
+    {
+        public string Id { get; set; }
+
+        [Display(Name="User Name")]
+        public string UserName { get; set; }
+
+        [Display(Name="Email")]
         public string Email { get; set; }
     }
 }
