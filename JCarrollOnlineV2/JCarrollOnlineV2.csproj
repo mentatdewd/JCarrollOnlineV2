@@ -634,6 +634,7 @@
       <SubType>Designer</SubType>
     </None>
     <Content Include="Views\Account\RegistrationNotification.cshtml" />
+    <Content Include="Views\Account\DeleteUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
