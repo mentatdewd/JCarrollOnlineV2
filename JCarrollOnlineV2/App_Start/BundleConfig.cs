@@ -39,7 +39,8 @@ namespace JCarrollOnlineV2
                 "~/Content/themes/base/spinner.less",
                 "~/Content/themes/base/tabs.less",
                 "~/Content/themes/base/theme.less",
-                "~/Content/themes/base/tooltip.less");
+                "~/Content/themes/base/tooltip.less",
+                "~/Content/MarkdownDeep.less");
 
             cssBundle.Transforms.Add(cssTransformer);
             cssBundle.Orderer = nullOrderer;
@@ -70,6 +71,7 @@ namespace JCarrollOnlineV2
             var myjsbundle = new ScriptBundle("~/bundles/myjsbundle");
             myjsbundle.Include("~/Scripts/prism.js");
             myjsbundle.Include("~/Scripts/jcarrollonlinev2.js");
+            myjsbundle.Include("~/Scripts/MarkdownDeepLib.min.js");
             myjsbundle.Transforms.Add(jsTransformer);
             myjsbundle.Orderer = nullOrderer;
             bundles.Add(myjsbundle);

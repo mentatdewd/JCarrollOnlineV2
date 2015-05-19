@@ -97,6 +97,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             var md = new MarkdownDeep.Markdown();
             md.FormatCodeBlock = MarkdownHelper.FormatCodeBlock;
             md.ExtraMode = true;
+            md.HtmlClassTitledImages = "markdown_image";
             return new MvcHtmlString(md.Transform(input));
         }
         private static string FormatCodeBlock(MarkdownDeep.Markdown md, string code)

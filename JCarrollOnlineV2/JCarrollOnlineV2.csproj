@@ -87,6 +87,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MarkdownDeep.Full.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
     </Reference>
+    <Reference Include="MarkdownHtmlHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MarkdownHtmlHelper.1.0.0\lib\MarkdownHtmlHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MarkdownSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MarkdownSharp.1.13.0.0\lib\35\MarkdownSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -366,6 +374,7 @@
     <Content Include="Content\images\rtable-space.gif" />
     <Content Include="Content\images\rtable-turn.gif" />
     <None Include="Content\PagedList.less" />
+    <Content Include="Content\MarkdownDeep.less" />
     <None Include="Content\themes\base\accordion.less" />
     <None Include="Content\themes\base\all.less" />
     <None Include="Content\themes\base\autocomplete.less" />
@@ -508,12 +517,12 @@
     <Content Include="Scripts\MarkdownDeep License.txt" />
     <Content Include="Scripts\MarkdownDeep Quick Reference.txt" />
     <Content Include="Scripts\MarkdownDeepLib.min.js" />
-    <Content Include="Scripts\mdd_ajax_loader.gif" />
-    <Content Include="Scripts\mdd_gripper.png" />
+    <Content Include="Content\images\mdd_ajax_loader.gif" />
+    <Content Include="Content\images\mdd_gripper.png" />
     <Content Include="Scripts\mdd_help.htm" />
-    <Content Include="Scripts\mdd_modal_background.png" />
-    <Content Include="Scripts\mdd_styles.css" />
-    <Content Include="Scripts\mdd_toolbar.png" />
+    <Content Include="Content\images\mdd_modal_background.png" />
+    <Content Include="Content\mdd_styles.css" />
+    <Content Include="Content\images\mdd_toolbar.png" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\prism.js" />

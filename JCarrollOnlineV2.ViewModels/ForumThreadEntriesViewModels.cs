@@ -151,7 +151,6 @@ namespace JCarrollOnlineV2.ViewModels
         [DataType(DataType.MultilineText)]
         public string Content { get; set; }
 
-        [Display(Name = "Author")]
         public ApplicationUserViewModel Author { get; set; }
     }
 
