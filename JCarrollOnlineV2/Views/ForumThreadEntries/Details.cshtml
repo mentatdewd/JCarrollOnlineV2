@@ -16,4 +16,4 @@
 @*@Html.Partial("_ForumThreadEntryTOCPartial", Model.ForumThreadEntryTOCItems)*@
     @Html.Partial("_ForumThreadEntryTOCPartial", Model.ForumThreadEntryDetailItems)
 }
-@Html.Raw(Html.TreeView("forumThreads", Model.ForumThreadEntryDetailItems.ForumThreadEntries.First().ChildNodes, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadPartial", l)).ToString()))
+@Html.Raw(Html.TreeView("forumThreads", "forumThreadEntry", Model.ForumThreadEntryDetailItems.ForumThreadEntries.First().ChildNodes, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadPartial", l)).ToString()))

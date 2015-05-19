@@ -148,9 +148,9 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
         /// <param name="rootItems">The root nodes to create</param>
         /// <param name="childrenProperty">A lambda expression that returns the children nodes</param>
         /// <param name="itemContent">A lambda expression defining the content in each tree node</param>
-        public static string TreeView<T>(this HtmlHelper html, string treeId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent)
+        public static string TreeView<T>(this HtmlHelper html, string treeId, string treeItemId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent)
         {
-            return html.TreeView(treeId, rootItems, childrenProperty, itemContent, true, null);
+            return html.TreeView(treeId, treeItemId, rootItems, childrenProperty, itemContent, true, null);
         }
 
         /// <summary>
@@ -161,9 +161,9 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
         /// <param name="childrenProperty">A lambda expression that returns the children nodes</param>
         /// <param name="itemContent">A lambda expression defining the content in each tree node</param>
         /// <param name="includeJavaScript">If true, output will automatically render the JavaScript to turn the ul into the treeview</param>    
-        public static string TreeView<T>(this HtmlHelper html, string treeId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript)
+        public static string TreeView<T>(this HtmlHelper html, string treeId, string treeItemId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript)
         {
-            return html.TreeView(treeId, rootItems, childrenProperty, itemContent, includeJavaScript, null);
+            return html.TreeView(treeId, treeItemId, rootItems, childrenProperty, itemContent, includeJavaScript, null);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
         /// <param name="includeJavaScript">If true, output will automatically render the JavaScript to turn the ul into the treeview</param>
         /// <param name="emptyContent">Content to be rendered when the tree is empty</param>
         /// <param name="includeJavaScript">If true, output will automatically into the JavaScript to turn the ul into the treeview</param>    
-        public static string TreeView<T>(this HtmlHelper html, string treeId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript, string emptyContent)
+        public static string TreeView<T>(this HtmlHelper html, string treeId, string treeItemId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript, string emptyContent)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -184,13 +184,13 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 
             if (rootItems.Count() == 0)
             {
-                sb.AppendFormat("<li>{0}</li>", emptyContent);
+                sb.AppendFormat("<li id='{0}'>{1}</li>", treeItemId, emptyContent);
             }
 
             foreach (T item in rootItems)
             {
-                RenderLi(sb, item, itemContent);
-                AppendChildren(sb, item, childrenProperty, itemContent);
+                RenderLi(sb, item, itemContent, treeItemId);
+                AppendChildren(sb, item, childrenProperty, itemContent, treeId, treeItemId);
             }
 
             sb.AppendLine("</ul>");
@@ -208,7 +208,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             return sb.ToString();
         }
 
-        private static void AppendChildren<T>(StringBuilder sb, T root, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent)
+        private static void AppendChildren<T>(StringBuilder sb, T root, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, string treeId, string treeItemId)
         {
             var children = childrenProperty(root);
             if (children != null)
@@ -219,11 +219,11 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
                     return;
                 }
 
-                sb.AppendLine("\r\n<ul>");
+                sb.AppendFormat("\r\n<ul id='{0}'>", treeId);
                 foreach (T item in children)
                 {
-                    RenderLi(sb, item, itemContent);
-                    AppendChildren(sb, item, childrenProperty, itemContent);
+                    RenderLi(sb, item, itemContent, treeItemId);
+                    AppendChildren(sb, item, childrenProperty, itemContent, treeId, treeItemId);
                 }
 
                 sb.AppendLine("</ul></li>");
@@ -234,9 +234,9 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             }
         }
 
-        private static void RenderLi<T>(StringBuilder sb, T item, Func<T, string> itemContent)
+        private static void RenderLi<T>(StringBuilder sb, T item, Func<T, string> itemContent, string treeItemId)
         {
-            sb.AppendFormat("<li>{0}", itemContent(item));
+            sb.AppendFormat("<li id='{0}'>{1}", treeItemId, itemContent(item));
         }
 
         /// <summary>
