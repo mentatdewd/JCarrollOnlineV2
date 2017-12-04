@@ -7,13 +7,13 @@ namespace JCarrollOnlineV2.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ChangedMicropostToUseApplicationUser : IMigrationMetadata
+    public sealed partial class ChangedMicroPostToUseApplicationUser : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedMicropostToUseApplicationUser));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedMicroPostToUseApplicationUser));
         
         string IMigrationMetadata.Id
         {
-            get { return "201504211411019_ChangedMicropostToUseApplicationUser"; }
+            get { return "201504211411019_ChangedMicroPostToUseApplicationUser"; }
         }
         
         string IMigrationMetadata.Source

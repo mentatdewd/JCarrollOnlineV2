@@ -1,5 +1,5 @@
 ﻿@using JCarrollOnlineV2.ViewModels
-@model MicropostCreateViewModel
+@model MicroPostCreateViewModel
 
 @{
     //Model.PageTitle = "Create";
@@ -14,7 +14,7 @@
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>Micropost</h4>
+        <h4>MicroPost</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">

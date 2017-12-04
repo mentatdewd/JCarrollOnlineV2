@@ -7,13 +7,13 @@ namespace JCarrollOnlineV2.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddedMicropostNotificationFields : IMigrationMetadata
+    public sealed partial class AddedMicroPostNotificationFields : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedMicropostNotificationFields));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedMicroPostNotificationFields));
         
         string IMigrationMetadata.Id
         {
-            get { return "201505042248312_AddedMicropostNotificationFields"; }
+            get { return "201505042248312_AddedMicroPostNotificationFields"; }
         }
         
         string IMigrationMetadata.Source

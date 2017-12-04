@@ -1,4 +1,5 @@
 ﻿using Omu.ValueInjecter;
+using Omu.ValueInjecter.Injections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -134,7 +135,7 @@ namespace JCarrollOnlineV2.ViewModels
             return Activator.CreateInstance(type);
         }
     }
-    public class MapperInjection : ConventionInjection
+    public class MapperInjection : LoopInjection
     {
         protected override bool Match(ConventionInfo c)
         {

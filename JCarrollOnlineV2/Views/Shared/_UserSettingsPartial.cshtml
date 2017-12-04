@@ -15,11 +15,11 @@
         <div style="margin-left: 23px;">
             @Html.HiddenFor(m=>m.UserId)
 
-            @Html.CheckBoxFor(m => m.MicropostEmailNotifications, new { @checked = Model.MicropostEmailNotifications })
-            @Html.LabelFor(m => m.MicropostEmailNotifications)
+            @Html.CheckBoxFor(m => m.MicroPostEmailNotifications, new { @checked = Model.MicroPostEmailNotifications })
+            @Html.LabelFor(m => m.MicroPostEmailNotifications)
             <br />
-            @Html.CheckBoxFor(m => m.MicropostSMSNotifications, new { @checked = Model.MicropostSMSNotifications })
-            @Html.LabelFor(m => m.MicropostSMSNotifications)
+            @Html.CheckBoxFor(m => m.MicroPostSMSNotifications, new { @checked = Model.MicroPostSMSNotifications })
+            @Html.LabelFor(m => m.MicroPostSMSNotifications)
             <button type="submit" class="btn btn-large btn-primary" value="UserSettings">Save User Settings</button>
         </div>
     }

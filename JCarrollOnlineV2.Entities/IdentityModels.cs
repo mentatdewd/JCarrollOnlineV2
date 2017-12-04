@@ -19,13 +19,13 @@ namespace JCarrollOnlineV2.Entities
         }
 
 
-        public bool MicropostEmailNotifications { get; set; }
-        public bool MicropostSMSNotifications { get; set; }
+        public bool MicroPostEmailNotifications { get; set; }
+        public bool MicroPostSMSNotifications { get; set; }
 
         // Navigation Property
         public virtual ICollection<ForumThreadEntry> ForumThreadEntries { get; set; }
 
-        public virtual ICollection<Micropost> Microposts { get; set; }
+        public virtual ICollection<MicroPost> MicroPosts { get; set; }
 
         public virtual ICollection<ApplicationUser> Following { get; set; }
         public virtual ICollection<ApplicationUser> Followers { get; set; }

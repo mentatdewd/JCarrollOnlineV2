@@ -17,136 +17,139 @@ using JCarrollOnlineV2.EmailViewModels;
 namespace JCarrollOnlineV2.Controllers
 {
     [Authorize]
-    public class MicropostsController : Controller
+    public class MicroPostsController : Controller
     {
         private IContext _data { get; set; }
 
-        public MicropostsController()
+        public MicroPostsController()
             : this(null)
         {
 
         }
 
-        public MicropostsController(IContext dataContext)
+        public MicroPostsController(IContext dataContext)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }
 
-        // GET: Microposts
+        // GET: MicroPosts
         public async Task<ActionResult> Index()
         {
-            return View(await _data.Microposts.ToListAsync());
+            return View(await _data.MicroPosts.ToListAsync());
         }
 
-        // GET: Microposts/Details/5
+        // GET: MicroPosts/Details/5
         public async Task<ActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Micropost micropost = await _data.Microposts.FindAsync(id);
-            if (micropost == null)
+
+            MicroPost microPost = await _data.MicroPosts.FindAsync(id);
+
+            if (microPost == null)
             {
                 return HttpNotFound();
             }
-            return View(micropost);
+
+            return View(microPost);
         }
 
-        // GET: Microposts/Create
+        // GET: MicroPosts/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Microposts/Create
+        // POST: MicroPosts/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] MicropostCreateViewModel micropostVM)
+        public async Task<ActionResult> Create([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] MicroPostCreateViewModel micropostVM)
         {
             if (ModelState.IsValid)
             {
-                Micropost micropost = new Micropost();
-                micropost.InjectFrom(micropostVM);
-                micropost.CreatedAt = DateTime.Now;
-                micropost.UpdatedAt = DateTime.Now;
+                MicroPost microPost = new MicroPost();
+                microPost.InjectFrom(micropostVM);
+                microPost.CreatedAt = DateTime.Now;
+                microPost.UpdatedAt = DateTime.Now;
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser currentUser = await _data.Users.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId);
-                micropost.Author = currentUser;
-                _data.Microposts.Add(micropost);
+                microPost.Author = currentUser;
+                _data.MicroPosts.Add(microPost);
                 await _data.SaveChangesAsync();
 
-                await SendMicropostNotification(micropost, currentUser);
+                await SendMicroPostNotification(microPost, currentUser);
 
                 return RedirectToAction("Index", "Home");
             }
             return View(micropostVM);
         }
 
-        private static async Task SendMicropostNotification(Micropost micropost, ApplicationUser currentUser)
+        private static async Task SendMicroPostNotification(MicroPost micropost, ApplicationUser currentUser)
         {
             foreach (var user in currentUser.Followers)
             {
-                if (user.MicropostEmailNotifications == true)
+                if (user.MicroPostEmailNotifications == true)
                 {
                     var mneVM = GenerateViewModel(micropost, currentUser, user);
                     
                     await SendEmail(mneVM);
                 }
             }
-            if (currentUser.MicropostEmailNotifications == true)
+            if (currentUser.MicroPostEmailNotifications == true)
             {
                 var mneVM = GenerateViewModel(micropost, currentUser, currentUser);
                 await SendEmail(mneVM);
             }
         }
 
-        private static MicropostNotificationEmailViewModel GenerateViewModel(Micropost micropost, ApplicationUser currentUser, ApplicationUser user)
+        private static MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
         {
-            var mneVM = new MicropostNotificationEmailViewModel();
+            var mneVM = new MicroPostNotificationEmailViewModel();
 
             mneVM.TargetUser = new ApplicationUserViewModel();
             mneVM.TargetUser.InjectFrom(user);
-            mneVM.MicropostAuthor = new ApplicationUserViewModel();
-            mneVM.MicropostAuthor.InjectFrom(currentUser);
-            mneVM.MicropostContent = micropost.Content;
+            mneVM.MicroPostAuthor = new ApplicationUserViewModel();
+            mneVM.MicroPostAuthor.InjectFrom(currentUser);
+            mneVM.MicroPostContent = micropost.Content;
             return mneVM;
         }
 
-        private static async Task SendEmail(MicropostNotificationEmailViewModel mneVM)
+        private static async Task SendEmail(MicroPostNotificationEmailViewModel mneVM)
         {
 
             var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicropostNotificationPage.cshtml");
+            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicroPostNotificationPage.cshtml");
             var templateService = RazorEngineService.Create();
-            mneVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "micropostTemplatekey", null, mneVM);
+            mneVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "microPostTemplatekey", null, mneVM);
 
             await SendEmailAsync(mneVM);
         }
 
-        public static async Task SendEmailAsync(MicropostNotificationEmailViewModel mneVM)
+        public static async Task SendEmailAsync(MicroPostNotificationEmailViewModel mneVM)
         {
             var email = new IdentityMessage()
             {
                 Body = mneVM.Content,
                 Destination = mneVM.TargetUser.Email,
-                Subject = mneVM.MicropostAuthor.UserName + " has added a new micropost"
+                Subject = mneVM.MicroPostAuthor.UserName + " has added a new micropost"
             };
             var emailService = new EmailService();
 
             await emailService.SendAsync(email);
         }
 
-        // GET: Microposts/Edit/5
+        // GET: MicroPosts/Edit/5
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Micropost micropost = await _data.Microposts.FindAsync(id);
+            MicroPost micropost = await _data.MicroPosts.FindAsync(id);
             if (micropost == null)
             {
                 return HttpNotFound();
@@ -154,12 +157,12 @@ namespace JCarrollOnlineV2.Controllers
             return View(micropost);
         }
 
-        // POST: Microposts/Edit/5
+        // POST: MicroPosts/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] Micropost micropost)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] MicroPost micropost)
         {
             if (ModelState.IsValid)
             {
@@ -170,14 +173,14 @@ namespace JCarrollOnlineV2.Controllers
             return View(micropost);
         }
 
-        // GET: Microposts/Delete/5
+        // GET: MicroPosts/Delete/5
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Micropost micropost = await _data.Microposts.FindAsync(id);
+            MicroPost micropost = await _data.MicroPosts.FindAsync(id);
             if (micropost == null)
             {
                 return HttpNotFound();
@@ -185,13 +188,13 @@ namespace JCarrollOnlineV2.Controllers
             return View(micropost);
         }
 
-        // POST: Microposts/Delete/5
+        // POST: MicroPosts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Micropost micropost = await _data.Microposts.FindAsync(id);
-            _data.Microposts.Remove(micropost);
+            MicroPost micropost = await _data.MicroPosts.FindAsync(id);
+            _data.MicroPosts.Remove(micropost);
             await _data.SaveChangesAsync();
             return RedirectToAction("Index");
         }
@@ -200,8 +203,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (disposing)
             {
-                _data.Dispose();
             }
+
             base.Dispose(disposing);
         }
     }

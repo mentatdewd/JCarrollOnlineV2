@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using JCarrollOnlineV2;
-using JCarrollOnlineV2.Controllers;
-using System.Threading.Tasks;
+﻿using JCarrollOnlineV2.Controllers;
 using JCarrollOnlineV2.ViewModels;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Tests.Controllers
 {

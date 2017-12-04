@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.DataContexts
 {
-    public interface IContext : IDisposable
+    public interface IContext
     {
         DbSet<IdentityRole> Roles { get; set; }
         DbSet<ApplicationUser> Users { get; set; }
@@ -21,7 +21,7 @@ namespace JCarrollOnlineV2.DataContexts
 
         DbSet<ForumThreadEntry> ForumThreadEntries { get; set; }
 
-        DbSet<Micropost> Microposts { get; set; }
+        DbSet<MicroPost> MicroPosts { get; set; }
 
         DbSet<BlogItem> BlogItems { get; set; }
         DbSet<BlogItemComment> BlogItemComments { get; set; }

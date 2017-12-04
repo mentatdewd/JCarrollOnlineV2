@@ -7,13 +7,13 @@ namespace JCarrollOnlineV2.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class UpdatedMicropostModelUserIdFromIntToString : IMigrationMetadata
+    public sealed partial class UpdatedMicroPostModelUserIdFromIntToString : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(UpdatedMicropostModelUserIdFromIntToString));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(UpdatedMicroPostModelUserIdFromIntToString));
         
         string IMigrationMetadata.Id
         {
-            get { return "201504161920011_UpdatedMicropostModelUserIdFromIntToString"; }
+            get { return "201504161920011_UpdatedMicroPostModelUserIdFromIntToString"; }
         }
         
         string IMigrationMetadata.Source

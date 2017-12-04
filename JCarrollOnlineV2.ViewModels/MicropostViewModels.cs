@@ -6,13 +6,13 @@ using PagedList;
 
 namespace JCarrollOnlineV2.ViewModels
 {
-    public class MicropostViewModelBase : ViewModelBase
+    public class MicroPostViewModelBase : ViewModelBase
     {
         public string UserId { get; set; }
         public string Email { get; set; }
     }
 
-    public class MicropostCreateViewModel : MicropostViewModelBase
+    public class MicroPostCreateViewModel : MicroPostViewModelBase
     {
         [DataType(DataType.MultilineText)]
         [StringLength(140)]
@@ -25,19 +25,19 @@ namespace JCarrollOnlineV2.ViewModels
         public DateTime UpdatedAt { get; set; } // :null => false
     }
 
-    public class MicropostFeedViewModel : MicropostViewModelBase
+    public class MicroPostFeedViewModel : MicroPostViewModelBase
     {
-        public MicropostFeedViewModel()
+        public MicroPostFeedViewModel()
         {
-            MicropostFeedItems = new List<MicropostFeedItemViewModel>();
+            MicroPostFeedItems = new List<MicroPostFeedItemViewModel>();
         }
-        public List<MicropostFeedItemViewModel> MicropostFeedItems { get; set; }
-        public IPagedList<MicropostFeedItemViewModel> OnePageOfMicroposts { get; set; }
+        public List<MicroPostFeedItemViewModel> MicroPostFeedItems { get; set; }
+        public IPagedList<MicroPostFeedItemViewModel> OnePageOfMicroPosts { get; set; }
     }
 
-    public class MicropostFeedItemViewModel : MicropostViewModelBase
+    public class MicroPostFeedItemViewModel : MicroPostViewModelBase
     {
-        public MicropostFeedItemViewModel()
+        public MicroPostFeedItemViewModel()
         {
             Author = new ApplicationUserViewModel();
         }
@@ -47,7 +47,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string TimeAgo { get; set; }
     }
 
-    public class MicropostDeleteViewModel : MicropostViewModelBase
+    public class MicroPostDeleteViewModel : MicroPostViewModelBase
     {
         [DataType(DataType.MultilineText)]
         [StringLength(140)]
@@ -65,7 +65,7 @@ namespace JCarrollOnlineV2.ViewModels
         public DateTime UpdatedAt { get; set; } // :null => false
     }
 
-    public class MicropostDetailsViewModel : MicropostViewModelBase
+    public class MicroPostDetailsViewModel : MicroPostViewModelBase
     {
         [DataType(DataType.MultilineText)]
         [StringLength(140)]
@@ -83,7 +83,7 @@ namespace JCarrollOnlineV2.ViewModels
         public DateTime UpdatedAt { get; set; } // :null => false
     }
 
-    public class MicropostEditViewModel : MicropostViewModelBase
+    public class MicroPostEditViewModel : MicroPostViewModelBase
     {
         [DataType(DataType.MultilineText)]
         [StringLength(140)]
@@ -101,7 +101,7 @@ namespace JCarrollOnlineV2.ViewModels
         public DateTime UpdatedAt { get; set; } // :null => false
     }
 
-    public class MicropostIndexViewModel : MicropostViewModelBase
+    public class MicroPostIndexViewModel : MicroPostViewModelBase
     {
         [DataType(DataType.MultilineText)]
         [StringLength(140)]

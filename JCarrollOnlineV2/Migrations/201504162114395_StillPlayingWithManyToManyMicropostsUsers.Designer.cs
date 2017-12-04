@@ -7,13 +7,13 @@ namespace JCarrollOnlineV2.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class StillPlayingWithManyToManyMicropostsUsers : IMigrationMetadata
+    public sealed partial class StillPlayingWithManyToManyMicroPostsUsers : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(StillPlayingWithManyToManyMicropostsUsers));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(StillPlayingWithManyToManyMicroPostsUsers));
         
         string IMigrationMetadata.Id
         {
-            get { return "201504162114395_StillPlayingWithManyToManyMicropostsUsers"; }
+            get { return "201504162114395_StillPlayingWithManyToManyMicroPostsUsers"; }
         }
         
         string IMigrationMetadata.Source
