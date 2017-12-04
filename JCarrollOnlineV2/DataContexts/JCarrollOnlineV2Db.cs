@@ -1,4 +1,5 @@
 ﻿using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.Migrations;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
 
@@ -18,9 +19,9 @@ namespace JCarrollOnlineV2.DataContexts
         }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-#if !DEBUG
+//#if !DEBUG
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
-#endif
+//#endif
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<IdentityUserLogin>().HasKey<string>(l => l.UserId);
