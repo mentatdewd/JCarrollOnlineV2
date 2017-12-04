@@ -56,7 +56,7 @@ namespace JCarrollOnlineV2.Migrations
                 .Index(t => t.ApplicationUser_Id);
             
             CreateTable(
-                "dbo.Microposts",
+                "dbo.MicroPosts",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
@@ -175,7 +175,7 @@ namespace JCarrollOnlineV2.Migrations
         public override void Down()
         {
             DropForeignKey("dbo.IdentityUserRoles", "ApplicationUser_Id", "dbo.ApplicationUsers");
-            DropForeignKey("dbo.Microposts", "ApplicationUser_Id", "dbo.ApplicationUsers");
+            DropForeignKey("dbo.MicroPosts", "ApplicationUser_Id", "dbo.ApplicationUsers");
             DropForeignKey("dbo.IdentityUserLogins", "ApplicationUser_Id", "dbo.ApplicationUsers");
             DropForeignKey("dbo.ForumThreadEntries", "ApplicationUser_Id", "dbo.ApplicationUsers");
             DropForeignKey("dbo.IdentityUserClaims", "ApplicationUser_Id", "dbo.ApplicationUsers");
@@ -189,7 +189,7 @@ namespace JCarrollOnlineV2.Migrations
             DropIndex("dbo.Relationships", "FollowerAndFollowedIndex");
             DropIndex("dbo.Relationships", "FollowedIndex");
             DropIndex("dbo.Relationships", "FollowerIndex");
-            DropIndex("dbo.Microposts", new[] { "ApplicationUser_Id" });
+            DropIndex("dbo.MicroPosts", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.ForumThreadEntries", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.ForumThreadEntries", new[] { "ForumId" });
             DropIndex("dbo.ForumModerators", new[] { "ForumId" });
@@ -200,7 +200,7 @@ namespace JCarrollOnlineV2.Migrations
             DropTable("dbo.IdentityUserRoles");
             DropTable("dbo.IdentityRoles");
             DropTable("dbo.Relationships");
-            DropTable("dbo.Microposts");
+            DropTable("dbo.MicroPosts");
             DropTable("dbo.ForumThreadEntries");
             DropTable("dbo.Fora");
             DropTable("dbo.ForumModerators");

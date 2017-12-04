@@ -12,13 +12,20 @@ namespace JCarrollOnlineV2.Controllers
             SandboxViewModel sbVM = new SandboxViewModel();
 
             sbVM.PageTitle = "Sandbox";
-            return View(sbVM);
+
+            return await Task.Run<ActionResult>(() =>
+            {
+                return View(sbVM);
+            });
         }
 
         // GET: Sandbox/Details/5
         public async Task<ActionResult> Details(int id)
         {
-            return View();
+            return await Task.Run<ActionResult>(() =>
+            {
+                return View();
+            });
         }
 
         // GET: Sandbox/Create
@@ -31,16 +38,18 @@ namespace JCarrollOnlineV2.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(FormCollection collection)
         {
-            try
+            return await Task.Run<ActionResult>(() =>
             {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+                try
+                {
+                    // TODO: Add insert logic here
+                    return RedirectToAction("Index");
+                }
+                catch
+                {
+                    return View();
+                }
+            });
         }
 
         // GET: Sandbox/Edit/5
@@ -53,38 +62,45 @@ namespace JCarrollOnlineV2.Controllers
         [HttpPost]
         public async Task<ActionResult> Edit(int id, FormCollection collection)
         {
-            try
+            return await Task.Run<ActionResult>(() =>
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+                try
+                {
+                    // TODO: Add update logic here
+                    return RedirectToAction("Index");
+                }
+                catch
+                {
+                    return View();
+                }
+            });
         }
 
         // GET: Sandbox/Delete/5
         public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            return await Task.Run<ActionResult>(() =>
+            {
+                return View();
+            });
         }
 
         // POST: Sandbox/Delete/5
         [HttpPost]
         public async Task<ActionResult> Delete(int id, FormCollection collection)
         {
-            try
+            return await Task.Run<ActionResult>(() =>
             {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+                try
+                {
+                    // TODO: Add delete logic here
+                    return RedirectToAction("Index");
+                }
+                catch
+                {
+                    return View();
+                }
+            });
         }
     }
 }

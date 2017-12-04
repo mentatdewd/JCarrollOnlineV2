@@ -1,14 +1,14 @@
-﻿using Omu.ValueInjecter;
+﻿using Omu.ValueInjecter.Injections;
 
 namespace JCarrollOnlineV2.ViewModels
 {
-    public class FilterId : LoopValueInjection
+    public class FilterId : LoopInjection
     {
         //sourcePropName "Id" will not map to target property name "Id"
         //ie: Keep target property value as it is (not change from mapping)
-        protected override bool UseSourceProp(string sourcePropName)
+        protected override string GetTargetProp(string sourcePropName)
         {
-            return sourcePropName != "Id";
+            return "Id";
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.Migrations;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
 
@@ -28,9 +27,9 @@ namespace JCarrollOnlineV2.DataContexts
             modelBuilder.Entity<IdentityRole>().HasKey<string>(r => r.Id);
             modelBuilder.Entity<IdentityUserRole>().HasKey(r => new { r.RoleId, r.UserId });
 
-            modelBuilder.Entity<Micropost>()
+            modelBuilder.Entity<MicroPost>()
                 .HasRequired(m => m.Author)
-                .WithMany(m => m.Microposts)
+                .WithMany(m => m.MicroPosts)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<ApplicationUser>()
@@ -56,7 +55,7 @@ namespace JCarrollOnlineV2.DataContexts
         public DbSet<Forum> Forums { get; set; }
         public DbSet<ForumModerator> ForumModerators { get; set; }
         public DbSet<ForumThreadEntry> ForumThreadEntries { get; set; }
-        public DbSet<Micropost> Microposts { get; set; }
+        public DbSet<MicroPost> MicroPosts { get; set; }
         public DbSet<BlogItem> BlogItems { get; set; }
         public DbSet<BlogItemComment> BlogItemComments { get; set; }
     }

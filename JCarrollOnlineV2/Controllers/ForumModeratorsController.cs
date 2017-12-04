@@ -127,8 +127,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (disposing)
             {
-                _data.Dispose();
             }
+
             base.Dispose(disposing);
         }
     }

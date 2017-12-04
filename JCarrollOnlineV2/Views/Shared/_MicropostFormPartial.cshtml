@@ -1,5 +1,5 @@
 ﻿@using JCarrollOnlineV2.ViewModels
-@model MicropostCreateViewModel
+@model MicroPostCreateViewModel
 
 @using (Html.BeginForm())
 {
@@ -25,7 +25,7 @@
         <div class="form-group">
             <div class="col-md-10">
                 <div align="center">
-                    <input id="submitbutton" disabled type="submit" value="Post" class="btn btn-large btn-primary" formaction='@Url.Action("Create", "Microposts")' />
+                    <input id="submitbutton" disabled type="submit" value="Post" class="btn btn-large btn-primary" formaction='@Url.Action("Create", "MicroPosts")' />
                 </div>
             </div>
         </div>
