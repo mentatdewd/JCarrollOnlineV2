@@ -1,15 +1,15 @@
 ﻿@using JCarrollOnlineV2.ViewModels
 @using PagedList
 @using PagedList.Mvc
-@model MicropostFeedViewModel
+@model MicroPostFeedViewModel
 
-@if (Model.MicropostFeedItems != null)
+@if (Model.MicroPostFeedItems != null)
 {
     <ul class="micropostfeed">
-        @foreach (MicropostFeedItemViewModel micropost in Model.OnePageOfMicroposts)
+        @foreach (MicroPostFeedItemViewModel micropost in Model.OnePageOfMicroPosts)
         {
-            @Html.Partial("_MicropostFeedItemPartial", micropost)
+            @Html.Partial("_MicroPostFeedItemPartial", micropost)
         }
     </ul>
-    @Html.PagedListPager((IPagedList)Model.OnePageOfMicroposts, page => Url.Action("Index", new { micropostPage = page }))
+    @Html.PagedListPager((IPagedList)Model.OnePageOfMicroPosts, page => Url.Action("Index", new { microPostPage = page }))
 }

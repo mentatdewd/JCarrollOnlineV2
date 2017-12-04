@@ -17,10 +17,10 @@ namespace JCarrollOnlineV2.ViewModels
         [Display(Name = "User Name")]
         public string UserName { get; set; }
 
-        [Display(Name="Enable micropost Email notifications")]
-        public bool MicropostEmailNotifications { get; set; }
+        [Display(Name="Enable microPost Email notifications")]
+        public bool MicroPostEmailNotifications { get; set; }
 
-        [Display(Name="Enable micropost SMS notifications")]
-        public bool MicropostSMSNotifications { get; set; }
+        [Display(Name="Enable microPost SMS notifications")]
+        public bool MicroPostSMSNotifications { get; set; }
     }
 }

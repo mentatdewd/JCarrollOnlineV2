@@ -32,38 +32,51 @@ namespace JCarrollOnlineV2.Migrations
         }
 
         const string adminRole = "Administrator";
-        string[] adminName = new string[1];
-        private bool AddRoleAndUser(DbContext context)
+
+        private bool AddAdminRoleAndUser(JCarrollOnlineV2Db context)
         {
-            adminName[0] = "John";
-            //JCarrollOnlineV2Db context = new JCarrollOnlineV2Db();
             var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+            var PasswordHash = new PasswordHasher();
             var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
 
-            if (!Roles.RoleExists(adminRole))
+            if(!context.Users.Any(u => u.UserName == "administrator@test.com"))
             {
-                Roles.CreateRole(adminRole);
-                Roles.AddUsersToRole(adminName, adminRole);
+                var adminUser = new ApplicationUser
+                {
+                    UserName = "administrator@test.com",
+                    Email = "administrator@test.com",
+                    PasswordHash = PasswordHash.HashPassword("password"),
+                    EmailConfirmed = true
+                };
+
+                UserManager.Create(adminUser);
+
+                if (!Roles.RoleExists(adminRole))
+                {
+                    Roles.CreateRole(adminRole);
+                    UserManager.AddToRole(adminUser.Id, adminRole);
+                }
             }
+
             return true;
         }
-        protected override void Seed(JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db context)
-        {
-           AddRoleAndUser(context);
- //#if DEBUG
-            //System.Diagnostics.Debugger.Launch();
 
-           // Deletes all data, from all tables, except for __MigrationHistory
-           //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
-           //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
-           //context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
-           //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
-           //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
-           //List<ApplicationUser> users = new List<ApplicationUser>();
+        protected override void Seed(JCarrollOnlineV2Db context)
+        {
+#if DEBUG
+           // System.Diagnostics.Debugger.Launch();
+
+            //Deletes all data, from all tables, except for __MigrationHistory
+//            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
+//            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
+//            context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
+//            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
+//            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
+//            List<ApplicationUser> users = new List<ApplicationUser>();
 
 //            for (int i = 0; i < 4; i++)
 //            {
-//                var newUser = new NewUser() { UserName = string.Format("User{0}", i.ToString()), Email = string.Format("User{0}@test.com", i.ToString()), Password = string.Format("Password{0}", i.ToString()), Roles = new List<string>() { "Admin" } };
+//                var newUser = new NewUser() { UserName = string.Format("User{0}", i.ToString()), Email = string.Format("User{0}@test.com", i.ToString()), Password = string.Format("Password{0}", i.ToString()), Roles = new List<string>() { "Administrator" } };
 //                var user = AddRoleAndUser(context, newUser);
 //                if (user == null)
 //                {
@@ -73,6 +86,8 @@ namespace JCarrollOnlineV2.Migrations
 //                System.Diagnostics.Trace.WriteLine(string.Format("Added userId: {0}", newUser.UserName));
 //            }
 
+//            AddAdminRoleAndUser(context);
+
 //            context.Forums.AddOrUpdate(x => x.Id,
 //                new Forum
 //                {
@@ -81,7 +96,7 @@ namespace JCarrollOnlineV2.Migrations
 //                    Description = "Forum 1 Description",
 //                    CreatedAt = DateTime.Now,
 //                    UpdatedAt = DateTime.Now,
-//                    ForumThreadEntries = new List<ForumThreadEntry> 
+//                    ForumThreadEntries = new List<ForumThreadEntry>
 //                    {
 //            #region Forum 1 Forum Thread 1
                         
@@ -191,7 +206,7 @@ namespace JCarrollOnlineV2.Migrations
 //            }
 
 //            return user;
-//#endif
+#endif
         }
     }
 }

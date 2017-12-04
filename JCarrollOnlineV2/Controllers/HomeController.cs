@@ -32,8 +32,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             HomeViewModel hVM = new HomeViewModel();
             hVM.Message = "JCarrollOnlineV2 Home - Index";
-            hVM.MicropostCreateVM = new MicropostCreateViewModel();
-            hVM.MicropostFeedVM = new MicropostFeedViewModel();
+            hVM.MicroPostCreateVM = new MicroPostCreateViewModel();
+            hVM.MicroPostFeedVM = new MicroPostFeedViewModel();
             hVM.UserStatsVM = new UserStatsViewModel();
             hVM.UserInfoVM = new UserItemViewModel();
             hVM.BlogFeed = new BlogFeedViewModel();
@@ -65,10 +65,10 @@ namespace JCarrollOnlineV2.Controllers
             if (User != null && User.Identity.IsAuthenticated == true)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser user = await _data.Users.Include("Following").Include("Followers").Include("Microposts").SingleAsync(u => u.Id == currentUserId);
+                ApplicationUser user = await _data.Users.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId);
 
                 hVM.UserInfoVM.User.InjectFrom(user);
-                hVM.UserInfoVM.MicropostsAuthored = user.Microposts.Count();
+                hVM.UserInfoVM.MicroPostsAuthored = user.MicroPosts.Count();
                 hVM.UserStatsVM.User.InjectFrom(user);
 
                 foreach (ApplicationUser item in user.Following)
@@ -77,32 +77,32 @@ namespace JCarrollOnlineV2.Controllers
                     uiVM.InjectFrom(item);
                     hVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
 
-                    foreach (var micropost in item.Microposts)
+                    foreach (var microPost in item.MicroPosts)
                     {
-                        MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
-                        mpVM.InjectFrom(micropost);
-                        mpVM.Author.InjectFrom(micropost.Author);
+                        MicroPostFeedItemViewModel mpVM = new MicroPostFeedItemViewModel();
+                        mpVM.InjectFrom(microPost);
+                        mpVM.Author.InjectFrom(microPost.Author);
                         mpVM.TimeAgo = mpVM.CreatedAt.ToUniversalTime().ToString("o");
-                        hVM.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
+                        hVM.MicroPostFeedVM.MicroPostFeedItems.Add(mpVM);
                     }
                 }
                 foreach (var item in user.Followers)
                 {
                     UserItemViewModel uiVM = new UserItemViewModel();
                     uiVM.InjectFrom(item);
-                    uiVM.MicropostsAuthored = await _data.Users.Include("Microposts").Where(u => u.Id == item.Id).Select(u => u.Microposts).CountAsync();
+                    uiVM.MicroPostsAuthored = await _data.Users.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
                     hVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
                 }
-                foreach (var micropost in user.Microposts)
+                foreach (var micropost in user.MicroPosts)
                 {
-                    MicropostFeedItemViewModel mpVM = new MicropostFeedItemViewModel();
+                    MicroPostFeedItemViewModel mpVM = new MicroPostFeedItemViewModel();
                     mpVM.InjectFrom(micropost);
                     mpVM.Author.InjectFrom(micropost.Author);
                     mpVM.TimeAgo = mpVM.CreatedAt.ToUniversalTime().ToString("o");
-                    hVM.MicropostFeedVM.MicropostFeedItems.Add(mpVM);
+                    hVM.MicroPostFeedVM.MicroPostFeedItems.Add(mpVM);
                 }
                 var micropostPageNumber = micropostPage ?? 1;
-                hVM.MicropostFeedVM.OnePageOfMicroposts = hVM.MicropostFeedVM.MicropostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
+                hVM.MicroPostFeedVM.OnePageOfMicroPosts = hVM.MicroPostFeedVM.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
 
                 hVM.RssFeedVM = await rss;
             }
@@ -131,16 +131,21 @@ namespace JCarrollOnlineV2.Controllers
         public async Task<ActionResult> Welcome()
         {
             HomeViewModel hVM = new HomeViewModel();
+
             hVM.Message = "JCarrollOnlineV2 Home - Welcome";
             hVM.PageContainer = "Welcome";
-            if (Request.IsAuthenticated)
+
+            return await Task.Run<ActionResult>(() =>
             {
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return View("Welcome", "_LayoutWelcome", hVM);
-            }
+                if (Request.IsAuthenticated)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return View("Welcome", "_LayoutWelcome", hVM);
+                }
+            });
         }
     }
 }

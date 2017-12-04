@@ -196,8 +196,9 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
+                ApplicationUser user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+                IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+
                 if (result.Succeeded)
                 {
                     //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
@@ -205,10 +206,10 @@ namespace JCarrollOnlineV2.Controllers
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    var callbackUri = new Uri(callbackUrl);
+                    Uri callbackUri = new Uri(Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme));
+
 #if DEBUG
-                    var cleanUrl = callbackUrl;
+                    var cleanUrl = callbackUri;
 #else
                     var cleanUrl = callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped);
 #endif
@@ -238,14 +239,14 @@ namespace JCarrollOnlineV2.Controllers
             return View(rnVM);
         }
 
-        private static async Task SendWelcomeEmail(ApplicationUserViewModel user, string callbackUrl)
+        private static async Task SendWelcomeEmail(ApplicationUserViewModel user, Uri callbackUrl)
         {
             var uwVM = GenerateViewModel(user, callbackUrl);
 
             await SendEmail(uwVM);
         }
 
-        private static UserWelcomeViewModel GenerateViewModel(ApplicationUserViewModel user, string callbackUrl)
+        private static UserWelcomeViewModel GenerateViewModel(ApplicationUserViewModel user, Uri callbackUrl)
         {
             var uwVm = new UserWelcomeViewModel();
 

@@ -1,12 +1,12 @@
 ﻿@using JCarrollOnlineV2.EmailViewModels
-@model MicropostNotificationEmailViewModel
+@model MicroPostNotificationEmailViewModel
 
 <!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>New Micropost</title>
+    <title>New MicroPost</title>
 </head>
 <body>
     <div class="headerimage">
@@ -16,11 +16,11 @@
         Hi @Model.TargetUser.UserName,
     </p>
     <p>
-        @Model.MicropostAuthor has added the following micropost:
+        @Model.MicroPostAuthor has added the following micropost:
         <br />
     </p>
     <p style="background-color:lightgrey; margin-left:40px; margin-right:80px">
-        @Model.MicropostContent
+        @Model.MicroPostContent
     </p>
 
     @*@if (!Model.IsPremiumUser)

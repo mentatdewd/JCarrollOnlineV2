@@ -10,18 +10,18 @@ namespace JCarrollOnlineV2.Migrations
             DropForeignKey("dbo.Relationships", "ApplicationUser_Id", "dbo.ApplicationUsers");
             DropForeignKey("dbo.Relationships", "ApplicationUser_Id1", "dbo.ApplicationUsers");
             DropForeignKey("dbo.Relationships", "ApplicationUser_Id2", "dbo.ApplicationUsers");
-            DropForeignKey("dbo.Relationships", "Micropost_Id", "dbo.Microposts");
-            DropForeignKey("dbo.Relationships", "Micropost_Id1", "dbo.Microposts");
-            DropForeignKey("dbo.Relationships", "Micropost_Id2", "dbo.Microposts");
+            DropForeignKey("dbo.Relationships", "MicroPost_Id", "dbo.MicroPosts");
+            DropForeignKey("dbo.Relationships", "MicroPost_Id1", "dbo.MicroPosts");
+            DropForeignKey("dbo.Relationships", "MicroPost_Id2", "dbo.MicroPosts");
             DropForeignKey("dbo.ForumThreadEntries", "ForumId", "dbo.Fora");
             DropForeignKey("dbo.ForumModerators", "ForumId", "dbo.Fora");
             DropIndex("dbo.ForumThreadEntries", new[] { "ForumId" });
             DropIndex("dbo.Relationships", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.Relationships", new[] { "ApplicationUser_Id1" });
             DropIndex("dbo.Relationships", new[] { "ApplicationUser_Id2" });
-            DropIndex("dbo.Relationships", new[] { "Micropost_Id" });
-            DropIndex("dbo.Relationships", new[] { "Micropost_Id1" });
-            DropIndex("dbo.Relationships", new[] { "Micropost_Id2" });
+            DropIndex("dbo.Relationships", new[] { "MicroPost_Id" });
+            DropIndex("dbo.Relationships", new[] { "MicroPost_Id1" });
+            DropIndex("dbo.Relationships", new[] { "MicroPost_Id2" });
             RenameColumn(table: "dbo.ForumThreadEntries", name: "ApplicationUser_Id", newName: "Author_Id");
             RenameColumn(table: "dbo.ForumThreadEntries", name: "ForumId", newName: "Forum_Id");
             RenameIndex(table: "dbo.ForumThreadEntries", name: "IX_ApplicationUser_Id", newName: "IX_Author_Id");
@@ -51,9 +51,9 @@ namespace JCarrollOnlineV2.Migrations
                         ApplicationUser_Id = c.String(maxLength: 128),
                         ApplicationUser_Id1 = c.String(maxLength: 128),
                         ApplicationUser_Id2 = c.String(nullable: false, maxLength: 128),
-                        Micropost_Id = c.Int(nullable: false),
-                        Micropost_Id1 = c.Int(),
-                        Micropost_Id2 = c.Int(),
+                        MicroPost_Id = c.Int(nullable: false),
+                        MicroPost_Id1 = c.Int(),
+                        MicroPost_Id2 = c.Int(),
                     })
                 .PrimaryKey(t => new { t.FollowerId, t.FollowedId });
             
@@ -70,18 +70,18 @@ namespace JCarrollOnlineV2.Migrations
             RenameIndex(table: "dbo.ForumThreadEntries", name: "IX_Author_Id", newName: "IX_ApplicationUser_Id");
             RenameColumn(table: "dbo.ForumThreadEntries", name: "Forum_Id", newName: "ForumId");
             RenameColumn(table: "dbo.ForumThreadEntries", name: "Author_Id", newName: "ApplicationUser_Id");
-            CreateIndex("dbo.Relationships", "Micropost_Id2");
-            CreateIndex("dbo.Relationships", "Micropost_Id1");
-            CreateIndex("dbo.Relationships", "Micropost_Id");
+            CreateIndex("dbo.Relationships", "MicroPost_Id2");
+            CreateIndex("dbo.Relationships", "MicroPost_Id1");
+            CreateIndex("dbo.Relationships", "MicroPost_Id");
             CreateIndex("dbo.Relationships", "ApplicationUser_Id2");
             CreateIndex("dbo.Relationships", "ApplicationUser_Id1");
             CreateIndex("dbo.Relationships", "ApplicationUser_Id");
             CreateIndex("dbo.ForumThreadEntries", "ForumId");
             AddForeignKey("dbo.ForumModerators", "ForumId", "dbo.Fora", "ForumId", cascadeDelete: true);
             AddForeignKey("dbo.ForumThreadEntries", "ForumId", "dbo.Fora", "ForumId", cascadeDelete: true);
-            AddForeignKey("dbo.Relationships", "Micropost_Id2", "dbo.Microposts", "Id");
-            AddForeignKey("dbo.Relationships", "Micropost_Id1", "dbo.Microposts", "Id");
-            AddForeignKey("dbo.Relationships", "Micropost_Id", "dbo.Microposts", "Id", cascadeDelete: true);
+            AddForeignKey("dbo.Relationships", "MicroPost_Id2", "dbo.MicroPosts", "Id");
+            AddForeignKey("dbo.Relationships", "MicroPost_Id1", "dbo.MicroPosts", "Id");
+            AddForeignKey("dbo.Relationships", "MicroPost_Id", "dbo.MicroPosts", "Id", cascadeDelete: true);
             AddForeignKey("dbo.Relationships", "ApplicationUser_Id2", "dbo.ApplicationUsers", "Id", cascadeDelete: true);
             AddForeignKey("dbo.Relationships", "ApplicationUser_Id1", "dbo.ApplicationUsers", "Id");
             AddForeignKey("dbo.Relationships", "ApplicationUser_Id", "dbo.ApplicationUsers", "Id");

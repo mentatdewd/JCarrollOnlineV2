@@ -46,14 +46,14 @@ namespace JCarrollOnlineV2.ViewModels
     {
         public string UserId { get; set; }
 
-        [Display(Name="Micropost Email Notifications")]
-        public bool MicropostEmailNotifications { get; set; }
+        [Display(Name="MicroPost Email Notifications")]
+        public bool MicroPostEmailNotifications { get; set; }
 
-        [Display(Name="Micropost SMS Notifications")]
-        public bool MicropostSMSNotifications { get; set; }
+        [Display(Name="MicroPost SMS Notifications")]
+        public bool MicroPostSMSNotifications { get; set; }
 
-        public int? MicropostsAuthored { get; set; }
-        public List<MicropostFeedItemViewModel> Microposts { get; set; }
+        public int? MicroPostsAuthored { get; set; }
+        public List<MicroPostFeedItemViewModel> MicroPosts { get; set; }
     }
 
     public class UserUnfollowViewModel : UserViewModelBase
