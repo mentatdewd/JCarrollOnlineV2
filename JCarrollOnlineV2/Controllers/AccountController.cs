@@ -208,11 +208,11 @@ namespace JCarrollOnlineV2.Controllers
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     Uri callbackUri = new Uri(Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme));
 
-#if DEBUG
-                    var cleanUrl = callbackUri;
-#else
-                    var cleanUrl = callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped);
-#endif
+//#if DEBUG
+//                    var cleanUrl = callbackUri;
+//#else
+                    var cleanUrl = new Uri(callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
+//#endif
 
                     //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
                     //await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
