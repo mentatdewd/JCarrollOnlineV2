@@ -32,6 +32,7 @@ namespace JCarrollOnlineV2.Migrations
         }
 
         const string adminRole = "Administrator";
+        const string adminName = "administrator@jcarrollonline.com";
 
         private bool AddAdminRoleAndUser(JCarrollOnlineV2Db context)
         {
@@ -39,12 +40,12 @@ namespace JCarrollOnlineV2.Migrations
             var PasswordHash = new PasswordHasher();
             var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
 
-            if(!context.Users.Any(u => u.UserName == "administrator@test.com"))
+            if(!context.Users.Any(u => u.UserName == adminName))
             {
                 var adminUser = new ApplicationUser
                 {
-                    UserName = "administrator@test.com",
-                    Email = "administrator@test.com",
+                    UserName = adminName,
+                    Email = "mentatdewd@comcast.net",
                     PasswordHash = PasswordHash.HashPassword("password"),
                     EmailConfirmed = true
                 };
@@ -54,8 +55,9 @@ namespace JCarrollOnlineV2.Migrations
                 if (!Roles.RoleExists(adminRole))
                 {
                     Roles.CreateRole(adminRole);
-                    UserManager.AddToRole(adminUser.Id, adminRole);
                 }
+
+                UserManager.AddToRole(adminUser.Id, adminRole);
             }
 
             return true;
@@ -64,29 +66,29 @@ namespace JCarrollOnlineV2.Migrations
         protected override void Seed(JCarrollOnlineV2Db context)
         {
 #if DEBUG
-           // System.Diagnostics.Debugger.Launch();
+            // System.Diagnostics.Debugger.Launch();
 
             //Deletes all data, from all tables, except for __MigrationHistory
-//            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
-//            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
-//            context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
-//            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
-//            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
-//            List<ApplicationUser> users = new List<ApplicationUser>();
+            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
+            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
+            //context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
+            //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
+            //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
+            //List<ApplicationUser> users = new List<ApplicationUser>();
 
-//            for (int i = 0; i < 4; i++)
-//            {
-//                var newUser = new NewUser() { UserName = string.Format("User{0}", i.ToString()), Email = string.Format("User{0}@test.com", i.ToString()), Password = string.Format("Password{0}", i.ToString()), Roles = new List<string>() { "Administrator" } };
-//                var user = AddRoleAndUser(context, newUser);
-//                if (user == null)
-//                {
-//                    Console.Write("Seeding failed for user: " + string.Format("User{0}", i.ToString()));
-//                }
-//                users.Add(user);
-//                System.Diagnostics.Trace.WriteLine(string.Format("Added userId: {0}", newUser.UserName));
-//            }
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    var newUser = new NewUser() { UserName = string.Format("User{0}", i.ToString()), Email = string.Format("User{0}@test.com", i.ToString()), Password = string.Format("Password{0}", i.ToString()), Roles = new List<string>() { "Administrator" } };
+            //    var user = AddRoleAndUser(context, newUser);
+            //    if (user == null)
+            //    {
+            //        Console.Write("Seeding failed for user: " + string.Format("User{0}", i.ToString()));
+            //    }
+            //    users.Add(user);
+            //    System.Diagnostics.Trace.WriteLine(string.Format("Added userId: {0}", newUser.UserName));
+            //}
 
-//            AddAdminRoleAndUser(context);
+            AddAdminRoleAndUser(context);
 
 //            context.Forums.AddOrUpdate(x => x.Id,
 //                new Forum
@@ -164,48 +166,48 @@ namespace JCarrollOnlineV2.Migrations
 //                }
 //            );
 //            context.SaveChanges();
-//        }
-//        ApplicationUser AddRoleAndUser(JCarrollOnlineV2Db context, NewUser newUser)
-//        {
-//            var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
-//            var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
-//            IdentityResult result = IdentityResult.Success;
+        }
+        ApplicationUser AddRoleAndUser(JCarrollOnlineV2Db context, NewUser newUser)
+        {
+            var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+            var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
+            IdentityResult result = IdentityResult.Success;
 
-//            var user = UserManager.FindByName(newUser.UserName);
+            var user = UserManager.FindByName(newUser.UserName);
 
-//            if (user == null)
-//            {
-//                user = new ApplicationUser() { UserName = newUser.UserName, Email = newUser.Email };
-//                result = UserManager.Create(user, newUser.Password);
+            if (user == null)
+            {
+                user = new ApplicationUser() { UserName = newUser.UserName, Email = newUser.Email };
+                result = UserManager.Create(user, newUser.Password);
 
-//                if (!result.Succeeded)
-//                {
-//                    Console.Write("Unable to create user: " + newUser.UserName);
-//                    return null;
-//                }
-//            }
+                if (!result.Succeeded)
+                {
+                    Console.Write("Unable to create user: " + newUser.UserName);
+                    return null;
+                }
+            }
 
-//            foreach (string r in newUser.Roles)
-//            {
-//                if (!RoleManager.RoleExists(r))
-//                {
-//                    var role = new IdentityRole(r);
-//                    result = RoleManager.Create(role);
-//                    if (!result.Succeeded)
-//                    {
-//                        Console.Write("Unable to create role: " + r);
-//                        return null;
-//                    }
-//                }
+            foreach (string r in newUser.Roles)
+            {
+                if (!RoleManager.RoleExists(r))
+                {
+                    var role = new IdentityRole(r);
+                    result = RoleManager.Create(role);
+                    if (!result.Succeeded)
+                    {
+                        Console.Write("Unable to create role: " + r);
+                        return null;
+                    }
+                }
 
-//                result = UserManager.AddToRole(user.Id, r);
-//                if (!result.Succeeded)
-//                {
-//                    Console.Write("Unable to add user '" + newUser.UserName + "' to role '" + r + "'.");
-//                }
-//            }
+                result = UserManager.AddToRole(user.Id, r);
+                if (!result.Succeeded)
+                {
+                    Console.Write("Unable to add user '" + newUser.UserName + "' to role '" + r + "'.");
+                }
+            }
 
-//            return user;
+            return user;
 #endif
         }
     }
