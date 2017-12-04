@@ -14,7 +14,7 @@ namespace JCarrollOnlineV2.App_Start
                 {
                     UseEcmaScript5Polyfill = true,
                     UseJson2Library = true,
-                    EngineMode = JsEngineMode.ChakraEdgeJsRt,
+                    EngineMode = JsEngineMode.Auto,
                     EnableDebugging = true
                 })
                 .AddV8();
