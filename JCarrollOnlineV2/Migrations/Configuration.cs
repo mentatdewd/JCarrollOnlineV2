@@ -32,6 +32,7 @@ namespace JCarrollOnlineV2.Migrations
         }
 
         const string adminRole = "Administrator";
+        IdentityRole identityAdminRole = new IdentityRole(adminRole);
         const string adminName = "administrator@jcarrollonline.com";
 
         private bool AddAdminRoleAndUser(JCarrollOnlineV2Db context)
@@ -52,9 +53,9 @@ namespace JCarrollOnlineV2.Migrations
 
                 UserManager.Create(adminUser);
 
-                if (!Roles.RoleExists(adminRole))
+                if (!RoleManager.RoleExists(adminRole))
                 {
-                    Roles.CreateRole(adminRole);
+                    RoleManager.Create(identityAdminRole);
                 }
 
                 UserManager.AddToRole(adminUser.Id, adminRole);
@@ -69,11 +70,11 @@ namespace JCarrollOnlineV2.Migrations
             // System.Diagnostics.Debugger.Launch();
 
             //Deletes all data, from all tables, except for __MigrationHistory
-            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
-            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
-            //context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
-            //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
-            //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
+            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
+            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
+            context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
+            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
+            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
             //List<ApplicationUser> users = new List<ApplicationUser>();
 
             //for (int i = 0; i < 4; i++)
