@@ -219,7 +219,7 @@ namespace JCarrollOnlineV2.Controllers
                     ApplicationUserViewModel auVM = new ApplicationUserViewModel();
                     auVM.InjectFrom(user);
 
-                    await SendWelcomeEmail(auVM, cleanUrl);
+                    //await SendWelcomeEmail(auVM, cleanUrl);
 
                     return RedirectToAction("RegistrationNotification", "Account");
                 }

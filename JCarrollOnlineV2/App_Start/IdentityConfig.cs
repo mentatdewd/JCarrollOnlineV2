@@ -26,7 +26,7 @@ namespace JCarrollOnlineV2
 
             using(var smtpClient = new SmtpClient())
             {
-                await smtpClient.SendMailAsync(mailMessage);
+               // await smtpClient.SendMailAsync(mailMessage);
             }
         }
 
