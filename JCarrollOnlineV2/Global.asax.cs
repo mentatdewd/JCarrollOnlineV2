@@ -1,6 +1,4 @@
-﻿using JavaScriptEngineSwitcher.Core;
-using JCarrollOnlineV2.App_Start;
-using JCarrollOnlineV2.DataContexts;
+﻿using JCarrollOnlineV2.DataContexts;
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -37,7 +35,6 @@ namespace JCarrollOnlineV2
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            JsEngineSwitcherConfig.Configure(JsEngineSwitcher.Instance);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             // Ensure ASP.NET Simple Membership is initialized only once per app start
             LazyInitializer.EnsureInitialized(ref _initializer, ref _isInitialized, ref _initializerLock);
