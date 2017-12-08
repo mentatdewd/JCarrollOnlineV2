@@ -8,7 +8,7 @@ namespace JCarrollOnlineV2.DataContexts
     public class JCarrollOnlineV2Db : DbContext, IContext
     {
         public JCarrollOnlineV2Db()
-            : base("JCarrollOnlineV2Connection")
+            : base("JCarrollOnlineV2")
         {
             //Database.Log = Console.WriteLine;
             Database.Log = s => { System.Diagnostics.Debug.Write(s); };
