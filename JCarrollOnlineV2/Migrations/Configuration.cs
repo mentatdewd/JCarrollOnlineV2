@@ -31,8 +31,10 @@ namespace JCarrollOnlineV2.Migrations
             AutomaticMigrationDataLossAllowed = true;
         }
 
-        const string adminRole = "Administrator";
-        const string adminName = "administrator@jcarrollonline.com";
+        const string adminRoleName = "Administrator";
+        IdentityRole identityRole = new IdentityRole(adminRoleName); 
+        const string adminName = "administrator";
+        const string adminPassword = "password";
 
         private bool AddAdminRoleAndUser(JCarrollOnlineV2Db context)
         {
@@ -49,14 +51,14 @@ namespace JCarrollOnlineV2.Migrations
                     EmailConfirmed = true
                 };
 
-                UserManager.Create(adminUser);
+                UserManager.Create(adminUser, adminPassword);
 
-                if (!Roles.RoleExists(adminRole))
+                if (!RoleManager.RoleExists(adminRoleName))
                 {
-                    Roles.CreateRole(adminRole);
+                    RoleManager.Create(identityRole);
                 }
 
-                UserManager.AddToRole(adminUser.Id, adminRole);
+                UserManager.AddToRole(adminUser.Id, adminRoleName);
             }
 
             return true;
@@ -67,26 +69,27 @@ namespace JCarrollOnlineV2.Migrations
             // System.Diagnostics.Debugger.Launch();
 
             //Deletes all data, from all tables, except for __MigrationHistory
-            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
-            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
-            //context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
+            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
+            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
+            context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
             //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
             //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
-            //List<ApplicationUser> users = new List<ApplicationUser>();
-
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    var newUser = new NewUser() { UserName = string.Format("User{0}", i.ToString()), Email = string.Format("User{0}@test.com", i.ToString()), Password = string.Format("Password{0}", i.ToString()), Roles = new List<string>() { "Administrator" } };
-            //    var user = AddRoleAndUser(context, newUser);
-            //    if (user == null)
-            //    {
-            //        Console.Write("Seeding failed for user: " + string.Format("User{0}", i.ToString()));
-            //    }
-            //    users.Add(user);
-            //    System.Diagnostics.Trace.WriteLine(string.Format("Added userId: {0}", newUser.UserName));
-            //}
-
             AddAdminRoleAndUser(context);
+
+//            List<ApplicationUser> users = new List<ApplicationUser>();
+
+//            for (int i = 0; i < 4; i++)
+//            {
+//                var newUser = new NewUser() { UserName = string.Format("User{0}", i.ToString()), Email = string.Format("User{0}@test.com", i.ToString()), Password = string.Format("Password{0}", i.ToString()), Roles = new List<string>() { "Administrator" } };
+//                var user = AddRoleAndUser(context, newUser);
+//                if (user == null)
+//                {
+//                    Console.Write("Seeding failed for user: " + string.Format("User{0}", i.ToString()));
+//                }
+//                users.Add(user);
+//                System.Diagnostics.Trace.WriteLine(string.Format("Added userId: {0}", newUser.UserName));
+//            }
+
 
 //            context.Forums.AddOrUpdate(x => x.Id,
 //                new Forum
@@ -206,7 +209,6 @@ namespace JCarrollOnlineV2.Migrations
             }
 
             return user;
-#endif
         }
     }
 }
