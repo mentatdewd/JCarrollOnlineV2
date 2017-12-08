@@ -1,5 +1,4 @@
 ﻿using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.Migrations;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Data.Entity;
@@ -31,7 +30,7 @@ namespace JCarrollOnlineV2.DataContexts
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
 //#if !DEBUG
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
+            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
 //#endif
 
             base.OnModelCreating(modelBuilder);
