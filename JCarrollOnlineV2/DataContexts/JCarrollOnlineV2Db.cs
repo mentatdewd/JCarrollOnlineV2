@@ -1,17 +1,27 @@
 ﻿using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.Migrations;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Data.Entity;
+using System.Web.Management;
 
 namespace JCarrollOnlineV2.DataContexts
 {
+    public class LogEvent : WebRequestErrorEvent
+    {
+        public LogEvent(string message)
+            : base(null, null, 100001, new Exception(message))
+        {
+        }
+    }
+
     public class JCarrollOnlineV2Db : DbContext, IContext
     {
         public JCarrollOnlineV2Db()
             : base("JCarrollOnlineV2")
         {
             //Database.Log = Console.WriteLine;
-
+            LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
             Database.Log = s => { System.Diagnostics.Debug.Write(s); };
         }
         public static JCarrollOnlineV2Db Create()
@@ -25,8 +35,8 @@ namespace JCarrollOnlineV2.DataContexts
 //#endif
 
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<IdentityUserLogin>().HasKey<string>(l => l.UserId);
-            modelBuilder.Entity<IdentityRole>().HasKey<string>(r => r.Id);
+            modelBuilder.Entity<IdentityUserLogin>().HasKey(l => l.UserId);
+            modelBuilder.Entity<IdentityRole>().HasKey(r => r.Id);
             modelBuilder.Entity<IdentityUserRole>().HasKey(r => new { r.RoleId, r.UserId });
 
             modelBuilder.Entity<MicroPost>()

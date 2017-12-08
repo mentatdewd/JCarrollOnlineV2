@@ -90,6 +90,7 @@ namespace JCarrollOnlineV2.Controllers
             ForumThreadEntryDetailsViewModel ftedVM = new ForumThreadEntryDetailsViewModel();
             ftedVM.ForumThreadEntryDetailItems = new ForumThreadEntryDetailItemsViewModel();
             ftedVM.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntries.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
+            var tmp =  _data.ForumThreadEntries.Include("Author").Include("Forum");//.AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
 
             ftedVM.Forum = new ForaDetailsViewModel();
             ftedVM.Forum.InjectFrom(_data.Forums.Find(forumId));
