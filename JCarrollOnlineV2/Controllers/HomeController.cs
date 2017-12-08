@@ -3,14 +3,12 @@ using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
 using Omu.ValueInjecter;
-using System.Collections.Generic;
-using System.Data.Entity;
+using PagedList;
 using System.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using PagedList;
-using System;
 
 namespace JCarrollOnlineV2.Controllers
 {
