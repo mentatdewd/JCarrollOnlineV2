@@ -32,17 +32,15 @@ namespace JCarrollOnlineV2.Migrations
         }
 
         const string adminRole = "Administrator";
-        IdentityRole identityAdminRole = new IdentityRole(adminRole);
-        const string adminName = "administrator";
+        const string adminName = "administrator@jcarrollonline.com";
 
         private bool AddAdminRoleAndUser(JCarrollOnlineV2Db context)
         {
             var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
             var PasswordHash = new PasswordHasher();
             var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
-            string password = "password";
 
-            if(!context.Users.Any(u => u.UserName == adminName))
+            if (!context.Users.Any(u => u.UserName == adminName))
             {
                 var adminUser = new ApplicationUser
                 {
@@ -51,11 +49,11 @@ namespace JCarrollOnlineV2.Migrations
                     EmailConfirmed = true
                 };
 
-                UserManager.Create(adminUser, password);
+                UserManager.Create(adminUser);
 
-                if (!RoleManager.RoleExists(adminRole))
+                if (!Roles.RoleExists(adminRole))
                 {
-                    RoleManager.Create(identityAdminRole);
+                    Roles.CreateRole(adminRole);
                 }
 
                 UserManager.AddToRole(adminUser.Id, adminRole);
@@ -66,15 +64,14 @@ namespace JCarrollOnlineV2.Migrations
 
         protected override void Seed(JCarrollOnlineV2Db context)
         {
-#if DEBUG
             // System.Diagnostics.Debugger.Launch();
 
             //Deletes all data, from all tables, except for __MigrationHistory
-            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
-            context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
-            context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
-            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
-            context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
+            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
+            //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'IF OBJECT_ID(''?'') NOT IN (ISNULL(OBJECT_ID(''[dbo].[__MigrationHistory]''),0)) DELETE FROM ?'");
+            //context.Database.ExecuteSqlCommand("EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'");
+            //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
+            //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
             //List<ApplicationUser> users = new List<ApplicationUser>();
 
             //for (int i = 0; i < 4; i++)
