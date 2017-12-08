@@ -11,6 +11,7 @@ namespace JCarrollOnlineV2.DataContexts
             : base("JCarrollOnlineV2")
         {
             //Database.Log = Console.WriteLine;
+
             Database.Log = s => { System.Diagnostics.Debug.Write(s); };
         }
         public static JCarrollOnlineV2Db Create()
