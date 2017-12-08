@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 namespace JCarrollOnlineV2.ViewModels
 {
