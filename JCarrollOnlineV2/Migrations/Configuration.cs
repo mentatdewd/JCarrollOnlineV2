@@ -40,6 +40,7 @@ namespace JCarrollOnlineV2.Migrations
             var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
             var PasswordHash = new PasswordHasher();
             var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
+            string password = "password";
 
             if(!context.Users.Any(u => u.UserName == adminName))
             {
@@ -47,11 +48,10 @@ namespace JCarrollOnlineV2.Migrations
                 {
                     UserName = adminName,
                     Email = "mentatdewd@comcast.net",
-                    PasswordHash = PasswordHash.HashPassword("password"),
                     EmailConfirmed = true
                 };
 
-                UserManager.Create(adminUser);
+                UserManager.Create(adminUser, password);
 
                 if (!RoleManager.RoleExists(adminRole))
                 {

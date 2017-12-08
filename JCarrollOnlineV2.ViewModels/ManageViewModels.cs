@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JCarrollOnlineV2.ViewModels
 {
-    public class IndexViewModel : ViewModelBase
+    public class ManageIndexViewModel : ViewModelBase
     {
         public bool HasPassword { get; set; }
         public IList<UserLoginInfo> Logins { get; set; }
@@ -23,12 +23,12 @@ namespace JCarrollOnlineV2.ViewModels
         public bool ShowRemoveButton { get; set; }
     }
 
-    public class FactorViewModel : ViewModelBase
+    public class ManageFactorViewModel : ViewModelBase
     {
         public string Purpose { get; set; }
     }
 
-    public class SetPasswordViewModel : ViewModelBase
+    public class ManageSetPasswordViewModel : ViewModelBase
     {
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
@@ -42,7 +42,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string ConfirmPassword { get; set; }
     }
 
-    public class ChangePasswordViewModel : ViewModelBase
+    public class ManageChangePasswordViewModel : ViewModelBase
     {
         [Required]
         [DataType(DataType.Password)]
@@ -61,7 +61,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string ConfirmPassword { get; set; }
     }
 
-    public class AddPhoneNumberViewModel : ViewModelBase
+    public class ManageAddPhoneNumberViewModel : ViewModelBase
     {
         [Required]
         [Phone]
@@ -69,7 +69,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string Number { get; set; }
     }
 
-    public class VerifyPhoneNumberViewModel : ViewModelBase
+    public class ManageVerifyPhoneNumberViewModel : ViewModelBase
     {
         [Required]
         [Display(Name = "Code")]
@@ -82,7 +82,7 @@ namespace JCarrollOnlineV2.ViewModels
         public string Status { get; set; }
     }
 
-    public class ConfigureTwoFactorViewModel : ViewModelBase
+    public class ManageConfigureTwoFactorViewModel : ViewModelBase
     {
         public string SelectedProvider { get; set; }
         public ICollection<System.Web.Mvc.SelectListItem> Providers { get; set; }
