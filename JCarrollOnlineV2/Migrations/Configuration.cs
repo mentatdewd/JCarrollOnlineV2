@@ -61,7 +61,7 @@ namespace JCarrollOnlineV2.Migrations
                 UserManager.AddToRole(adminUser.Id, adminRoleName);
             }
 
-            return true;
+            return true; 
         }
 
         protected override void Seed(JCarrollOnlineV2Db context)
