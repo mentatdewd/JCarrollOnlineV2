@@ -100,6 +100,7 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -279,74 +280,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HtmlHelperExtensions\HtmlHelperExtensions.cs" />
-    <None Include="Migrations\201504142148542_Initial.cs" />
-    <Compile Include="Migrations\201504142148542_Initial.designer.cs">
-      <DependentUpon>201504142148542_Initial.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504152338360_ChangedRootIdToNullable.cs" />
-    <Compile Include="Migrations\201504152338360_ChangedRootIdToNullable.designer.cs">
-      <DependentUpon>201504152338360_ChangedRootIdToNullable.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504161920011_UpdatedMicropostModelUserIdFromIntToString.cs" />
-    <Compile Include="Migrations\201504161920011_UpdatedMicropostModelUserIdFromIntToString.designer.cs">
-      <DependentUpon>201504161920011_UpdatedMicropostModelUserIdFromIntToString.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.cs" />
-    <Compile Include="Migrations\201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.designer.cs">
-      <DependentUpon>201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504162114395_StillPlayingWithManyToManyMicropostsUsers.cs" />
-    <Compile Include="Migrations\201504162114395_StillPlayingWithManyToManyMicropostsUsers.designer.cs">
-      <DependentUpon>201504162114395_StillPlayingWithManyToManyMicropostsUsers.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504170207508_ReworkedRssTable.cs" />
-    <Compile Include="Migrations\201504170207508_ReworkedRssTable.designer.cs">
-      <DependentUpon>201504170207508_ReworkedRssTable.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504170213009_ReworkedRssTableRenamedToRssFeed.cs" />
-    <Compile Include="Migrations\201504170213009_ReworkedRssTableRenamedToRssFeed.designer.cs">
-      <DependentUpon>201504170213009_ReworkedRssTableRenamedToRssFeed.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504170243498_DroppedRssFeeds.cs" />
-    <Compile Include="Migrations\201504170243498_DroppedRssFeeds.designer.cs">
-      <DependentUpon>201504170243498_DroppedRssFeeds.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504202303406_LargeUpdate.cs" />
-    <Compile Include="Migrations\201504202303406_LargeUpdate.Designer.cs">
-      <DependentUpon>201504202303406_LargeUpdate.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504202324577_ReintroduceRelationships.cs" />
-    <Compile Include="Migrations\201504202324577_ReintroduceRelationships.Designer.cs">
-      <DependentUpon>201504202324577_ReintroduceRelationships.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504211411019_ChangedMicropostToUseApplicationUser.cs" />
-    <Compile Include="Migrations\201504211411019_ChangedMicropostToUseApplicationUser.Designer.cs">
-      <DependentUpon>201504211411019_ChangedMicropostToUseApplicationUser.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504211549421_SettingUpNonNullableFields.cs" />
-    <Compile Include="Migrations\201504211549421_SettingUpNonNullableFields.Designer.cs">
-      <DependentUpon>201504211549421_SettingUpNonNullableFields.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504212120270_DroppedRelationship.cs" />
-    <Compile Include="Migrations\201504212120270_DroppedRelationship.Designer.cs">
-      <DependentUpon>201504212120270_DroppedRelationship.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504272316218_AddedBlogTable.cs" />
-    <Compile Include="Migrations\201504272316218_AddedBlogTable.Designer.cs">
-      <DependentUpon>201504272316218_AddedBlogTable.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504292145012_AddedBlogComments.cs" />
-    <Compile Include="Migrations\201504292145012_AddedBlogComments.Designer.cs">
-      <DependentUpon>201504292145012_AddedBlogComments.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201504301929563_SetMostFieldsInBlogItemToRequired.cs" />
-    <Compile Include="Migrations\201504301929563_SetMostFieldsInBlogItemToRequired.Designer.cs">
-      <DependentUpon>201504301929563_SetMostFieldsInBlogItemToRequired.cs</DependentUpon>
-    </Compile>
-    <None Include="Migrations\201505042248312_AddedMicropostNotificationFields.cs" />
-    <Compile Include="Migrations\201505042248312_AddedMicropostNotificationFields.Designer.cs">
-      <DependentUpon>201505042248312_AddedMicropostNotificationFields.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\JCarrollOnlineV2.WCFService.Login\Reference.cs">
@@ -743,59 +676,6 @@
       <Project>{a4675e34-6310-4fef-9ad8-498cdc8c7757}</Project>
       <Name>JCarrollOnlineV2.ViewModels</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201504142148542_Initial.resx">
-      <DependentUpon>201504142148542_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504152338360_ChangedRootIdToNullable.resx">
-      <DependentUpon>201504152338360_ChangedRootIdToNullable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504161920011_UpdatedMicropostModelUserIdFromIntToString.resx">
-      <DependentUpon>201504161920011_UpdatedMicropostModelUserIdFromIntToString.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.resx">
-      <DependentUpon>201504161954496_UpdatedRelationshipsModelFollowedFromIntToString.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504162114395_StillPlayingWithManyToManyMicropostsUsers.resx">
-      <DependentUpon>201504162114395_StillPlayingWithManyToManyMicropostsUsers.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504170207508_ReworkedRssTable.resx">
-      <DependentUpon>201504170207508_ReworkedRssTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504170213009_ReworkedRssTableRenamedToRssFeed.resx">
-      <DependentUpon>201504170213009_ReworkedRssTableRenamedToRssFeed.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504170243498_DroppedRssFeeds.resx">
-      <DependentUpon>201504170243498_DroppedRssFeeds.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504202303406_LargeUpdate.resx">
-      <DependentUpon>201504202303406_LargeUpdate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504202324577_ReintroduceRelationships.resx">
-      <DependentUpon>201504202324577_ReintroduceRelationships.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504211411019_ChangedMicropostToUseApplicationUser.resx">
-      <DependentUpon>201504211411019_ChangedMicropostToUseApplicationUser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504211549421_SettingUpNonNullableFields.resx">
-      <DependentUpon>201504211549421_SettingUpNonNullableFields.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504212120270_DroppedRelationship.resx">
-      <DependentUpon>201504212120270_DroppedRelationship.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504272316218_AddedBlogTable.resx">
-      <DependentUpon>201504272316218_AddedBlogTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504292145012_AddedBlogComments.resx">
-      <DependentUpon>201504292145012_AddedBlogComments.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504301929563_SetMostFieldsInBlogItemToRequired.resx">
-      <DependentUpon>201504301929563_SetMostFieldsInBlogItemToRequired.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201505042248312_AddedMicropostNotificationFields.resx">
-      <DependentUpon>201505042248312_AddedMicropostNotificationFields.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
