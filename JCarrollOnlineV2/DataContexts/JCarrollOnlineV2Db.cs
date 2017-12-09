@@ -20,13 +20,14 @@ namespace JCarrollOnlineV2.DataContexts
             : base("JCarrollOnlineV2")
         {
             //Database.Log = Console.WriteLine;
-            LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
-            Database.Log = s => { System.Diagnostics.Debug.Write(s); };
+            //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
+            //Database.Log = s => { System.Diagnostics.Debug.Write(s); };
         }
         public static JCarrollOnlineV2Db Create()
         {
             return new JCarrollOnlineV2Db();
         }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
 //#if !DEBUG
