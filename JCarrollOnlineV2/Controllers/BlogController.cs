@@ -36,7 +36,7 @@ namespace JCarrollOnlineV2.Controllers
 
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser user = await _data.Users.FindAsync(currentUserId);
-            List<BlogItem> blogItems = await _data.BlogItems.Include("BlogItemComments").ToListAsync();
+            List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").ToListAsync();
 
             foreach(var item in blogItems.OrderByDescending(m => m.UpdatedAt))
             {
@@ -83,7 +83,7 @@ namespace JCarrollOnlineV2.Controllers
                 bic.InjectFrom(blogCommentItemViewModel);
                 bic.CreatedAt = DateTime.Now;
 
-                bic.BlogItem = await _data.BlogItems.FindAsync(blogCommentItemViewModel.BlogItemId);
+                bic.BlogItem = await _data.BlogItem.FindAsync(blogCommentItemViewModel.BlogItemId);
 
                 _data.BlogItemComments.Add(bic);
                 await _data.SaveChangesAsync();
@@ -130,7 +130,7 @@ namespace JCarrollOnlineV2.Controllers
                 ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
                 blogPost.Author = currentUser;
 
-                _data.BlogItems.Add(blogPost);
+                _data.BlogItem.Add(blogPost);
                 await _data.SaveChangesAsync();
 
                 return new RedirectResult(Url.Action("Index"));
@@ -144,7 +144,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             BlogFeedItemViewModel bfiVM = new BlogFeedItemViewModel();
 
-            var blogItem = await _data.BlogItems.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId);
+            var blogItem = await _data.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId);
 
             if (blogItem == null)
             {

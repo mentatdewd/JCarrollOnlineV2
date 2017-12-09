@@ -83,7 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Blog.cs" />
+    <Compile Include="BlogItem.cs" />
     <Compile Include="BlogItemComment.cs" />
     <Compile Include="Forum.cs" />
     <Compile Include="ForumModerator.cs" />

@@ -23,7 +23,7 @@ namespace JCarrollOnlineV2.DataContexts
 
         DbSet<MicroPost> MicroPosts { get; set; }
 
-        DbSet<BlogItem> BlogItems { get; set; }
+        DbSet<BlogItem> BlogItem { get; set; }
         DbSet<BlogItemComment> BlogItemComments { get; set; }
 
         int SaveChanges();
