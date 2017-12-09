@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JCarrollOnlineV2.Entities
 {
+    
     public class MicroPost
     {
         public int Id { get; set; }

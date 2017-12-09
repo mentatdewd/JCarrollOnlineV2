@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Web.Management;
 
 namespace JCarrollOnlineV2.DataContexts
@@ -23,6 +24,7 @@ namespace JCarrollOnlineV2.DataContexts
             //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
             //Database.Log = s => { System.Diagnostics.Debug.Write(s); };
         }
+
         public static JCarrollOnlineV2Db Create()
         {
             return new JCarrollOnlineV2Db();
@@ -30,27 +32,36 @@ namespace JCarrollOnlineV2.DataContexts
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-//#if !DEBUG
+            //#if !DEBUG
             //Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>()); 
-//#endif
+            //#endif
+
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<IdentityUserLogin>().HasKey(l => l.UserId);
-            modelBuilder.Entity<IdentityRole>().HasKey(r => r.Id);
-            modelBuilder.Entity<IdentityUserRole>().HasKey(r => new { r.RoleId, r.UserId });
+            modelBuilder.Entity<IdentityUserLogin>()
+                .HasKey(p => p.UserId);
+
+            modelBuilder.Entity<IdentityUserRole>()
+                .HasKey(p => p.UserId);
 
             modelBuilder.Entity<MicroPost>()
+                .ToTable("MicroPost")
                 .HasRequired(m => m.Author)
                 .WithMany(m => m.MicroPosts)
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<ApplicationUser>()
-                .HasMany(m => m.Followers)
-                .WithMany(m => m.Following)
-                .Map(x => x.MapLeftKey("UserId")
-                .MapRightKey("FollowerId")
-                .ToTable("UserFollowers"));
+            modelBuilder.Entity<BlogItem>()
+                .ToTable("BlogItem");
 
+            modelBuilder.Entity<Forum>()
+                .ToTable("Forum");
+
+            modelBuilder.Entity<ForumModerator>()
+                .ToTable("ForumModerator");
+
+            modelBuilder.Entity<ForumThreadEntry>()
+                .ToTable("ForumThreadEntry");
 
             //modelBuilder.Entity<ForumThreadEntry>()
             //    .HasRequired<ApplicationUser>(s => s.Author)
@@ -68,7 +79,7 @@ namespace JCarrollOnlineV2.DataContexts
         public DbSet<ForumModerator> ForumModerators { get; set; }
         public DbSet<ForumThreadEntry> ForumThreadEntries { get; set; }
         public DbSet<MicroPost> MicroPosts { get; set; }
-        public DbSet<BlogItem> BlogItems { get; set; }
+        public DbSet<BlogItem> BlogItem { get; set; }
         public DbSet<BlogItemComment> BlogItemComments { get; set; }
     }
 }
