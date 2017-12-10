@@ -10,7 +10,7 @@ using System.Web.Management;
 
 namespace JCarrollOnlineV2.DataContexts
 {
-    public class JCarrollOnlineV2Db : DbContext, IContext
+    public class JCarrollOnlineV2Db : DbContext, IJCarrollOnlineV2Context
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 

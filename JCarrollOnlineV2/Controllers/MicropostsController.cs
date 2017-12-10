@@ -19,7 +19,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class MicroPostsController : Controller
     {
-        private IContext _data { get; set; }
+        private IJCarrollOnlineV2Context _data { get; set; }
 
         public MicroPostsController()
             : this(null)
@@ -27,7 +27,7 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        public MicroPostsController(IContext dataContext)
+        public MicroPostsController(IJCarrollOnlineV2Context dataContext)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }

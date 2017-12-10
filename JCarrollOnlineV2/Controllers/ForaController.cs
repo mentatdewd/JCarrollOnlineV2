@@ -13,14 +13,14 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class ForaController : Controller
     {
-        private IContext _data { get; set; }
+        private IJCarrollOnlineV2Context _data { get; set; }
 
         public ForaController() : this(null)
         {
 
         }
 
-        public ForaController(IContext dataContext = null)
+        public ForaController(IJCarrollOnlineV2Context dataContext = null)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }

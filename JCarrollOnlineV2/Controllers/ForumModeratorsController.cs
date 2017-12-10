@@ -10,14 +10,14 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles="Administrator")]
     public class ForumModeratorsController : Controller
     {
-        private IContext _data { get; set; }
+        private IJCarrollOnlineV2Context _data { get; set; }
 
         public ForumModeratorsController() : this(null)
         {
 
         }
 
-        public ForumModeratorsController(IContext dataContext)
+        public ForumModeratorsController(IJCarrollOnlineV2Context dataContext)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }

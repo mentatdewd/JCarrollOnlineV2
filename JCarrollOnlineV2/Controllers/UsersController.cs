@@ -14,7 +14,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class UsersController : Controller
     {
-        private IContext _data { get; set; }
+        private IJCarrollOnlineV2Context _data { get; set; }
 
         public UsersController()
             : this(null)
@@ -22,7 +22,7 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        public UsersController(IContext dataContext)
+        public UsersController(IJCarrollOnlineV2Context dataContext)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }
