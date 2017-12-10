@@ -1,11 +1,13 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
+using NLog;
 using Omu.ValueInjecter;
 using RazorEngine.Templating;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -14,6 +16,8 @@ namespace JCarrollOnlineV2
 {
     public static class ControllerHelpers
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public static async Task<int> GetThreadPostCountAsync(int thread, IJCarrollOnlineV2Context data)
         {
             return await data.ForumThreadEntry.Where(i => i.RootId == thread).AsQueryable().CountAsync();
@@ -68,8 +72,10 @@ namespace JCarrollOnlineV2
 
         public static async Task<RssFeedViewModel> UpdateRssAsync()
         {
+            logger.Info("Obtaining rss data")
             TNX.RssReader.RssFeed rssFeed = await TNX.RssReader.RssHelper.ReadFeedAsync("http://m.mariners.mlb.com/partnerxml/gen/news/rss/sea.xml");
 
+            logger.Info("Processing rss data")
             RssFeedViewModel rssFeedVM = new RssFeedViewModel();
             rssFeedVM.RssFeedItems = new List<RssFeedItemViewModel>();
             foreach (var item in rssFeed.Items)
@@ -80,6 +86,8 @@ namespace JCarrollOnlineV2
                 rss.UpdatedAt = DateTime.Now;
                 rssFeedVM.RssFeedItems.Add(rss);
             }
+
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "Processed {0} rss records", rssFeedVM.RssFeedItems.Count));
             return rssFeedVM;
         }
     }
