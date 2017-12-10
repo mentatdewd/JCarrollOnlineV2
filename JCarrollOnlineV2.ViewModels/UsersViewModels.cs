@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NLog;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace JCarrollOnlineV2.ViewModels
@@ -33,9 +34,11 @@ namespace JCarrollOnlineV2.ViewModels
     }
     public class UserDetailViewModel : UserViewModelBase
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public UserDetailViewModel()
         {
-            UserInfoVM = new UserItemViewModel();
+            UserInfoVM = new UserItemViewModel(logger);
             UserStatsVM = new UserStatsViewModel();
         }
         public UserItemViewModel UserInfoVM { get; set; }
@@ -44,6 +47,11 @@ namespace JCarrollOnlineV2.ViewModels
 
     public class UserItemViewModel : UserViewModelBase
     {
+        public UserItemViewModel(Logger logger)
+        {
+            Logger = logger;
+        }
+
         public string UserId { get; set; }
 
         [Display(Name="MicroPost Email Notifications")]
@@ -54,6 +62,7 @@ namespace JCarrollOnlineV2.ViewModels
 
         public int? MicroPostsAuthored { get; set; }
         public List<MicroPostFeedItemViewModel> MicroPosts { get; set; }
+        public Logger Logger { get; set; }
     }
 
     public class UserUnfollowViewModel : UserViewModelBase

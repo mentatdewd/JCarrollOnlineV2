@@ -37,7 +37,7 @@ namespace JCarrollOnlineV2.Controllers
             homeViewModel.MicroPostCreateVM = new MicroPostCreateViewModel();
             homeViewModel.MicroPostFeedVM = new MicroPostFeedViewModel();
             homeViewModel.UserStatsVM = new UserStatsViewModel();
-            homeViewModel.UserInfoVM = new UserItemViewModel();
+            homeViewModel.UserInfoVM = new UserItemViewModel(logger);
             homeViewModel.BlogFeed = new BlogFeedViewModel();
 
             homeViewModel.UserStatsVM.UserFollowers = new UserFollowersViewModel();
@@ -79,6 +79,7 @@ namespace JCarrollOnlineV2.Controllers
                 ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId);
 
                 homeViewModel.UserInfoVM.User.InjectFrom(user);
+                homeViewModel.UserInfoVM.UserId = user.Id;
                 homeViewModel.UserInfoVM.MicroPostsAuthored = user.MicroPosts.Count();
                 homeViewModel.UserStatsVM.User.InjectFrom(user);
 
@@ -86,7 +87,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 foreach (ApplicationUser item in user.Following)
                 {
-                    UserItemViewModel userItemViewModel = new UserItemViewModel();
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
                     userItemViewModel.InjectFrom(item);
                     homeViewModel.UserStatsVM.UsersFollowing.Users.Add(userItemViewModel);
@@ -105,7 +106,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 foreach (var item in user.Followers)
                 {
-                    UserItemViewModel userItemViewModel = new UserItemViewModel();
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
                     userItemViewModel.InjectFrom(item);
                     userItemViewModel.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
