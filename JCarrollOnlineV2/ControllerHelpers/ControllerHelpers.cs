@@ -16,19 +16,19 @@ namespace JCarrollOnlineV2
     {
         public static async Task<int> GetThreadPostCountAsync(int thread, IContext data)
         {
-            return await data.ForumThreadEntries.Where(i => i.RootId == thread).AsQueryable().CountAsync();
+            return await data.ForumThreadEntry.Where(i => i.RootId == thread).AsQueryable().CountAsync();
         }
 
         public static async Task<int> GetThreadCountAsync(Forum forum, IContext data)
         {
-            return await data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync();
+            return await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync();
         }
 
         public static async Task<DateTime> GetLastReplyAsync(int? rootId, IContext data)
         {
             if (rootId != null)
             {
-                ForumThreadEntry fte = await data.ForumThreadEntries.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
+                ForumThreadEntry fte = await data.ForumThreadEntry.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
                 return fte.UpdatedAt;
             }
             else return DateTime.Now;
@@ -38,7 +38,7 @@ namespace JCarrollOnlineV2
         {
             LastThreadViewModel ltVM = new LastThreadViewModel();
 
-            var fte = await data.ForumThreadEntries.Where(i => i.Forum.Id == forum.Id)
+            var fte = await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id)
                 .Include(i => i.Author)
                 .OrderByDescending(i => i.UpdatedAt)
                 .FirstOrDefaultAsync();
@@ -55,7 +55,7 @@ namespace JCarrollOnlineV2
                 if (fte.ParentId != null)
                     while (rootNotFound)
                     {
-                        fte = await data.ForumThreadEntries.FindAsync(fte.ParentId);
+                        fte = await data.ForumThreadEntry.FindAsync(fte.ParentId);
                         if (fte != null)
                             if (fte.ParentId == null)
                                 rootNotFound = false;

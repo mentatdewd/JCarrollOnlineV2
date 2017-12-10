@@ -35,7 +35,7 @@ namespace JCarrollOnlineV2.Controllers
             BlogIndexViewModel biVM = new BlogIndexViewModel();
 
             string currentUserId = User.Identity.GetUserId();
-            ApplicationUser user = await _data.Users.FindAsync(currentUserId);
+            ApplicationUser user = await _data.ApplicationUser.FindAsync(currentUserId);
             List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").ToListAsync();
 
             foreach(var item in blogItems.OrderByDescending(m => m.UpdatedAt))
@@ -85,7 +85,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 bic.BlogItem = await _data.BlogItem.FindAsync(blogCommentItemViewModel.BlogItemId);
 
-                _data.BlogItemComments.Add(bic);
+                _data.BlogItemComment.Add(bic);
                 await _data.SaveChangesAsync();
 
                 //var cmts = await _data.BlogItemComments.Include("BlogItem").Where(m => m.BlogItem.Id == bic.BlogItem.Id).ToListAsync();
@@ -127,7 +127,7 @@ namespace JCarrollOnlineV2.Controllers
                 blogPost.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
+                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
                 blogPost.Author = currentUser;
 
                 _data.BlogItem.Add(blogPost);
@@ -166,7 +166,7 @@ namespace JCarrollOnlineV2.Controllers
                 BlogItem domModel = new BlogItem();
 
                 domModel.InjectFrom(blogItemVM);
-                domModel.Author = await _data.Users.FindAsync(blogItemVM.AuthorId);
+                domModel.Author = await _data.ApplicationUser.FindAsync(blogItemVM.AuthorId);
                 domModel.UpdatedAt = DateTime.Now;
 
                 _data.Entry(domModel).State = EntityState.Modified;

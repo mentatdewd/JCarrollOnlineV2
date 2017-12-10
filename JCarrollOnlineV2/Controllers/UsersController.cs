@@ -34,7 +34,7 @@ namespace JCarrollOnlineV2.Controllers
 
             uiVM.PageTitle = "Users";
 
-            var users = await _data.Users.Include("Following").Include("Followers").ToListAsync();
+            var users = await _data.ApplicationUser.Include("Following").Include("Followers").ToListAsync();
 
             foreach (var user in users)
             {
@@ -42,7 +42,7 @@ namespace JCarrollOnlineV2.Controllers
                 //uiVM.User = new ApplicationUserViewModel();
 
                 uivm.User.InjectFrom(user);
-                uivm.MicroPostsAuthored = await _data.Users.Include("MicroPosts").Where(u => u.Id == user.Id).Select(u => u.MicroPosts).CountAsync();
+                uivm.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == user.Id).Select(u => u.MicroPosts).CountAsync();
                 uiVM.Users.Add(uivm);
             }
 
@@ -55,9 +55,9 @@ namespace JCarrollOnlineV2.Controllers
             UserDetailViewModel udVM = new UserDetailViewModel();
 
             string currentUserId = User.Identity.GetUserId();
-            ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
+            ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
 
-            ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
+            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
             udVM.UserInfoVM.User.InjectFrom(user);
 
             udVM.UserInfoVM.MicroPostEmailNotifications = user.MicroPostEmailNotifications;
@@ -71,7 +71,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 UserItemViewModel uiVM = new UserItemViewModel();
                 uiVM.User.InjectFrom(item);
-                uiVM.MicroPostsAuthored = await _data.MicroPosts.Where(u => u.Author.Id == item.Id).CountAsync();
+                uiVM.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == item.Id).CountAsync();
                 udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
             }
             udVM.UserStatsVM.UserFollowers = new UserFollowersViewModel();
@@ -79,7 +79,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 UserItemViewModel uiVM = new UserItemViewModel();
                 uiVM.User.InjectFrom(item);
-                uiVM.MicroPostsAuthored = await _data.MicroPosts.Where(u => u.Author.Id == item.Id).CountAsync();
+                uiVM.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == item.Id).CountAsync();
                 udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
             }
             return View(udVM);
@@ -91,7 +91,7 @@ namespace JCarrollOnlineV2.Controllers
             udVM.PageTitle = "Following";
             udVM.UserInfoVM = new UserItemViewModel();
 
-            ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
+            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
             udVM.UserStatsVM = new UserStatsViewModel();
             udVM.User.InjectFrom(user);
             udVM.UserInfoVM.User.InjectFrom(user);
@@ -120,7 +120,7 @@ namespace JCarrollOnlineV2.Controllers
             udVM.PageTitle = "Followers";
             udVM.UserInfoVM = new UserItemViewModel();
 
-            ApplicationUser user = await _data.Users.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
+            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
             udVM.UserStatsVM = new UserStatsViewModel();
             udVM.User.InjectFrom(user);
             udVM.UserInfoVM.User.InjectFrom(user);
@@ -151,8 +151,8 @@ namespace JCarrollOnlineV2.Controllers
             if (ModelState.IsValid)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                var followingUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
+                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
+                var followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
 
                 currentUser.Following.Add(followingUser);
                 await _data.SaveChangesAsync();
@@ -168,8 +168,8 @@ namespace JCarrollOnlineV2.Controllers
             if (ModelState.IsValid)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                var followingUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
+                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
+                var followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
 
                 currentUser.Following.Remove(followingUser);
                 await _data.SaveChangesAsync();
@@ -183,7 +183,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await _data.Users.FirstOrDefaultAsync(x => x.Id == auVM.UserId);
+                ApplicationUser user = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == auVM.UserId);
 
                 user.MicroPostEmailNotifications = auVM.MicroPostEmailNotifications;
                 user.MicroPostSMSNotifications = auVM.MicroPostSMSNotifications;

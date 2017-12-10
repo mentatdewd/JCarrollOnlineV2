@@ -40,10 +40,12 @@ namespace JCarrollOnlineV2.DataContexts
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<IdentityUserLogin>()
-                .HasKey(p => p.UserId);
+                .HasKey(p => p.UserId)
+                .ToTable("IdentityUserLogin");
 
             modelBuilder.Entity<IdentityUserRole>()
-                .HasKey(p => p.UserId);
+                .HasKey(p => p.UserId)
+                .ToTable("IdentityUserRole");
 
             modelBuilder.Entity<MicroPost>()
                 .ToTable("MicroPost")
@@ -63,23 +65,28 @@ namespace JCarrollOnlineV2.DataContexts
             modelBuilder.Entity<ForumThreadEntry>()
                 .ToTable("ForumThreadEntry");
 
+            modelBuilder.Entity<Entities.NLog>()
+                .HasKey(k => k.Id)
+                .ToTable("NLog");
+
             //modelBuilder.Entity<ForumThreadEntry>()
             //    .HasRequired<ApplicationUser>(s => s.Author)
             //    .WithMany(t => t.ForumThreadEntries).HasForeignKey(m => m.AuthorId)
             //.WillCascadeOnDelete(false);
 
         }
-        public virtual DbSet<IdentityRole> Roles { get; set; }
-        public virtual DbSet<ApplicationUser> Users { get; set; }
-        public virtual DbSet<IdentityUserClaim> UserClaims { get; set; }
-        public virtual DbSet<IdentityUserLogin> UserLogins { get; set; }
-        public virtual DbSet<IdentityUserRole> UserRoles { get; set; }
+        public virtual DbSet<IdentityRole> IdentityRole { get; set; }
+        public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
+        public virtual DbSet<IdentityUserClaim> IdentityUserClaim { get; set; }
+        public virtual DbSet<IdentityUserLogin> IdentityUserLogin { get; set; }
+        public virtual DbSet<IdentityUserRole> IdentityUserRole { get; set; }
 
-        public DbSet<Forum> Forums { get; set; }
-        public DbSet<ForumModerator> ForumModerators { get; set; }
-        public DbSet<ForumThreadEntry> ForumThreadEntries { get; set; }
-        public DbSet<MicroPost> MicroPosts { get; set; }
+        public DbSet<Forum> Forum { get; set; }
+        public DbSet<ForumModerator> ForumModerator { get; set; }
+        public DbSet<ForumThreadEntry> ForumThreadEntry { get; set; }
+        public DbSet<MicroPost> MicroPost { get; set; }
         public DbSet<BlogItem> BlogItem { get; set; }
-        public DbSet<BlogItemComment> BlogItemComments { get; set; }
+        public DbSet<BlogItemComment> BlogItemComment { get; set; }
+        public DbSet<Entities.NLog> NLog { get; set; }
     }
 }

@@ -63,7 +63,7 @@ namespace JCarrollOnlineV2.Controllers
             if (User != null && User.Identity.IsAuthenticated == true)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser user = await _data.Users.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId);
+                ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId);
 
                 hVM.UserInfoVM.User.InjectFrom(user);
                 hVM.UserInfoVM.MicroPostsAuthored = user.MicroPosts.Count();
@@ -88,7 +88,7 @@ namespace JCarrollOnlineV2.Controllers
                 {
                     UserItemViewModel uiVM = new UserItemViewModel();
                     uiVM.InjectFrom(item);
-                    uiVM.MicroPostsAuthored = await _data.Users.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
+                    uiVM.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
                     hVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
                 }
                 foreach (var micropost in user.MicroPosts)

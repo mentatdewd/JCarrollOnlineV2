@@ -34,9 +34,9 @@ namespace JCarrollOnlineV2.Controllers
             viewModel.Author.InjectFrom(domModel.Author);
             viewModel.Forum.InjectFrom(domModel.Forum);
             if(domModel.ParentId != null)
-                viewModel.ParentPostNumber = _data.ForumThreadEntries.Find(domModel.ParentId).PostNumber;
+                viewModel.ParentPostNumber = _data.ForumThreadEntry.Find(domModel.ParentId).PostNumber;
 
-            viewModel.PostCount = _data.ForumThreadEntries.Where(m => m.Author.Id == domModel.Author.Id).Count();
+            viewModel.PostCount = _data.ForumThreadEntry.Where(m => m.Author.Id == domModel.Author.Id).Count();
         }
 
         public void Format()
@@ -50,15 +50,15 @@ namespace JCarrollOnlineV2.Controllers
             ForumThreadEntryIndexViewModel fteiVM = new ForumThreadEntryIndexViewModel();
 
             // Retrieve forum data
-            Forum forum = _data.Forums.Find(forumId);
+            Forum forum = _data.Forum.Find(forumId);
             fteiVM.Forum = new ForaViewModel();
             fteiVM.Forum.InjectFrom(forum);
 
-            var forumThreads = _data.ForumThreadEntries.ToList();
+            var forumThreads = _data.ForumThreadEntry.ToList();
 
             // Create the view model
             fteiVM.ForumThreadEntryIndex = new List<ForumThreadEntryIndexItemViewModel>();
-            var forumThreadList = await _data.ForumThreadEntries.Where(p => p.Forum.Id == forumId && p.ParentId == null)
+            var forumThreadList = await _data.ForumThreadEntry.Where(p => p.Forum.Id == forumId && p.ParentId == null)
                 .Include(p => p.Author)
                 .Include(p => p.Forum)
                 .ToListAsync();
@@ -89,13 +89,13 @@ namespace JCarrollOnlineV2.Controllers
             // Create the details view model
             ForumThreadEntryDetailsViewModel ftedVM = new ForumThreadEntryDetailsViewModel();
             ftedVM.ForumThreadEntryDetailItems = new ForumThreadEntryDetailItemsViewModel();
-            ftedVM.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntries.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
-            var tmp =  _data.ForumThreadEntries.Include("Author").Include("Forum");//.AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
+            ftedVM.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntry.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
+            var tmp =  _data.ForumThreadEntry.Include("Author").Include("Forum");//.AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ForumThreadEntry, ForumThreadEntryDetailsItemViewModel>(detailItemInjector);
 
             ftedVM.Forum = new ForaDetailsViewModel();
-            ftedVM.Forum.InjectFrom(_data.Forums.Find(forumId));
+            ftedVM.Forum.InjectFrom(_data.Forum.Find(forumId));
             
-            ftedVM.ForumThreadEntryDetailItems.NumberOfReplies = _data.ForumThreadEntries.Where(b => b.RootId == id).Count();
+            ftedVM.ForumThreadEntryDetailItems.NumberOfReplies = _data.ForumThreadEntry.Where(b => b.RootId == id).Count();
             return View(ftedVM);
         }
 
@@ -130,19 +130,19 @@ namespace JCarrollOnlineV2.Controllers
                 forumThread.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.Users.FirstOrDefaultAsync(x => x.Id == currentUserId);
+                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
                 forumThread.Author = currentUser;
 
-                forumThread.Forum = _data.Forums.Find(forumThreadEntryViewModel.ForumId);
+                forumThread.Forum = _data.Forum.Find(forumThreadEntryViewModel.ForumId);
 
                 if (forumThread.ParentId != null)
-                    forumThread.PostNumber = await _data.ForumThreadEntries.Where(m => m.RootId == forumThread.RootId).CountAsync() + 1;
+                    forumThread.PostNumber = await _data.ForumThreadEntry.Where(m => m.RootId == forumThread.RootId).CountAsync() + 1;
                 else
                 { 
                     forumThread.PostNumber = 1;
                 }
 
-                _data.ForumThreadEntries.Add(forumThread);
+                _data.ForumThreadEntry.Add(forumThread);
                 await _data.SaveChangesAsync();
                 if (forumThread.ParentId == null)
                 {
@@ -166,7 +166,7 @@ namespace JCarrollOnlineV2.Controllers
             }
             ForumThreadEntriesEditViewModel fteeVM = new ForumThreadEntriesEditViewModel();
 
-            var forumThread = await _data.ForumThreadEntries.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
+            var forumThread = await _data.ForumThreadEntry.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
 
             if (forumThread == null)
             {
@@ -192,8 +192,8 @@ namespace JCarrollOnlineV2.Controllers
                 ForumThreadEntry forumThread = new ForumThreadEntry();
 
                 forumThread.InjectFrom(forumThreadEntry);
-                forumThread.Author = await _data.Users.FindAsync(forumThreadEntry.AuthorId);
-                forumThread.Forum = await _data.Forums.FindAsync(forumThreadEntry.ForumId);
+                forumThread.Author = await _data.ApplicationUser.FindAsync(forumThreadEntry.AuthorId);
+                forumThread.Forum = await _data.Forum.FindAsync(forumThreadEntry.ForumId);
                 forumThread.UpdatedAt = DateTime.Now;
 
                 _data.Entry(forumThread).State = EntityState.Modified;
@@ -211,7 +211,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumThreadEntry forumThread = await _data.ForumThreadEntries.Include("Author").Include("Forum").Where(m => m.Id == id).SingleOrDefaultAsync();
+            ForumThreadEntry forumThread = await _data.ForumThreadEntry.Include("Author").Include("Forum").Where(m => m.Id == id).SingleOrDefaultAsync();
             ForumThreadEntryDetailsItemViewModel ftediVM = new ForumThreadEntryDetailsItemViewModel();
 
             ftediVM.InjectFrom(forumThread);
@@ -231,9 +231,9 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            ForumThreadEntry forumThread = await _data.ForumThreadEntries.Include("Author").Include("Forum").Where(m => m.Id == id).SingleOrDefaultAsync();
+            ForumThreadEntry forumThread = await _data.ForumThreadEntry.Include("Author").Include("Forum").Where(m => m.Id == id).SingleOrDefaultAsync();
             string userId = User.Identity.GetUserId();
-            ApplicationUser user = await _data.Users.FindAsync(userId);
+            ApplicationUser user = await _data.ApplicationUser.FindAsync(userId);
 
             forumThread.Title = "This post was deleted on " + DateTime.Now + " by " + user.UserName;
             forumThread.Content = "";
