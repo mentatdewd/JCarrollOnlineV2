@@ -16,7 +16,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles = "Administrator")]
     public class BlogController : Controller
     {
-        private IContext _data { get; set; }
+        private IJCarrollOnlineV2Context _data { get; set; }
 
         public BlogController()
             : this(null)
@@ -24,7 +24,7 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        public BlogController(IContext dataContext)
+        public BlogController(IJCarrollOnlineV2Context dataContext)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }

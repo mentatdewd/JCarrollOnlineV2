@@ -2,6 +2,7 @@
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
+using NLog;
 using Omu.ValueInjecter;
 using PagedList;
 using System.Data;
@@ -14,20 +15,23 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class HomeController : Controller
     {
-        private IContext _data { get; set; }
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        private IJCarrollOnlineV2Context _data { get; set; }
 
         public HomeController()
             : this(null)
         {
         }
 
-        public HomeController(IContext dataContext = null)
+        public HomeController(IJCarrollOnlineV2Context dataContext = null)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }
 
         public async Task<ActionResult> Index(int? micropostPage)
         {
+            logger.Info("In Home/Index");
             HomeViewModel hVM = new HomeViewModel();
             hVM.Message = "JCarrollOnlineV2 Home - Index";
             hVM.MicroPostCreateVM = new MicroPostCreateViewModel();
@@ -39,7 +43,10 @@ namespace JCarrollOnlineV2.Controllers
             hVM.UserStatsVM.UserFollowers = new UserFollowersViewModel();
             hVM.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
 
+            logger.Info("Checking for blog entries");
             var blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
+
+            logger.Info("Processing blog entries");
 
             foreach (var item in blogItems)
             {
@@ -58,6 +65,8 @@ namespace JCarrollOnlineV2.Controllers
                 hVM.BlogFeed.BlogFeedItemVMs.Add(bfi);
             }
 
+            logger.Info("Processing rss");
+
             Task<RssFeedViewModel> rss = ControllerHelpers.UpdateRssAsync();
 
             if (User != null && User.Identity.IsAuthenticated == true)
@@ -69,6 +78,7 @@ namespace JCarrollOnlineV2.Controllers
                 hVM.UserInfoVM.MicroPostsAuthored = user.MicroPosts.Count();
                 hVM.UserStatsVM.User.InjectFrom(user);
 
+                logger.Info("Processing followings");
                 foreach (ApplicationUser item in user.Following)
                 {
                     UserItemViewModel uiVM = new UserItemViewModel();
@@ -84,6 +94,7 @@ namespace JCarrollOnlineV2.Controllers
                         hVM.MicroPostFeedVM.MicroPostFeedItems.Add(mpVM);
                     }
                 }
+                logger.Info("Processing followers");
                 foreach (var item in user.Followers)
                 {
                     UserItemViewModel uiVM = new UserItemViewModel();
@@ -91,6 +102,7 @@ namespace JCarrollOnlineV2.Controllers
                     uiVM.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
                     hVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
                 }
+                logger.Info("Processing microPosts");
                 foreach (var micropost in user.MicroPosts)
                 {
                     MicroPostFeedItemViewModel mpVM = new MicroPostFeedItemViewModel();

@@ -17,14 +17,14 @@ namespace JCarrollOnlineV2.Controllers
 
     public class ForumThreadEntriesController : Controller
     {
-        private IContext _data { get; set; }
+        private IJCarrollOnlineV2Context _data { get; set; }
 
         public ForumThreadEntriesController() : this(null)
         {
 
         }
 
-        public ForumThreadEntriesController(IContext dataContext)
+        public ForumThreadEntriesController(IJCarrollOnlineV2Context dataContext)
         {
             _data = dataContext ?? new JCarrollOnlineV2Db();
         }

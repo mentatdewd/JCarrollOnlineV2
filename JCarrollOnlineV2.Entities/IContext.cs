@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.DataContexts
 {
-    public interface IContext
+    public interface IJCarrollOnlineV2Context
     {
         DbSet<IdentityRole> IdentityRole { get; set; }
         DbSet<ApplicationUser> ApplicationUser { get; set; }

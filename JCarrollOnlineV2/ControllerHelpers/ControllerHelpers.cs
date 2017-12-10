@@ -14,17 +14,17 @@ namespace JCarrollOnlineV2
 {
     public static class ControllerHelpers
     {
-        public static async Task<int> GetThreadPostCountAsync(int thread, IContext data)
+        public static async Task<int> GetThreadPostCountAsync(int thread, IJCarrollOnlineV2Context data)
         {
             return await data.ForumThreadEntry.Where(i => i.RootId == thread).AsQueryable().CountAsync();
         }
 
-        public static async Task<int> GetThreadCountAsync(Forum forum, IContext data)
+        public static async Task<int> GetThreadCountAsync(Forum forum, IJCarrollOnlineV2Context data)
         {
             return await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync();
         }
 
-        public static async Task<DateTime> GetLastReplyAsync(int? rootId, IContext data)
+        public static async Task<DateTime> GetLastReplyAsync(int? rootId, IJCarrollOnlineV2Context data)
         {
             if (rootId != null)
             {
@@ -34,7 +34,7 @@ namespace JCarrollOnlineV2
             else return DateTime.Now;
         }
 
-        public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, IContext data)
+        public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, IJCarrollOnlineV2Context data)
         {
             LastThreadViewModel ltVM = new LastThreadViewModel();
 
