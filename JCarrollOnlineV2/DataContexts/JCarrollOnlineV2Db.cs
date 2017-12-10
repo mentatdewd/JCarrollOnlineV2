@@ -10,11 +10,11 @@ using System.Web.Management;
 
 namespace JCarrollOnlineV2.DataContexts
 {
-    public class JCarrollOnlineV2Db : DbContext, IJCarrollOnlineV2Context
+    public class JCarrollOnlineV2Connection : DbContext, IJCarrollOnlineV2Context
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public JCarrollOnlineV2Db()
+        public JCarrollOnlineV2Connection()
             : base("JCarrollOnlineV2Connection")
         {
             //Database.Log = Console.WriteLine;
@@ -22,17 +22,17 @@ namespace JCarrollOnlineV2.DataContexts
             //Database.Log = s => { System.Diagnostics.Debug.Write(s); };
         }
 
-        public static JCarrollOnlineV2Db Create()
+        public static JCarrollOnlineV2Connection Create()
         {
             logger.Info(string.Format(CultureInfo.InvariantCulture, "Creating new db context, call stack: {0}", new System.Diagnostics.StackTrace()));
-            var context = new JCarrollOnlineV2Db();
+            var context = new JCarrollOnlineV2Connection();
             logger.Info(string.Format(CultureInfo.InvariantCulture, "Using connection string: {0}", context.Database.Connection.ConnectionString));
             return context;
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Db, Configuration>());
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Connection, Configuration>());
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();

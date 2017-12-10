@@ -48,11 +48,11 @@ namespace JCarrollOnlineV2
         {
             public SimpleMembershipInitializer()
             {
-                Database.SetInitializer<JCarrollOnlineV2Db>(null);
+                Database.SetInitializer<JCarrollOnlineV2Connection>(null);
 
                 try
                 {
-                    using (var context = new JCarrollOnlineV2Db())
+                    using (var context = new JCarrollOnlineV2Connection())
                     {
                         if (!context.Database.Exists())
                         {

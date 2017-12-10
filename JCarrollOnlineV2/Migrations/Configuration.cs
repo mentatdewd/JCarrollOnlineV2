@@ -7,7 +7,7 @@ namespace JCarrollOnlineV2.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Db>
+    internal sealed class Configuration : DbMigrationsConfiguration<JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Connection>
     {
         public Configuration()
         {
@@ -15,7 +15,7 @@ namespace JCarrollOnlineV2.Migrations
             AutomaticMigrationDataLossAllowed = true;
         }
 
-        protected override void Seed(DataContexts.JCarrollOnlineV2Db context)
+        protected override void Seed(DataContexts.JCarrollOnlineV2Connection context)
         {
             //Deletes all data, from all tables, except for __MigrationHistory
             //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
@@ -31,7 +31,7 @@ namespace JCarrollOnlineV2.Migrations
         const string adminRole = "Administrator";
         const string adminName = "administrator";
 
-        private bool AddAdminRoleAndUser(JCarrollOnlineV2Db context)
+        private bool AddAdminRoleAndUser(JCarrollOnlineV2Connection context)
         {
             var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
             var PasswordHash = new PasswordHasher();

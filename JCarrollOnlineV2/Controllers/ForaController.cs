@@ -22,7 +22,7 @@ namespace JCarrollOnlineV2.Controllers
 
         public ForaController(IJCarrollOnlineV2Context dataContext = null)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Db();
+            _data = dataContext ?? new JCarrollOnlineV2Connection();
         }
 
         // GET: Fora

@@ -29,7 +29,7 @@ namespace JCarrollOnlineV2.Controllers
 
         public MicroPostsController(IJCarrollOnlineV2Context dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Db();
+            _data = dataContext ?? new JCarrollOnlineV2Connection();
         }
 
         // GET: MicroPosts

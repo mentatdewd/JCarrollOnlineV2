@@ -19,7 +19,7 @@ namespace JCarrollOnlineV2.Controllers
 
         public ForumModeratorsController(IJCarrollOnlineV2Context dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Db();
+            _data = dataContext ?? new JCarrollOnlineV2Connection();
         }
 
         // GET: ForumModerators
