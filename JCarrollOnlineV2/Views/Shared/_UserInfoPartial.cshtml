@@ -16,9 +16,11 @@
         @if (@Model.UserId != User.Identity.GetUserId())
     {
         @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.User.Id }, null)
+        @{Model.Logger.Info(string.Format("Rendered details for {0}", Model.UserId));}
 }
     </span>
     <span class="microposts" id="user_info">
         @Html.Raw(Model.MicroPostsAuthored + " " + @Html.Pluralize(Model.MicroPostsAuthored, "Post"))
+        @{Model.Logger.Info(string.Format("Rendered MicroPostsAuthored {0}", Model.MicroPostsAuthored));}
     </span>
 </div>
