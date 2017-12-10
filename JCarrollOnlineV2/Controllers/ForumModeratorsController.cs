@@ -25,7 +25,7 @@ namespace JCarrollOnlineV2.Controllers
         // GET: ForumModerators
         public async Task<ActionResult> Index()
         {
-            return View(await _data.ForumModerators.ToListAsync());
+            return View(await _data.ForumModerator.ToListAsync());
         }
 
         // GET: ForumModerators/Details/5
@@ -35,7 +35,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
+            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
             if (forumModerator == null)
             {
                 return HttpNotFound();
@@ -58,7 +58,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                _data.ForumModerators.Add(forumModerator);
+                _data.ForumModerator.Add(forumModerator);
                 await _data.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -73,7 +73,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
+            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
             if (forumModerator == null)
             {
                 return HttpNotFound();
@@ -104,7 +104,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
+            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
             if (forumModerator == null)
             {
                 return HttpNotFound();
@@ -117,8 +117,8 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            ForumModerator forumModerator = await _data.ForumModerators.FindAsync(id);
-            _data.ForumModerators.Remove(forumModerator);
+            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+            _data.ForumModerator.Remove(forumModerator);
             await _data.SaveChangesAsync();
             return RedirectToAction("Index");
         }

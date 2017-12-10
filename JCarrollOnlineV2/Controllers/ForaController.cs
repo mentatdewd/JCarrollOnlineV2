@@ -31,7 +31,7 @@ namespace JCarrollOnlineV2.Controllers
             ForaIndexViewModel fiVM = new ForaIndexViewModel();
             fiVM.ForaIndexItems = new List<ForaIndexItemViewModel>();
 
-            var dlist = await _data.Forums.ToListAsync();
+            var dlist = await _data.Forum.ToListAsync();
             foreach(var item in dlist)
             {
                 var fiiVM = new ForaIndexItemViewModel();
@@ -52,7 +52,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Forum forum = await _data.Forums.FindAsync(id);
+            Forum forum = await _data.Forum.FindAsync(id);
             if (forum == null)
             {
                 return HttpNotFound();
@@ -82,7 +82,7 @@ namespace JCarrollOnlineV2.Controllers
                 forum.InjectFrom(forumViewModel);
                 forum.CreatedAt = DateTime.Now;
                 forum.UpdatedAt = DateTime.Now;
-                _data.Forums.Add(forum);
+                _data.Forum.Add(forum);
                 await _data.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -98,7 +98,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Forum forum = await _data.Forums.FindAsync(id);
+            Forum forum = await _data.Forum.FindAsync(id);
             ForumEditViewModel forumEditVM = new ForumEditViewModel();
             forumEditVM.InjectFrom(forum);
             if (forum == null)
@@ -133,7 +133,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Forum forum = await _data.Forums.FindAsync(id);
+            Forum forum = await _data.Forum.FindAsync(id);
             ForumDeleteViewModel forumDeleteVM = new ForumDeleteViewModel();
             forumDeleteVM.InjectFrom(forum);
             if (forum == null)
@@ -149,8 +149,8 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Forum forum = await _data.Forums.FindAsync(id);
-            _data.Forums.Remove(forum);
+            Forum forum = await _data.Forum.FindAsync(id);
+            _data.Forum.Remove(forum);
             await _data.SaveChangesAsync();
             return RedirectToAction("Index");
         }

@@ -35,7 +35,7 @@ namespace JCarrollOnlineV2.Controllers
         // GET: MicroPosts
         public async Task<ActionResult> Index()
         {
-            return View(await _data.MicroPosts.ToListAsync());
+            return View(await _data.MicroPost.ToListAsync());
         }
 
         // GET: MicroPosts/Details/5
@@ -46,7 +46,7 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            MicroPost microPost = await _data.MicroPosts.FindAsync(id);
+            MicroPost microPost = await _data.MicroPost.FindAsync(id);
 
             if (microPost == null)
             {
@@ -76,9 +76,9 @@ namespace JCarrollOnlineV2.Controllers
                 microPost.CreatedAt = DateTime.Now;
                 microPost.UpdatedAt = DateTime.Now;
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.Users.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId);
+                ApplicationUser currentUser = await _data.ApplicationUser.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId);
                 microPost.Author = currentUser;
-                _data.MicroPosts.Add(microPost);
+                _data.MicroPost.Add(microPost);
                 await _data.SaveChangesAsync();
 
                 await SendMicroPostNotification(microPost, currentUser);
@@ -149,7 +149,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            MicroPost micropost = await _data.MicroPosts.FindAsync(id);
+            MicroPost micropost = await _data.MicroPost.FindAsync(id);
             if (micropost == null)
             {
                 return HttpNotFound();
@@ -180,7 +180,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            MicroPost micropost = await _data.MicroPosts.FindAsync(id);
+            MicroPost micropost = await _data.MicroPost.FindAsync(id);
             if (micropost == null)
             {
                 return HttpNotFound();
@@ -193,8 +193,8 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            MicroPost micropost = await _data.MicroPosts.FindAsync(id);
-            _data.MicroPosts.Remove(micropost);
+            MicroPost micropost = await _data.MicroPost.FindAsync(id);
+            _data.MicroPost.Remove(micropost);
             await _data.SaveChangesAsync();
             return RedirectToAction("Index");
         }

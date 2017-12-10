@@ -92,6 +92,7 @@
     <Compile Include="IContext.cs" />
     <Compile Include="IdentityModels.cs" />
     <Compile Include="Micropost.cs" />
+    <Compile Include="NLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

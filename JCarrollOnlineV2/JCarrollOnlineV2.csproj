@@ -132,6 +132,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="Omu.ValueInjecter, Version=3.1.1.0, Culture=neutral, PublicKeyToken=c7694541b0ac80e4, processorArchitecture=MSIL">
       <HintPath>..\packages\ValueInjecter.3.1.1.5\lib\net40\Omu.ValueInjecter.dll</HintPath>
     </Reference>
@@ -280,12 +283,17 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HtmlHelperExtensions\HtmlHelperExtensions.cs" />
-    <Compile Include="Migrations\201712090117163_Initial.cs" />
-    <Compile Include="Migrations\201712090117163_Initial.Designer.cs">
-      <DependentUpon>201712090117163_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201712101515297_Initial.cs" />
+    <Compile Include="Migrations\201712101515297_Initial.Designer.cs">
+      <DependentUpon>201712101515297_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Sql.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Sql.resx</DependentUpon>
+    </Compile>
     <Compile Include="Service References\JCarrollOnlineV2.WCFService.Login\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -496,6 +504,12 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jcarrollonlinev2.js" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.2.1.js" />
     <Content Include="Scripts\jquery-3.2.1.min.js" />
@@ -546,6 +560,8 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="Sql\dbo.WriteLog.sql" />
+    <Content Include="Sql\dbo.DropWriteLog.sql" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -662,6 +678,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -688,8 +705,12 @@
     <WCFMetadataStorage Include="Service References\JCarrollOnlineV2.WCFService.Login\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201712090117163_Initial.resx">
-      <DependentUpon>201712090117163_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201712101515297_Initial.resx">
+      <DependentUpon>201712101515297_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Sql.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Sql.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

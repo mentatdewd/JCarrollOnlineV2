@@ -1,18 +1,19 @@
-﻿using JCarrollOnlineV2.DataContexts;
+﻿using JCarrollOnlineV2.EmailViewModels;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using NLog;
+using Omu.ValueInjecter;
+using RazorEngine.Templating;
+using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
-using RazorEngine.Templating;
-using System;
-using Omu.ValueInjecter;
-using JCarrollOnlineV2.EmailViewModels;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -21,6 +22,7 @@ namespace JCarrollOnlineV2.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public AccountController()
         {
@@ -94,6 +96,7 @@ namespace JCarrollOnlineV2.Controllers
             LoginViewModel vm = new LoginViewModel();
 
             vm.ReturnUrl = returnUrl;
+            logger.Info("In Login(get)");
             return View(vm);
         }
 
@@ -105,6 +108,8 @@ namespace JCarrollOnlineV2.Controllers
         [OutputCache(NoStore = true, Location = OutputCacheLocation.None)]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            logger.Info("In Login(post)");
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -113,6 +118,9 @@ namespace JCarrollOnlineV2.Controllers
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "PasswordSignInAsync with UserName {0}, Password {1}, returned {2}", model.UserName, model.Password, result));
+
             switch (result)
             {
                 case SignInStatus.Success:

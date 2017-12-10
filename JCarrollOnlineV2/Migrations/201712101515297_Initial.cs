@@ -7,20 +7,7 @@ namespace JCarrollOnlineV2.Migrations
     {
         public override void Up()
         {
-            CreateTable(
-                "dbo.BlogItem",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Content = c.String(nullable: false),
-                        CreatedAt = c.DateTime(nullable: false),
-                        UpdatedAt = c.DateTime(nullable: false),
-                        Author_Id = c.String(nullable: false, maxLength: 128),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ApplicationUser", t => t.Author_Id, cascadeDelete: true)
-                .Index(t => t.Author_Id);
-            
+            this.Sql(Properties.Sql.dbo_WriteLog);
             CreateTable(
                 "dbo.ApplicationUser",
                 c => new
@@ -146,6 +133,20 @@ namespace JCarrollOnlineV2.Migrations
                 .Index(t => t.IdentityRole_Id);
             
             CreateTable(
+                "dbo.BlogItem",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Content = c.String(nullable: false),
+                        CreatedAt = c.DateTime(nullable: false),
+                        UpdatedAt = c.DateTime(nullable: false),
+                        Author_Id = c.String(nullable: false, maxLength: 128),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ApplicationUser", t => t.Author_Id, cascadeDelete: true)
+                .Index(t => t.Author_Id);
+            
+            CreateTable(
                 "dbo.BlogItemComment",
                 c => new
                     {
@@ -169,6 +170,30 @@ namespace JCarrollOnlineV2.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
+                "dbo.NLog",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        MachineName = c.String(maxLength: 200),
+                        SiteName = c.String(nullable: false, maxLength: 200),
+                        Logged = c.DateTime(nullable: false),
+                        Level = c.String(nullable: false, maxLength: 5),
+                        UserName = c.String(maxLength: 200),
+                        Message = c.String(nullable: false),
+                        Logger = c.String(maxLength: 300),
+                        Properties = c.String(),
+                        ServerName = c.String(maxLength: 200),
+                        Port = c.String(maxLength: 100),
+                        Url = c.String(maxLength: 2000),
+                        Https = c.Byte(nullable: false),
+                        ServerAddress = c.String(maxLength: 100),
+                        RemoteAddress = c.String(maxLength: 100),
+                        Callsite = c.String(maxLength: 300),
+                        Exception = c.String(),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
                 "dbo.ApplicationUserApplicationUser",
                 c => new
                     {
@@ -185,6 +210,7 @@ namespace JCarrollOnlineV2.Migrations
         
         public override void Down()
         {
+            this.Sql(Properties.Sql.dbo_DropWriteLog);
             DropForeignKey("dbo.IdentityUserRole", "IdentityRole_Id", "dbo.IdentityRole");
             DropForeignKey("dbo.BlogItemComment", "BlogItem_Id", "dbo.BlogItem");
             DropForeignKey("dbo.BlogItem", "Author_Id", "dbo.ApplicationUser");
@@ -200,6 +226,7 @@ namespace JCarrollOnlineV2.Migrations
             DropIndex("dbo.ApplicationUserApplicationUser", new[] { "ApplicationUser_Id1" });
             DropIndex("dbo.ApplicationUserApplicationUser", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.BlogItemComment", new[] { "BlogItem_Id" });
+            DropIndex("dbo.BlogItem", new[] { "Author_Id" });
             DropIndex("dbo.IdentityUserRole", new[] { "IdentityRole_Id" });
             DropIndex("dbo.IdentityUserRole", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.MicroPost", new[] { "Author_Id" });
@@ -208,10 +235,11 @@ namespace JCarrollOnlineV2.Migrations
             DropIndex("dbo.ForumThreadEntry", new[] { "Forum_Id" });
             DropIndex("dbo.ForumThreadEntry", new[] { "Author_Id" });
             DropIndex("dbo.IdentityUserClaim", new[] { "ApplicationUser_Id" });
-            DropIndex("dbo.BlogItem", new[] { "Author_Id" });
             DropTable("dbo.ApplicationUserApplicationUser");
+            DropTable("dbo.NLog");
             DropTable("dbo.IdentityRole");
             DropTable("dbo.BlogItemComment");
+            DropTable("dbo.BlogItem");
             DropTable("dbo.IdentityUserRole");
             DropTable("dbo.MicroPost");
             DropTable("dbo.IdentityUserLogin");
@@ -220,7 +248,6 @@ namespace JCarrollOnlineV2.Migrations
             DropTable("dbo.ForumThreadEntry");
             DropTable("dbo.IdentityUserClaim");
             DropTable("dbo.ApplicationUser");
-            DropTable("dbo.BlogItem");
         }
     }
 }
