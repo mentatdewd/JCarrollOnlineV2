@@ -2,6 +2,7 @@
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
 using Microsoft.AspNet.Identity;
+using NLog;
 using Omu.ValueInjecter;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -14,6 +15,8 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class UsersController : Controller
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private IJCarrollOnlineV2Context _data { get; set; }
 
         public UsersController()
@@ -38,7 +41,7 @@ namespace JCarrollOnlineV2.Controllers
 
             foreach (var user in users)
             {
-                UserItemViewModel uivm = new UserItemViewModel();
+                UserItemViewModel uivm = new UserItemViewModel(logger);
                 //uiVM.User = new ApplicationUserViewModel();
 
                 uivm.User.InjectFrom(user);
@@ -69,7 +72,7 @@ namespace JCarrollOnlineV2.Controllers
             udVM.UserStatsVM.User.InjectFrom(user);
             foreach (var item in user.Following)
             {
-                UserItemViewModel uiVM = new UserItemViewModel();
+                UserItemViewModel uiVM = new UserItemViewModel(logger);
                 uiVM.User.InjectFrom(item);
                 uiVM.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == item.Id).CountAsync();
                 udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
@@ -77,7 +80,7 @@ namespace JCarrollOnlineV2.Controllers
             udVM.UserStatsVM.UserFollowers = new UserFollowersViewModel();
             foreach (var item in user.Followers)
             {
-                UserItemViewModel uiVM = new UserItemViewModel();
+                UserItemViewModel uiVM = new UserItemViewModel(logger);
                 uiVM.User.InjectFrom(item);
                 uiVM.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == item.Id).CountAsync();
                 udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
@@ -89,7 +92,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             UserDetailViewModel udVM = new UserDetailViewModel();
             udVM.PageTitle = "Following";
-            udVM.UserInfoVM = new UserItemViewModel();
+            udVM.UserInfoVM = new UserItemViewModel(logger);
 
             ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
             udVM.UserStatsVM = new UserStatsViewModel();
@@ -99,14 +102,14 @@ namespace JCarrollOnlineV2.Controllers
 
             foreach (var item in user.Following)
             {
-                UserItemViewModel uiVM = new UserItemViewModel();
+                UserItemViewModel uiVM = new UserItemViewModel(logger);
                 uiVM.User.InjectFrom(item);
                 uiVM.MicroPostsAuthored = item.MicroPosts.Count();
                 udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
             }
             foreach (var item in user.Followers)
             {
-                UserItemViewModel uiVM = new UserItemViewModel();
+                UserItemViewModel uiVM = new UserItemViewModel(logger);
                 uiVM.InjectFrom(item);
                 uiVM.MicroPostsAuthored = item.MicroPosts.Count();
                 udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
@@ -118,7 +121,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             UserDetailViewModel udVM = new UserDetailViewModel();
             udVM.PageTitle = "Followers";
-            udVM.UserInfoVM = new UserItemViewModel();
+            udVM.UserInfoVM = new UserItemViewModel(logger);
 
             ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
             udVM.UserStatsVM = new UserStatsViewModel();
@@ -128,14 +131,14 @@ namespace JCarrollOnlineV2.Controllers
 
             foreach (var item in user.Following)
             {
-                UserItemViewModel uiVM = new UserItemViewModel();
+                UserItemViewModel uiVM = new UserItemViewModel(logger);
                 uiVM.User.InjectFrom(item);
                 uiVM.MicroPostsAuthored = item.MicroPosts.Count();
                 udVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
             }
             foreach (var item in user.Followers)
             {
-                UserItemViewModel uiVM = new UserItemViewModel();
+                UserItemViewModel uiVM = new UserItemViewModel(logger);
                 uiVM.User.InjectFrom(item);
                 uiVM.MicroPostsAuthored = item.MicroPosts.Count();
                 udVM.UserStatsVM.UserFollowers.Users.Add(uiVM);

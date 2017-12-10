@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNet.Identity
-@using System.Web.Security
 @using JCarrollOnlineV2.ViewModels
 @using JCarrollOnlineV2.HtmlHelperExtensions
+
 @model UserItemViewModel
 
 <div class="user_info">
@@ -12,10 +12,11 @@
         <h1>@Model.User.UserName</h1>
     </span>
     <span>
+        @{Model.Logger.Info(string.Format("Model.UserId is {0}, User.Identity.GetUserId is {1}", Model.UserId, User.Identity.GetUserId()));}
         @if (@Model.UserId != User.Identity.GetUserId())
-        {
-            @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.User.Id }, null)
-        }
+    {
+        @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.User.Id }, null)
+}
     </span>
     <span class="microposts" id="user_info">
         @Html.Raw(Model.MicroPostsAuthored + " " + @Html.Pluralize(Model.MicroPostsAuthored, "Post"))
