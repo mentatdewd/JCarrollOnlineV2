@@ -12,7 +12,7 @@ namespace JCarrollOnlineV2
         public void ConfigureAuth(IAppBuilder app)
         {
             // Configure the db context, user manager and signin manager to use a single instance per request
-            app.CreatePerOwinContext(JCarrollOnlineV2Db.Create);
+            app.CreatePerOwinContext(JCarrollOnlineV2Connection.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
             app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
 

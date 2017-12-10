@@ -26,7 +26,7 @@ namespace JCarrollOnlineV2.Controllers
 
         public HomeController(IJCarrollOnlineV2Context dataContext = null)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Db();
+            _data = dataContext ?? new JCarrollOnlineV2Connection();
         }
 
         public async Task<ActionResult> Index(int? micropostPage)
