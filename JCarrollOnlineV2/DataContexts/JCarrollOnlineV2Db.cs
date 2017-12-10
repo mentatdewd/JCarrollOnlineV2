@@ -15,7 +15,7 @@ namespace JCarrollOnlineV2.DataContexts
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public JCarrollOnlineV2Db()
-            : base("JCarrollOnlineV2")
+            : base("JCarrollOnlineV2Connection")
         {
             //Database.Log = Console.WriteLine;
             //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
