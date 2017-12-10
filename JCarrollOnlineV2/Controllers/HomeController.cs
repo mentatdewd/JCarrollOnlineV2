@@ -32,16 +32,16 @@ namespace JCarrollOnlineV2.Controllers
         public async Task<ActionResult> Index(int? micropostPage)
         {
             logger.Info("In Home/Index");
-            HomeViewModel hVM = new HomeViewModel();
-            hVM.Message = "JCarrollOnlineV2 Home - Index";
-            hVM.MicroPostCreateVM = new MicroPostCreateViewModel();
-            hVM.MicroPostFeedVM = new MicroPostFeedViewModel();
-            hVM.UserStatsVM = new UserStatsViewModel();
-            hVM.UserInfoVM = new UserItemViewModel();
-            hVM.BlogFeed = new BlogFeedViewModel();
+            HomeViewModel homeViewModel = new HomeViewModel();
+            homeViewModel.Message = "JCarrollOnlineV2 Home - Index";
+            homeViewModel.MicroPostCreateVM = new MicroPostCreateViewModel();
+            homeViewModel.MicroPostFeedVM = new MicroPostFeedViewModel();
+            homeViewModel.UserStatsVM = new UserStatsViewModel();
+            homeViewModel.UserInfoVM = new UserItemViewModel();
+            homeViewModel.BlogFeed = new BlogFeedViewModel();
 
-            hVM.UserStatsVM.UserFollowers = new UserFollowersViewModel();
-            hVM.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
+            homeViewModel.UserStatsVM.UserFollowers = new UserFollowersViewModel();
+            homeViewModel.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
 
             logger.Info("Checking for blog entries");
             var blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
@@ -50,19 +50,23 @@ namespace JCarrollOnlineV2.Controllers
 
             foreach (var item in blogItems)
             {
-                BlogFeedItemViewModel bfi = new BlogFeedItemViewModel();
-                bfi.InjectFrom(item);
-                bfi.Comments.BlogItemId = item.Id;
-                bfi.Author.InjectFrom(item.Author);
+                BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
+
+                blogFeedItemViewModel.InjectFrom(item);
+                blogFeedItemViewModel.Comments.BlogItemId = item.Id;
+                blogFeedItemViewModel.Author.InjectFrom(item.Author);
+
                 foreach(var comment in item.BlogItemComments.ToList())
                 {
-                    BlogCommentItemViewModel bciVM = new BlogCommentItemViewModel();
-                    bciVM.InjectFrom(comment);
-                    bciVM.BlogItemId = comment.BlogItem.Id;
-                    bciVM.TimeAgo = bciVM.CreatedAt.ToUniversalTime().ToString("o");
-                    bfi.Comments.BlogComments.Add(bciVM);
+                    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
+
+                    blogCommentItemViewModel.InjectFrom(comment);
+                    blogCommentItemViewModel.BlogItemId = comment.BlogItem.Id;
+                    blogCommentItemViewModel.TimeAgo = blogCommentItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
+                    blogFeedItemViewModel.Comments.BlogComments.Add(blogCommentItemViewModel);
                 }
-                hVM.BlogFeed.BlogFeedItemVMs.Add(bfi);
+
+                homeViewModel.BlogFeed.BlogFeedItemVMs.Add(blogFeedItemViewModel);
             }
 
             logger.Info("Processing rss");
@@ -74,50 +78,64 @@ namespace JCarrollOnlineV2.Controllers
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId);
 
-                hVM.UserInfoVM.User.InjectFrom(user);
-                hVM.UserInfoVM.MicroPostsAuthored = user.MicroPosts.Count();
-                hVM.UserStatsVM.User.InjectFrom(user);
+                homeViewModel.UserInfoVM.User.InjectFrom(user);
+                homeViewModel.UserInfoVM.MicroPostsAuthored = user.MicroPosts.Count();
+                homeViewModel.UserStatsVM.User.InjectFrom(user);
 
                 logger.Info("Processing followings");
+
                 foreach (ApplicationUser item in user.Following)
                 {
-                    UserItemViewModel uiVM = new UserItemViewModel();
-                    uiVM.InjectFrom(item);
-                    hVM.UserStatsVM.UsersFollowing.Users.Add(uiVM);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel();
+
+                    userItemViewModel.InjectFrom(item);
+                    homeViewModel.UserStatsVM.UsersFollowing.Users.Add(userItemViewModel);
 
                     foreach (var microPost in item.MicroPosts)
                     {
-                        MicroPostFeedItemViewModel mpVM = new MicroPostFeedItemViewModel();
-                        mpVM.InjectFrom(microPost);
-                        mpVM.Author.InjectFrom(microPost.Author);
-                        mpVM.TimeAgo = mpVM.CreatedAt.ToUniversalTime().ToString("o");
-                        hVM.MicroPostFeedVM.MicroPostFeedItems.Add(mpVM);
+                        MicroPostFeedItemViewModel microPostFeedItemViewModel = new MicroPostFeedItemViewModel();
+                        microPostFeedItemViewModel.InjectFrom(microPost);
+                        microPostFeedItemViewModel.Author.InjectFrom(microPost.Author);
+                        microPostFeedItemViewModel.TimeAgo = microPostFeedItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
+                        homeViewModel.MicroPostFeedVM.MicroPostFeedItems.Add(microPostFeedItemViewModel);
                     }
                 }
+
                 logger.Info("Processing followers");
+
                 foreach (var item in user.Followers)
                 {
-                    UserItemViewModel uiVM = new UserItemViewModel();
-                    uiVM.InjectFrom(item);
-                    uiVM.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
-                    hVM.UserStatsVM.UserFollowers.Users.Add(uiVM);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel();
+
+                    userItemViewModel.InjectFrom(item);
+                    userItemViewModel.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
+                    homeViewModel.UserStatsVM.UserFollowers.Users.Add(userItemViewModel);
                 }
+
                 logger.Info("Processing microPosts");
+
                 foreach (var micropost in user.MicroPosts)
                 {
-                    MicroPostFeedItemViewModel mpVM = new MicroPostFeedItemViewModel();
-                    mpVM.InjectFrom(micropost);
-                    mpVM.Author.InjectFrom(micropost.Author);
-                    mpVM.TimeAgo = mpVM.CreatedAt.ToUniversalTime().ToString("o");
-                    hVM.MicroPostFeedVM.MicroPostFeedItems.Add(mpVM);
-                }
-                var micropostPageNumber = micropostPage ?? 1;
-                hVM.MicroPostFeedVM.OnePageOfMicroPosts = hVM.MicroPostFeedVM.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
+                    MicroPostFeedItemViewModel microPostFeedItemViewModel = new MicroPostFeedItemViewModel();
 
-                hVM.RssFeedVM = await rss;
+                    microPostFeedItemViewModel.InjectFrom(micropost);
+                    microPostFeedItemViewModel.Author.InjectFrom(micropost.Author);
+                    microPostFeedItemViewModel.TimeAgo = microPostFeedItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
+                    homeViewModel.MicroPostFeedVM.MicroPostFeedItems.Add(microPostFeedItemViewModel);
+                }
+
+                var micropostPageNumber = micropostPage ?? 1;
+
+                homeViewModel.MicroPostFeedVM.OnePageOfMicroPosts = homeViewModel.MicroPostFeedVM.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
+
+                logger.Info("awaiting rss");
+                homeViewModel.RssFeedVM = await rss;
             }
-            hVM.PageContainer = "Home";
-            return View(hVM);
+
+            homeViewModel.PageContainer = "Home";
+            logger.Info("Navigating to homepage");
+
+            return View(homeViewModel);
         }
 
         public ActionResult About()
