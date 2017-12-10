@@ -9,15 +9,15 @@
         @Html.Gravatar(Model.User.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" })
     </a>
     <span class="user_name">
-        <h1>@Model.User.UserName</h1>
+        @*<h1>@Model.User.UserName</h1>*@
     </span>
     <span>
         @{Model.Logger.Info(string.Format("Model.UserId is {0}, User.Identity.GetUserId is {1}", Model.UserId, User.Identity.GetUserId()));}
         @if (@Model.UserId != User.Identity.GetUserId())
-    {
-        @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.User.Id }, null)
-        @{Model.Logger.Info(string.Format("Rendered details for {0}", Model.UserId));}
-}
+        {
+            @Html.ActionLink("View my profile", "Details", "Users", new { userId = Model.User.Id }, null)
+            Model.Logger.Info(string.Format("Rendered details for {0}", Model.UserId));
+        }
     </span>
     <span class="microposts" id="user_info">
         @Html.Raw(Model.MicroPostsAuthored + " " + @Html.Pluralize(Model.MicroPostsAuthored, "Post"))
