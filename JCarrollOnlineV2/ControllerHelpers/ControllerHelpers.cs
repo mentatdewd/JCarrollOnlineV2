@@ -72,10 +72,10 @@ namespace JCarrollOnlineV2
 
         public static async Task<RssFeedViewModel> UpdateRssAsync()
         {
-            logger.Info("Obtaining rss data")
+            logger.Info("Obtaining rss data");
             TNX.RssReader.RssFeed rssFeed = await TNX.RssReader.RssHelper.ReadFeedAsync("http://m.mariners.mlb.com/partnerxml/gen/news/rss/sea.xml");
 
-            logger.Info("Processing rss data")
+            logger.Info("Processing rss data");
             RssFeedViewModel rssFeedVM = new RssFeedViewModel();
             rssFeedVM.RssFeedItems = new List<RssFeedItemViewModel>();
             foreach (var item in rssFeed.Items)
