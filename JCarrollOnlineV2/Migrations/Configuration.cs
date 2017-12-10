@@ -24,7 +24,7 @@ namespace JCarrollOnlineV2.Migrations
             //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
             //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
 
-            context.NLog.RemoveRange(context.NLog);
+            context.Database.ExecuteSqlCommand(@"TRUNCATE TABLE dbo.NLog");
             AddAdminRoleAndUser(context);
         }
 

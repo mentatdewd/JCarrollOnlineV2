@@ -19,14 +19,14 @@ namespace JCarrollOnlineV2.DataContexts
         {
             //Database.Log = Console.WriteLine;
             //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
-            //Database.Log = s => { System.Diagnostics.Debug.Write(s); };
+            Database.Log = s => { logger.Info(s); };
         }
 
         public static JCarrollOnlineV2Connection Create()
         {
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "Creating new db context, call stack: {0}", new System.Diagnostics.StackTrace()));
+            //logger.Info(string.Format(CultureInfo.InvariantCulture, "Creating new db context, call stack: {0}", new System.Diagnostics.StackTrace()));
             var context = new JCarrollOnlineV2Connection();
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "Using connection string: {0}", context.Database.Connection.ConnectionString));
+            //logger.Info(string.Format(CultureInfo.InvariantCulture, "Using connection string: {0}", context.Database.Connection.ConnectionString));
             return context;
         }
 
