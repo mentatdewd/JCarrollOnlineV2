@@ -130,6 +130,9 @@ namespace JCarrollOnlineV2.Controllers
                         ModelState.AddModelError("", "You need to confirm your email");
                         return View(model);
                     }
+
+                    logger.Info(string.Format(CultureInfo.InvariantCulture, "Redirecting to local {0}", returnUrl));
+
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
