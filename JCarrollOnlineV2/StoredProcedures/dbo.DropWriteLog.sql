@@ -1,0 +1,1 @@
+﻿DROP PROCEDURE dbo.NLog_AddEntry

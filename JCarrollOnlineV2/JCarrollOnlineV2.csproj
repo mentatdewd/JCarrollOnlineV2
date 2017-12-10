@@ -560,8 +560,8 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <Content Include="Sql\dbo.WriteLog.sql" />
-    <Content Include="Sql\dbo.DropWriteLog.sql" />
+    <Content Include="StoredProcedures\dbo.WriteLog.sql" />
+    <Content Include="StoredProcedures\dbo.DropWriteLog.sql" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
