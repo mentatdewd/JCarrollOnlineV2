@@ -25,7 +25,9 @@ namespace JCarrollOnlineV2.DataContexts
         public static JCarrollOnlineV2Db Create()
         {
             logger.Info(string.Format(CultureInfo.InvariantCulture, "Creating new db context, call stack: {0}", new System.Diagnostics.StackTrace()));
-            return new JCarrollOnlineV2Db();
+            var context = new JCarrollOnlineV2Db();
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "Using connection string: {0}", context.Database.Connection.ConnectionString));
+            return context;
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
