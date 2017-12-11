@@ -8,9 +8,10 @@ namespace JCarrollOnlineV2
     {
         public async Task SendAsync(IdentityMessage message)
         {
-            var mailMessage = new MailMessage("jcarrollonline@gmail.com", message.Destination, message.Subject, message.Body);
-
-            mailMessage.IsBodyHtml = true;
+            var mailMessage = new MailMessage("jcarrollonline@gmail.com", message.Destination, message.Subject, message.Body)
+            {
+                IsBodyHtml = true
+            };
 
             using (var smtpClient = new SmtpClient())
             {

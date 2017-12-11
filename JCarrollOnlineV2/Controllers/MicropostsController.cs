@@ -112,9 +112,11 @@ namespace JCarrollOnlineV2.Controllers
 
         private static MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
         {
-            var microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel();
+            var microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel
+            {
+                TargetUser = new ApplicationUserViewModel()
+            };
 
-            microPostNotificationEmailViewModel.TargetUser = new ApplicationUserViewModel();
             microPostNotificationEmailViewModel.TargetUser.InjectFrom(user);
             microPostNotificationEmailViewModel.MicroPostAuthor = new ApplicationUserViewModel();
             microPostNotificationEmailViewModel.MicroPostAuthor.InjectFrom(currentUser);

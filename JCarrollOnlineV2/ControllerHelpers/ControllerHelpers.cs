@@ -86,9 +86,10 @@ namespace JCarrollOnlineV2
             TNX.RssReader.RssFeed rssFeed = await TNX.RssReader.RssHelper.ReadFeedAsync("http://m.mariners.mlb.com/partnerxml/gen/news/rss/sea.xml");
 
             logger.Info("Processing rss data");
-            RssFeedViewModel rssFeedViewModel = new RssFeedViewModel();
-
-            rssFeedViewModel.RssFeedItems = new List<RssFeedItemViewModel>();
+            RssFeedViewModel rssFeedViewModel = new RssFeedViewModel
+            {
+                RssFeedItems = new List<RssFeedItemViewModel>()
+            };
 
             foreach (var item in rssFeed.Items)
             {

@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JCarrollOnlineV2</RootNamespace>
     <AssemblyName>JCarrollOnlineV2</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>true</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort>44305</IISExpressSSLPort>
@@ -300,11 +300,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Sql.resx</DependentUpon>
     </Compile>
-    <Compile Include="Service References\JCarrollOnlineV2.WCFService.Login\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -560,12 +555,6 @@
     </Content>
     <Content Include="Scripts\jquery-3.2.1.min.map" />
     <Content Include="Scripts\jquery-3.2.1.slim.min.map" />
-    <None Include="Service References\JCarrollOnlineV2.WCFService.Login\configuration91.svcinfo" />
-    <None Include="Service References\JCarrollOnlineV2.WCFService.Login\configuration.svcinfo" />
-    <None Include="Service References\JCarrollOnlineV2.WCFService.Login\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
     <Content Include="StoredProcedures\dbo.WriteLog.sql" />
     <Content Include="StoredProcedures\dbo.DropWriteLog.sql" />
     <Content Include="Web.config">
@@ -663,16 +652,6 @@
     <Content Include="Views\Shared\_BlogCommentItemPartial.cshtml" />
     <Content Include="Views\Shared\_BlogCommentFormPartial.cshtml" />
     <Content Include="Views\Shared\_UserSettingsPartial.cshtml" />
-    <None Include="Service References\JCarrollOnlineV2.WCFService.Login\JCarrollOnlineV2.WCFService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\JCarrollOnlineV2.WCFService.Login\service.wsdl" />
-    <None Include="Service References\JCarrollOnlineV2.WCFService.Login\service.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\JCarrollOnlineV2.WCFService.Login\service1.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Views\Account\RegistrationNotification.cshtml" />
     <Content Include="Views\Account\DeleteUser.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
@@ -705,9 +684,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\JCarrollOnlineV2.WCFService.Login\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201712101515297_Initial.resx">

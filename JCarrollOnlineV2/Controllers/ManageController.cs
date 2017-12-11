@@ -219,9 +219,11 @@ namespace JCarrollOnlineV2.Controllers
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
-            ManageChangePasswordViewModel manageChangePasswordViewModel = new ManageChangePasswordViewModel();
-            manageChangePasswordViewModel.Message = "Change Password";
-            manageChangePasswordViewModel.PageContainer = "ChangePassword";
+            ManageChangePasswordViewModel manageChangePasswordViewModel = new ManageChangePasswordViewModel
+            {
+                Message = "Change Password",
+                PageContainer = "ChangePassword"
+            };
 
             return View(manageChangePasswordViewModel);
         }
@@ -254,9 +256,11 @@ namespace JCarrollOnlineV2.Controllers
         // GET: /Manage/SetPassword
         public ActionResult SetPassword()
         {
-            ManageSetPasswordViewModel manageSetPasswordViewModel = new ManageSetPasswordViewModel();
-            manageSetPasswordViewModel.PageTitle = "Set Password";
-            manageSetPasswordViewModel.PageContainer = "SetPassword";
+            ManageSetPasswordViewModel manageSetPasswordViewModel = new ManageSetPasswordViewModel
+            {
+                PageTitle = "Set Password",
+                PageContainer = "SetPassword"
+            };
 
             return View(manageSetPasswordViewModel);
         }

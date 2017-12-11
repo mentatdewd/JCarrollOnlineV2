@@ -60,11 +60,13 @@ namespace JCarrollOnlineV2.CustomLinqExtensions
 
             foreach (var item in dataModel)
             {
-                HierarchyNodesViewModel<TView> hierarchyNodesViewModel = new HierarchyNodesViewModel<TView>();
-
-                hierarchyNodesViewModel.ImageList = new List<string>();
-
-                hierarchyNodesViewModel.ImageList.Add("/Content/images/reply-new.gif");
+                HierarchyNodesViewModel<TView> hierarchyNodesViewModel = new HierarchyNodesViewModel<TView>
+                {
+                    ImageList = new List<string>
+                {
+                    "/Content/images/reply-new.gif"
+                }
+                };
 
                 if (item == dataModel.Last())
                 {

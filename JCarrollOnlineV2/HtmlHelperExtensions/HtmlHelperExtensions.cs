@@ -81,11 +81,14 @@ namespace JCarrollOnlineV2.HtmlHelpers
             if(language != null)
                 MarkdownHelper.Language = language.Replace("{{","").Replace("}}","");
 
-            var md = new MarkdownDeep.Markdown();
-            md.FormatCodeBlock = MarkdownHelper.FormatCodeBlock;
-            md.ExtraMode = true;
-            md.HtmlClassTitledImages = "markdown_image";
-            return new MvcHtmlString(md.Transform(input));
+            var markDown = new MarkdownDeep.Markdown
+            {
+                FormatCodeBlock = MarkdownHelper.FormatCodeBlock,
+                ExtraMode = true,
+                HtmlClassTitledImages = "markdown_image"
+            };
+
+            return new MvcHtmlString(markDown.Transform(input));
         }
 
         //private static string FormatCodeBlock(MarkdownDeep.Markdown md, string code)
@@ -116,8 +119,11 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
             var urlHelper = new UrlHelper(html.ViewContext.RequestContext);
             var url = urlHelper.Action(action, controller, routeValues);
-            var anchor = new TagBuilder("a");
-            anchor.InnerHtml = linkText;
+            var anchor = new TagBuilder("a")
+            {
+                InnerHtml = linkText
+            };
+
             anchor.Attributes["href"] = url;
             anchor.MergeAttributes(new RouteValueDictionary(htmlAttributes));
             return MvcHtmlString.Create(anchor.ToString());
