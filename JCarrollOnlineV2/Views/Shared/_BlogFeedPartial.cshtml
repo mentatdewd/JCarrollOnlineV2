@@ -1,4 +1,4 @@
-﻿@using JCarrollOnlineV2.ViewModels
+﻿@using JCarrollOnlineV2.ViewModels.Blog
 @model BlogFeedViewModel
 
 <script type="text/javascript">
@@ -27,7 +27,7 @@
 
 </div>
 
-    @foreach (var item in Model.BlogFeedItemVMs)
+    @foreach (var item in Model.BlogFeedItemViewModels)
     {
         @Html.Partial("_BlogFeedItemPartial", item)
         <hr />

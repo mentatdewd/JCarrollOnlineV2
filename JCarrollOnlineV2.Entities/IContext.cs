@@ -19,7 +19,7 @@ namespace JCarrollOnlineV2.DataContexts
 
         DbSet<ForumModerator> ForumModerator { get; set; }
 
-        DbSet<ForumThreadEntry> ForumThreadEntry { get; set; }
+        DbSet<ThreadEntry> ForumThreadEntry { get; set; }
 
         DbSet<MicroPost> MicroPost { get; set; }
 

@@ -1,15 +1,14 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.ViewModels;
+using JCarrollOnlineV2.ViewModels.Blog;
 using Microsoft.AspNet.Identity;
+using Omu.ValueInjecter;
+using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Omu.ValueInjecter;
-using System;
-using System.Net;
-using System.Collections.Generic;
 
 namespace JCarrollOnlineV2.Controllers
 {
@@ -32,29 +31,33 @@ namespace JCarrollOnlineV2.Controllers
         // GET: BlogItemId
         public async Task<ActionResult> Index()
         {
-            BlogIndexViewModel biVM = new BlogIndexViewModel();
+            BlogIndexViewModel blogIndexViewModel = new BlogIndexViewModel();
 
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser user = await _data.ApplicationUser.FindAsync(currentUserId);
             List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").ToListAsync();
 
-            foreach(var item in blogItems.OrderByDescending(m => m.UpdatedAt))
+            foreach(var blogItem in blogItems.OrderByDescending(m => m.UpdatedAt))
             {
-                BlogFeedItemViewModel bfi = new BlogFeedItemViewModel();
-                bfi.InjectFrom(item);
-                bfi.Author.InjectFrom(item.Author);
-                bfi.Comments.BlogItemId = item.Id;
+                BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
-                foreach(var comment in item.BlogItemComments.ToList())
+                blogFeedItemViewModel.InjectFrom(blogItem);
+                blogFeedItemViewModel.Author.InjectFrom(blogItem.Author);
+                blogFeedItemViewModel.Comments.BlogItemId = blogItem.Id;
+
+                foreach(var blogItemComment in blogItem.BlogItemComments.ToList())
                 {
-                    BlogCommentItemViewModel bciVM = new BlogCommentItemViewModel();
-                    bciVM.InjectFrom(comment);
-                    bciVM.TimeAgo = bciVM.CreatedAt.ToUniversalTime().ToString("o");
-                    bfi.Comments.BlogComments.Add(bciVM);
+                    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
+
+                    blogCommentItemViewModel.InjectFrom(blogItemComment);
+                    blogCommentItemViewModel.TimeAgo = blogCommentItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
+                    blogFeedItemViewModel.Comments.BlogComments.Add(blogCommentItemViewModel);
                 }
-                biVM.BlogFeedItems.BlogFeedItemVMs.Add(bfi);               
+
+                blogIndexViewModel.BlogFeedItems.BlogFeedItemViewModels.Add(blogFeedItemViewModel);               
             }
-            return View(biVM);
+
+            return View(blogIndexViewModel);
         }
 
         // GET: BlogItemId/Details/5
@@ -66,10 +69,12 @@ namespace JCarrollOnlineV2.Controllers
         // GET: BlogItemComment/CreateComment
         public ActionResult CreateComment(int blogItemId, string returnUrl)
         {
-            BlogCommentItemViewModel bciVM = new BlogCommentItemViewModel();
-            bciVM.BlogItemId = blogItemId;
-            bciVM.ReturnUrl = returnUrl;
-            return View("_BlogCommentFormPartial", bciVM);
+            BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
+
+            blogCommentItemViewModel.BlogItemId = blogItemId;
+            blogCommentItemViewModel.ReturnUrl = returnUrl;
+
+            return View("_BlogCommentFormPartial", blogCommentItemViewModel);
         }
 
         // POST: BlogItemComment/CreateComment
@@ -78,39 +83,28 @@ namespace JCarrollOnlineV2.Controllers
         {
             if(ModelState.IsValid)
             {
-                BlogItemComment bic = new BlogItemComment();
+                BlogItemComment blogItemComment = new BlogItemComment();
 
-                bic.InjectFrom(blogCommentItemViewModel);
-                bic.CreatedAt = DateTime.Now;
+                blogItemComment.InjectFrom(blogCommentItemViewModel);
+                blogItemComment.CreatedAt = DateTime.Now;
 
-                bic.BlogItem = await _data.BlogItem.FindAsync(blogCommentItemViewModel.BlogItemId);
+                blogItemComment.BlogItem = await _data.BlogItem.FindAsync(blogCommentItemViewModel.BlogItemId);
 
-                _data.BlogItemComment.Add(bic);
+                _data.BlogItemComment.Add(blogItemComment);
                 await _data.SaveChangesAsync();
-
-                //var cmts = await _data.BlogItemComments.Include("BlogItem").Where(m => m.BlogItem.Id == bic.BlogItem.Id).ToListAsync();
-                //BlogCommentsViewModel comments = new BlogCommentsViewModel();
-
-                //foreach(var item in cmts)
-                //{
-                //    BlogCommentItemViewModel bciVM = new BlogCommentItemViewModel();
-                //    bciVM.InjectFrom(item);
-
-                //    comments.BlogComments.Add(bciVM);
-                //}
-                
+               
                 return new RedirectResult(blogCommentItemViewModel.ReturnUrl);
-                //return PartialView("_BlogCommentsPartial", comments);
             }
+
             return View(blogCommentItemViewModel);
         }
 
         // GET: BlogItemId/Create
         public ActionResult Create()
         {
-            BlogFeedItemViewModel bfiVM = new BlogFeedItemViewModel();
+            BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
-            return View(bfiVM);
+            return View(blogFeedItemViewModel);
         }
 
         // POST: BlogItemId/Create
@@ -119,18 +113,19 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                BlogItem blogPost = new BlogItem();
+                BlogItem blogItem = new BlogItem();
 
-                blogPost.InjectFrom(blogFeedItemViewModel);
+                blogItem.InjectFrom(blogFeedItemViewModel);
 
-                blogPost.CreatedAt = DateTime.Now;
-                blogPost.UpdatedAt = DateTime.Now;
+                blogItem.CreatedAt = DateTime.Now;
+                blogItem.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                blogPost.Author = currentUser;
 
-                _data.BlogItem.Add(blogPost);
+                blogItem.Author = currentUser;
+
+                _data.BlogItem.Add(blogItem);
                 await _data.SaveChangesAsync();
 
                 return new RedirectResult(Url.Action("Index"));
@@ -142,7 +137,7 @@ namespace JCarrollOnlineV2.Controllers
         // GET: BlogItemId/Edit/5
         public async Task<ActionResult> Edit(int blogItemId)
         {
-            BlogFeedItemViewModel bfiVM = new BlogFeedItemViewModel();
+            BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
             var blogItem = await _data.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId);
 
@@ -150,30 +145,33 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return HttpNotFound();
             }
-            bfiVM.InjectFrom(blogItem);
-            bfiVM.Author.InjectFrom(blogItem.Author);
-            bfiVM.AuthorId = bfiVM.Author.Id;
 
-            return View(bfiVM);
+            blogFeedItemViewModel.InjectFrom(blogItem);
+            blogFeedItemViewModel.Author.InjectFrom(blogItem.Author);
+            blogFeedItemViewModel.AuthorId = blogFeedItemViewModel.Author.Id;
+
+            return View(blogFeedItemViewModel);
         }
 
         // POST: BlogItemId/Edit/5
         [HttpPost]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,AuthorId,Title,Content,CreatedAt")] BlogFeedItemViewModel blogItemVM)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,AuthorId,Title,Content,CreatedAt")] BlogFeedItemViewModel blogItemViewModel)
         {
             if (ModelState.IsValid)
             {
-                BlogItem domModel = new BlogItem();
+                BlogItem blogItem = new BlogItem();
 
-                domModel.InjectFrom(blogItemVM);
-                domModel.Author = await _data.ApplicationUser.FindAsync(blogItemVM.AuthorId);
-                domModel.UpdatedAt = DateTime.Now;
+                blogItem.InjectFrom(blogItemViewModel);
+                blogItem.Author = await _data.ApplicationUser.FindAsync(blogItemViewModel.AuthorId);
+                blogItem.UpdatedAt = DateTime.Now;
 
-                _data.Entry(domModel).State = EntityState.Modified;
+                _data.Entry(blogItem).State = EntityState.Modified;
                 await _data.SaveChangesAsync();
+
                 return Redirect(Url.RouteUrl(new { controller = "Blog", action = "Index"}));
             }
-            return View(blogItemVM);
+
+            return View(blogItemViewModel);
         }
 
         // GET: BlogItemId/Delete/5

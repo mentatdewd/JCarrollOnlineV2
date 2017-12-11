@@ -35,11 +35,14 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+
             if (forumModerator == null)
             {
                 return HttpNotFound();
             }
+
             return View(forumModerator);
         }
 
@@ -60,6 +63,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 _data.ForumModerator.Add(forumModerator);
                 await _data.SaveChangesAsync();
+
                 return RedirectToAction("Index");
             }
 
@@ -73,11 +77,14 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+
             if (forumModerator == null)
             {
                 return HttpNotFound();
             }
+
             return View(forumModerator);
         }
 
@@ -92,8 +99,10 @@ namespace JCarrollOnlineV2.Controllers
             {
                 _data.Entry(forumModerator).State = EntityState.Modified;
                 await _data.SaveChangesAsync();
+
                 return RedirectToAction("Index");
             }
+
             return View(forumModerator);
         }
 
@@ -104,11 +113,14 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+
             if (forumModerator == null)
             {
                 return HttpNotFound();
             }
+
             return View(forumModerator);
         }
 
@@ -118,8 +130,10 @@ namespace JCarrollOnlineV2.Controllers
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+
             _data.ForumModerator.Remove(forumModerator);
             await _data.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
 

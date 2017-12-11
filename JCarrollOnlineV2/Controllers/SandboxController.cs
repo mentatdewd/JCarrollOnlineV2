@@ -1,4 +1,4 @@
-﻿using JCarrollOnlineV2.ViewModels;
+﻿using JCarrollOnlineV2.ViewModels.Sandbox;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -9,13 +9,13 @@ namespace JCarrollOnlineV2.Controllers
         // GET: Sandbox
         public async Task<ActionResult> Index()
         {
-            SandboxViewModel sbVM = new SandboxViewModel();
+            SandboxViewModel sandboxViewModel = new SandboxViewModel();
 
-            sbVM.PageTitle = "Sandbox";
+            sandboxViewModel.PageTitle = "Sandbox";
 
             return await Task.Run<ActionResult>(() =>
             {
-                return View(sbVM);
+                return View(sandboxViewModel);
             });
         }
 

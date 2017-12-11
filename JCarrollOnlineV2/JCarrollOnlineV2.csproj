@@ -259,10 +259,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\ApplicationUserManager.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\EmailService.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="App_Start\IdentityConfig.cs" />
+    <Compile Include="App_Start\ApplicationSigninManager.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\SmsService.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -276,13 +279,15 @@
     <Compile Include="Controllers\MicroPostsController.cs" />
     <Compile Include="Controllers\SandboxController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
-    <Compile Include="CustomLinqExtensions\LinqToObjectsExtensionMethods.cs" />
+    <Compile Include="CustomLinqExtensions\EnumerableExtensions.cs" />
+    <Compile Include="CustomLinqExtensions\LinqToSqlExtensionMethods.cs" />
     <Compile Include="DataContexts\JCarrollOnlineV2Db.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HtmlHelperExtensions\HtmlHelperExtensions.cs" />
+    <Compile Include="HtmlHelperExtensions\MarkdownHelper.cs" />
     <Compile Include="Migrations\201712101515297_Initial.cs" />
     <Compile Include="Migrations\201712101515297_Initial.Designer.cs">
       <DependentUpon>201712101515297_Initial.cs</DependentUpon>

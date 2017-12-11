@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JCarrollOnlineV2.Entities
 {
-    public class ForumThreadEntry
+    public class ThreadEntry
     {
         [Key]
         public int Id { get; set; }

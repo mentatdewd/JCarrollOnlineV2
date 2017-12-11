@@ -1,5 +1,4 @@
-﻿using JCarrollOnlineV2.DataContexts;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -23,7 +22,7 @@ namespace JCarrollOnlineV2.Entities
         public bool MicroPostSMSNotifications { get; set; }
 
         // Navigation Property
-        public virtual ICollection<ForumThreadEntry> ForumThreadEntries { get; set; }
+        public virtual ICollection<ThreadEntry> ForumThreadEntries { get; set; }
 
         public virtual ICollection<MicroPost> MicroPosts { get; set; }
 

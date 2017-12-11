@@ -1,4 +1,5 @@
 ﻿using JCarrollOnlineV2.ViewModels;
+using JCarrollOnlineV2.ViewModels.Manage;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;

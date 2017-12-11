@@ -1,6 +1,8 @@
 ﻿using JCarrollOnlineV2.EmailViewModels;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
+using JCarrollOnlineV2.ViewModels.Account;
+using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -61,16 +63,17 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> DeleteUser(string userId)
         {
-            DeleteUserViewModel duVM = new DeleteUserViewModel();
+            DeleteUserViewModel deleteUserViewModel = new DeleteUserViewModel();
             ApplicationUser user = await UserManager.FindByIdAsync(userId);
 
-            duVM.InjectFrom(user);
+            deleteUserViewModel.InjectFrom(user);
 
             if (user == null)
             {
                 return View();
             }
-            return View(duVM);
+
+            return View(deleteUserViewModel);
         }
 
         [HttpPost, ActionName("DeleteUser")]
@@ -227,8 +230,9 @@ namespace JCarrollOnlineV2.Controllers
 
                     //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
                     //await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                    ApplicationUserViewModel auVM = new ApplicationUserViewModel();
-                    auVM.InjectFrom(user);
+                    ApplicationUserViewModel appplicationUserViewModel = new ApplicationUserViewModel();
+
+                    appplicationUserViewModel.InjectFrom(user);
 
                     //await SendWelcomeEmail(auVM, cleanUrl);
 
@@ -245,16 +249,16 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public ActionResult RegistrationNotification()
         {
-            RegistrationNotificationViewModel rnVM = new RegistrationNotificationViewModel();
+            RegistrationNotificationViewModel registrationNotificationViewModel = new RegistrationNotificationViewModel();
 
-            return View(rnVM);
+            return View(registrationNotificationViewModel);
         }
 
         private static async Task SendWelcomeEmail(ApplicationUserViewModel user, Uri callbackUrl)
         {
-            var uwVM = GenerateViewModel(user, callbackUrl);
+            var userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
 
-            await SendEmail(uwVM);
+            //await SendEmail(uwVM);
         }
 
         private static UserWelcomeViewModel GenerateViewModel(ApplicationUserViewModel user, Uri callbackUrl)
@@ -266,28 +270,28 @@ namespace JCarrollOnlineV2.Controllers
             return uwVm;
         }
 
-        private static async Task SendEmail(UserWelcomeViewModel uwVM)
+        private static async Task SendEmail(UserWelcomeViewModel userWelcomeViewModel)
         {
 
             var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
             var templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
             var templateService = RazorEngineService.Create();
-            uwVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, uwVM);
+            //uwVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, uwVM);
 
-            await SendEmailAsync(uwVM);
+            //await SendEmailAsync(uwVM);
         }
 
-        public static async Task SendEmailAsync(UserWelcomeViewModel uwVM)
+        public static async Task SendEmailAsync(UserWelcomeViewModel userWelcomeViewModel)
         {
             var email = new IdentityMessage()
             {
-                Body = uwVM.Content,
-                Destination = uwVM.TargetUser.Email,
+                Body = userWelcomeViewModel.Content,
+                Destination = userWelcomeViewModel.TargetUser.Email,
                 Subject = "Welcome to JCarrollOnline"
             };
             var emailService = new EmailService();
 
-            await emailService.SendAsync(email);
+            //await emailService.SendAsync(email);
         }
 
         //
@@ -299,9 +303,11 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View("Error");
             }
-            LoginConfirmationViewModel lcVM = new LoginConfirmationViewModel();
+
+            LoginConfirmationViewModel loginConfirmationViewModel = new LoginConfirmationViewModel();
             var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error", lcVM);
+
+            return View(result.Succeeded ? "ConfirmEmail" : "Error", loginConfirmationViewModel);
         }
 
         //
@@ -309,9 +315,9 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
-            ForgotPasswordViewModel fpVM = new ForgotPasswordViewModel();
+            ForgotPasswordViewModel forgotPasswordViewModel = new ForgotPasswordViewModel();
 
-            return View(fpVM);
+            return View(forgotPasswordViewModel);
         }
 
         //
@@ -328,10 +334,10 @@ namespace JCarrollOnlineV2.Controllers
 
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
-                    ForgotPasswordConfirmationViewModel fpcVM = new ForgotPasswordConfirmationViewModel();
+                    ForgotPasswordConfirmationViewModel forgotPasswordConfirmationViewModel = new ForgotPasswordConfirmationViewModel();
 
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation", fpcVM);
+                    return View("ForgotPasswordConfirmation", forgotPasswordConfirmationViewModel);
                 }
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
@@ -351,9 +357,9 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
-            ForgotPasswordConfirmationViewModel fpcVM = new ForgotPasswordConfirmationViewModel();
+            ForgotPasswordConfirmationViewModel forgotPasswordConfirmationViewModel = new ForgotPasswordConfirmationViewModel();
 
-            return View(fpcVM);
+            return View(forgotPasswordConfirmationViewModel);
         }
 
         //
@@ -361,9 +367,9 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
         {
-            ResetPasswordViewModel rpVM = new ResetPasswordViewModel();
+            ResetPasswordViewModel resetPasswordViewModel = new ResetPasswordViewModel();
 
-            return code == null ? View("Error") : View(rpVM);
+            return code == null ? View("Error") : View(resetPasswordViewModel);
         }
 
         //
@@ -397,9 +403,9 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
-            ResetPasswordConfirmationViewModel rpcVM = new ResetPasswordConfirmationViewModel();
+            ResetPasswordConfirmationViewModel resetPasswordConfirmationViewModel = new ResetPasswordConfirmationViewModel();
 
-            return View(rpcVM);
+            return View(resetPasswordConfirmationViewModel);
         }
 
         //

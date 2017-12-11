@@ -1,6 +1,10 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.ViewModels;
+using JCarrollOnlineV2.ViewModels.Blog;
+using JCarrollOnlineV2.ViewModels.MicroPosts;
+using JCarrollOnlineV2.ViewModels.Rss;
+using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
 using NLog;
 using Omu.ValueInjecter;
@@ -34,14 +38,14 @@ namespace JCarrollOnlineV2.Controllers
             logger.Info("In Home/Index");
             HomeViewModel homeViewModel = new HomeViewModel();
             homeViewModel.Message = "JCarrollOnlineV2 Home - Index";
-            homeViewModel.MicroPostCreateVM = new MicroPostCreateViewModel();
-            homeViewModel.MicroPostFeedVM = new MicroPostFeedViewModel();
-            homeViewModel.UserStatsVM = new UserStatsViewModel();
-            homeViewModel.UserInfoVM = new UserItemViewModel(logger);
+            homeViewModel.MicroPostCreateViewModel = new MicroPostCreateViewModel();
+            homeViewModel.MicroPostFeedViewModel = new MicroPostFeedViewModel();
+            homeViewModel.UserStatsViewModel = new UserStatsViewModel();
+            homeViewModel.UserInfoViewModel = new UserItemViewModel(logger);
             homeViewModel.BlogFeed = new BlogFeedViewModel();
 
-            homeViewModel.UserStatsVM.UserFollowers = new UserFollowersViewModel();
-            homeViewModel.UserStatsVM.UsersFollowing = new UserFollowingViewModel();
+            homeViewModel.UserStatsViewModel.UserFollowers = new UserFollowersViewModel();
+            homeViewModel.UserStatsViewModel.UsersFollowing = new UserFollowingViewModel();
 
             logger.Info("Checking for blog entries");
             var blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
@@ -66,7 +70,7 @@ namespace JCarrollOnlineV2.Controllers
                     blogFeedItemViewModel.Comments.BlogComments.Add(blogCommentItemViewModel);
                 }
 
-                homeViewModel.BlogFeed.BlogFeedItemVMs.Add(blogFeedItemViewModel);
+                homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(blogFeedItemViewModel);
             }
 
             logger.Info("Processing rss");
@@ -78,10 +82,10 @@ namespace JCarrollOnlineV2.Controllers
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId);
 
-                homeViewModel.UserInfoVM.User.InjectFrom(user);
-                homeViewModel.UserInfoVM.UserId = user.Id;
-                homeViewModel.UserInfoVM.MicroPostsAuthored = user.MicroPosts.Count();
-                homeViewModel.UserStatsVM.User.InjectFrom(user);
+                homeViewModel.UserInfoViewModel.User.InjectFrom(user);
+                homeViewModel.UserInfoViewModel.UserId = user.Id;
+                homeViewModel.UserInfoViewModel.MicroPostsAuthored = user.MicroPosts.Count();
+                homeViewModel.UserStatsViewModel.User.InjectFrom(user);
 
                 logger.Info("Processing followings");
 
@@ -90,15 +94,16 @@ namespace JCarrollOnlineV2.Controllers
                     UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
                     userItemViewModel.InjectFrom(item);
-                    homeViewModel.UserStatsVM.UsersFollowing.Users.Add(userItemViewModel);
+                    homeViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
 
                     foreach (var microPost in item.MicroPosts)
                     {
                         MicroPostFeedItemViewModel microPostFeedItemViewModel = new MicroPostFeedItemViewModel();
+
                         microPostFeedItemViewModel.InjectFrom(microPost);
                         microPostFeedItemViewModel.Author.InjectFrom(microPost.Author);
                         microPostFeedItemViewModel.TimeAgo = microPostFeedItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
-                        homeViewModel.MicroPostFeedVM.MicroPostFeedItems.Add(microPostFeedItemViewModel);
+                        homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.Add(microPostFeedItemViewModel);
                     }
                 }
 
@@ -110,7 +115,7 @@ namespace JCarrollOnlineV2.Controllers
 
                     userItemViewModel.InjectFrom(item);
                     userItemViewModel.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
-                    homeViewModel.UserStatsVM.UserFollowers.Users.Add(userItemViewModel);
+                    homeViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
                 }
 
                 logger.Info("Processing microPosts");
@@ -122,15 +127,15 @@ namespace JCarrollOnlineV2.Controllers
                     microPostFeedItemViewModel.InjectFrom(micropost);
                     microPostFeedItemViewModel.Author.InjectFrom(micropost.Author);
                     microPostFeedItemViewModel.TimeAgo = microPostFeedItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
-                    homeViewModel.MicroPostFeedVM.MicroPostFeedItems.Add(microPostFeedItemViewModel);
+                    homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.Add(microPostFeedItemViewModel);
                 }
 
                 var micropostPageNumber = micropostPage ?? 1;
 
-                homeViewModel.MicroPostFeedVM.OnePageOfMicroPosts = homeViewModel.MicroPostFeedVM.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
+                homeViewModel.MicroPostFeedViewModel.OnePageOfMicroPosts = homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
 
                 logger.Info("awaiting rss");
-                homeViewModel.RssFeedVM = await rss;
+                homeViewModel.RssFeedViewModel = await rss;
             }
 
             homeViewModel.PageContainer = "Home";
@@ -141,28 +146,30 @@ namespace JCarrollOnlineV2.Controllers
 
         public ActionResult About()
         {
-            AboutViewModel aVM = new AboutViewModel();
+            AboutViewModel aboutViewModel = new AboutViewModel();
 
-            aVM.Message = "About JCarrollOnlineV2";
-            aVM.PageContainer = "AboutPage";
-            return View(aVM);
+            aboutViewModel.Message = "About JCarrollOnlineV2";
+            aboutViewModel.PageContainer = "AboutPage";
+
+            return View(aboutViewModel);
         }
 
         public ActionResult Contact()
         {
-            ContactViewModel cVM = new ContactViewModel();
+            ContactViewModel contactViewModel = new ContactViewModel();
 
-            cVM.Message = "JCarrollOnlineV2 Contact";
-            cVM.PageContainer = "ContactPater";
-            return View(cVM);
+            contactViewModel.Message = "JCarrollOnlineV2 Contact";
+            contactViewModel.PageContainer = "ContactPater";
+
+            return View(contactViewModel);
         }
 
         public async Task<ActionResult> Welcome()
         {
-            HomeViewModel hVM = new HomeViewModel();
+            HomeViewModel homeViewModel = new HomeViewModel();
 
-            hVM.Message = "JCarrollOnlineV2 Home - Welcome";
-            hVM.PageContainer = "Welcome";
+            homeViewModel.Message = "JCarrollOnlineV2 Home - Welcome";
+            homeViewModel.PageContainer = "Welcome";
 
             return await Task.Run<ActionResult>(() =>
             {
@@ -172,7 +179,7 @@ namespace JCarrollOnlineV2.Controllers
                 }
                 else
                 {
-                    return View("Welcome", "_LayoutWelcome", hVM);
+                    return View("Welcome", "_LayoutWelcome", homeViewModel);
                 }
             });
         }
