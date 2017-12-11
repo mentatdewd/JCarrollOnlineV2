@@ -1,8 +1,8 @@
 ﻿@using JCarrollOnlineV2.ViewModels.Users
-@using JCarrollOnlineV2.HtmlHelperExtensions
+@using JCarrollOnlineV2.HtmlHelpers
 @model UserStatsViewModel
 
 <div class="stats">
-    @Html.MultiLineActionLink(Model.UsersFollowing.Users.Count() + "<br/>following", "Following", "Users", new { userId = Model.User.Id }, null)
-    @Html.MultiLineActionLink(Model.UserFollowers.Users.Count() + "<br/>followers", "Followed", "Users", new { userId = Model.User.Id }, null)
+    @Html.MultilineActionLink(Model.UsersFollowing.Users.Count() + "<br/>following", "Following", "Users", new { userId = Model.User.Id }, null)
+    @Html.MultilineActionLink(Model.UserFollowers.Users.Count() + "<br/>followers", "Followed", "Users", new { userId = Model.User.Id }, null)
 </div>

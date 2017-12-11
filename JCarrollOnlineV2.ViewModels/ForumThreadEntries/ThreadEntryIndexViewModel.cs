@@ -7,7 +7,8 @@ namespace JCarrollOnlineV2.ViewModels.ForumThreadEntries
 {
     public class ThreadEntryIndexViewModel : ThreadEntriesViewModelBase
     {
-        public List<ThreadEntryIndexItemViewModel> ForumThreadEntryIndex { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ICollection<ThreadEntryIndexItemViewModel> ForumThreadEntryIndex { get; set; }
 
         public ForaViewModel Forum { get; set; }
 

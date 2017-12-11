@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Entities
@@ -23,6 +20,6 @@ namespace JCarrollOnlineV2.Entities
 
         [Required]
         public virtual ApplicationUser Author { get; set; }
-        public virtual List<BlogItemComment> BlogItemComments { get; set; }
+        public virtual Collection<BlogItemComment> BlogItemComments { get; private set; }
     }
 }

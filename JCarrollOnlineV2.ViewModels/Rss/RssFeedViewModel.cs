@@ -2,8 +2,10 @@
 
 namespace JCarrollOnlineV2.ViewModels.Rss
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Rss")]
     public class RssFeedViewModel : RssFeedViewModelBase
     {
-        public List<RssFeedItemViewModel> RssFeedItems { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ICollection<RssFeedItemViewModel> RssFeedItems { get; set; }
     }
 }

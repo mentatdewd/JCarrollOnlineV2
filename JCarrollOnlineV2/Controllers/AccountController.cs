@@ -93,6 +93,8 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/JCarrollOnlineV2Service
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#")]
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -105,6 +107,8 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Account/JCarrollOnlineV2Service
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -150,6 +154,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/VerifyCode
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
@@ -254,32 +259,33 @@ namespace JCarrollOnlineV2.Controllers
             return View(registrationNotificationViewModel);
         }
 
-        private static async Task SendWelcomeEmail(ApplicationUserViewModel user, Uri callbackUrl)
-        {
-            var userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
+        //private static async Task SendWelcomeEmail(ApplicationUserViewModel user, Uri callbackUrl)
+        //{
+        //    var userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
 
-            //await SendEmail(uwVM);
-        }
+        //    await SendEmail(userWelcomeViewModel);
+        //}
 
-        private static UserWelcomeViewModel GenerateViewModel(ApplicationUserViewModel user, Uri callbackUrl)
-        {
-            var uwVm = new UserWelcomeViewModel();
+        //private static UserWelcomeViewModel GenerateViewModel(ApplicationUserViewModel user, Uri callbackUrl)
+        //{
+        //    var userWelcomeViewModel = new UserWelcomeViewModel();
 
-            uwVm.TargetUser = user;
-            uwVm.CallbackUrl = callbackUrl;
-            return uwVm;
-        }
+        //    userWelcomeViewModel.TargetUser = user;
+        //    userWelcomeViewModel.CallbackUrl = callbackUrl;
+        //    return userWelcomeViewModel;
+        //}
 
-        private static async Task SendEmail(UserWelcomeViewModel userWelcomeViewModel)
-        {
+        //private static async Task SendEmail(UserWelcomeViewModel userWelcomeViewModel)
+        //{
 
-            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
-            var templateService = RazorEngineService.Create();
-            //uwVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, uwVM);
+        //    var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+        //    var templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
+        //    var templateService = RazorEngineService.Create();
 
-            //await SendEmailAsync(uwVM);
-        }
+        //    userWelcomeViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, userWelcomeViewModel);
+
+        //    await SendEmailAsync(userWelcomeViewModel);
+        //}
 
         public static async Task SendEmailAsync(UserWelcomeViewModel userWelcomeViewModel)
         {
@@ -289,9 +295,10 @@ namespace JCarrollOnlineV2.Controllers
                 Destination = userWelcomeViewModel.TargetUser.Email,
                 Subject = "Welcome to JCarrollOnline"
             };
+
             var emailService = new EmailService();
 
-            //await emailService.SendAsync(email);
+            await emailService.SendAsync(email);
         }
 
         //
@@ -410,6 +417,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Account/ExternalLogin
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -421,6 +429,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/SendCode
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#")]
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
@@ -456,6 +465,8 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/ExternalLoginCallback
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#")]
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
@@ -487,6 +498,8 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Account/ExternalLoginConfirmation
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -535,6 +548,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/ExternalLoginFailure
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
         {
@@ -610,11 +624,18 @@ namespace JCarrollOnlineV2.Controllers
 
             public override void ExecuteResult(ControllerContext context)
             {
+                if (context == null)
+                {
+                    throw new ArgumentNullException(nameof(context));
+                }
+
                 var properties = new AuthenticationProperties { RedirectUri = RedirectUri };
+
                 if (UserId != null)
                 {
                     properties.Dictionary[XsrfKey] = UserId;
                 }
+
                 context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
             }
         }

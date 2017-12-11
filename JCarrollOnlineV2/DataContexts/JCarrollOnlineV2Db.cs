@@ -19,7 +19,7 @@ namespace JCarrollOnlineV2.DataContexts
         {
             //Database.Log = Console.WriteLine;
             //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
-            Database.Log = s => { logger.Info(s); };
+            //Database.Log = s => { logger.Info(s); };
         }
 
         public static JCarrollOnlineV2Connection Create()
@@ -32,6 +32,11 @@ namespace JCarrollOnlineV2.DataContexts
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(modelBuilder));
+            }
+
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Connection, Configuration>());
             base.OnModelCreating(modelBuilder);
 

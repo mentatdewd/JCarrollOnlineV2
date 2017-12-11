@@ -12,6 +12,7 @@ namespace JCarrollOnlineV2.DataContexts
         DbSet<IdentityRole> IdentityRole { get; set; }
         DbSet<ApplicationUser> ApplicationUser { get; set; }
         DbSet<IdentityUserClaim> IdentityUserClaim { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         DbSet<IdentityUserLogin> IdentityUserLogin { get; set; }
         DbSet<IdentityUserRole> IdentityUserRole { get; set; }
 

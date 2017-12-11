@@ -10,6 +10,7 @@ namespace JCarrollOnlineV2.ViewModels.Account
         [Required]
         [Display(Name = "Code")]
         public string Code { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings")]
         public string ReturnUrl { get; set; }
 
         [Display(Name = "Remember this browser?")]

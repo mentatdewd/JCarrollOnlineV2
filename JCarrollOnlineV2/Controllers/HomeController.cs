@@ -24,16 +24,11 @@ namespace JCarrollOnlineV2.Controllers
         private IJCarrollOnlineV2Context _data { get; set; }
 
         public HomeController()
-            : this(null)
         {
+            _data = new JCarrollOnlineV2Connection();
         }
 
-        public HomeController(IJCarrollOnlineV2Context dataContext = null)
-        {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
-        }
-
-        public async Task<ActionResult> Index(int? micropostPage)
+        public async Task<ActionResult> Index(int? microPostPage)
         {
             logger.Info("In Home/Index");
             HomeViewModel homeViewModel = new HomeViewModel();
@@ -130,7 +125,7 @@ namespace JCarrollOnlineV2.Controllers
                     homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.Add(microPostFeedItemViewModel);
                 }
 
-                var micropostPageNumber = micropostPage ?? 1;
+                var micropostPageNumber = microPostPage ?? 1;
 
                 homeViewModel.MicroPostFeedViewModel.OnePageOfMicroPosts = homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
 

@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace JCarrollOnlineV2.HtmlHelperExtensions
+namespace JCarrollOnlineV2.HtmlHelpers
 {
     /// <summary>
     /// Helper class for transforming Markdown.
     /// </summary>
 
-    public static class HtmlHelperExtensions
+    public static class HtmlExtensions
     {
         public static MvcHtmlString BlogShowCommentsButton(this HtmlHelper helper, int blogItemId)
         {
@@ -35,11 +35,12 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 
             builder.MergeAttribute("class", "ShowCommentsDialogButton btn btn-large btn-primary");
             builder.MergeAttribute("id", "showCommentsDialogButton" + blogItemId);
-            builder.MergeAttribute("data-BlogItemId", blogItemId.ToString());
+            builder.MergeAttribute("data-BlogItemId", blogItemId.ToString(CultureInfo.InvariantCulture));
             builder.SetInnerText("Add Comment");
             return new MvcHtmlString(builder.ToString());
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Div")]
         public static MvcHtmlString BlogCommentsDivTag(this HtmlHelper helper, int blogItemId)
         {
             var builder = new StringBuilder("<div id= \"");
@@ -51,14 +52,19 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             return new MvcHtmlString(builder.ToString());
         }
 
-        public static string ExternalLink(this HtmlHelper helper, string URI, string label)
+        public static string ExternalLink(this HtmlHelper helper, Uri uri, string label)
         {
-            return string.Format("<a href='{0}'>{1}</a>", URI, label);
+            return string.Format(CultureInfo.InvariantCulture, "<a href='{0}'>{1}</a>", uri, label);
         }
 
-        public static Regex rxExtractLanguage = new Regex("({{(.+)}}[\r\n])", RegexOptions.Compiled);
+        private static Regex rxExtractLanguage = new Regex("({{(.+)}}[\r\n])", RegexOptions.Compiled);
+
         public static MvcHtmlString Markdown(this HtmlHelper helper, string input)
         {
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
             // Try to extract the language from the first line
             var match = rxExtractLanguage.Match(input);
             string language = null;
@@ -81,19 +87,20 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             md.HtmlClassTitledImages = "markdown_image";
             return new MvcHtmlString(md.Transform(input));
         }
-        private static string FormatCodeBlock(MarkdownDeep.Markdown md, string code)
-        {
-            // Wrap the code in <pre><code> as the default MarkdownDeep.NET implementation does, but add a class of
-            // "prettyprint" which is what Google Code Prettify uses to identify code blocks.
-            // http://google-code-prettify.googlecode.com/svn/trunk/README.html
-            var sb = new StringBuilder();
-            sb.Append("<pre class=\"prettyprint\"><code>");
-            sb.Append(code);
-            sb.Append("</code></pre>\n\n");
-            return sb.ToString();
-        }
 
-        public static MvcHtmlString MultiLineActionLink(
+        //private static string FormatCodeBlock(MarkdownDeep.Markdown md, string code)
+        //{
+        //    // Wrap the code in <pre><code> as the default MarkdownDeep.NET implementation does, but add a class of
+        //    // "prettyprint" which is what Google Code Prettify uses to identify code blocks.
+        //    // http://google-code-prettify.googlecode.com/svn/trunk/README.html
+        //    var sb = new StringBuilder();
+        //    sb.Append("<pre class=\"prettyprint\"><code>");
+        //    sb.Append(code);
+        //    sb.Append("</code></pre>\n\n");
+        //    return sb.ToString();
+        //}
+
+        public static MvcHtmlString MultilineActionLink(
             this HtmlHelper html,
             string linkText,
             string action,
@@ -102,6 +109,11 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
             object htmlAttributes
         )
         {
+            if (html == null)
+            {
+                throw new ArgumentNullException(nameof(html));
+            }
+
             var urlHelper = new UrlHelper(html.ViewContext.RequestContext);
             var url = urlHelper.Action(action, controller, routeValues);
             var anchor = new TagBuilder("a");
@@ -159,13 +171,18 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
         /// <param name="includeJavaScript">If true, output will automatically into the JavaScript to turn the ul into the treeview</param>    
         public static string TreeView<T>(this HtmlHelper html, string treeId, string treeItemId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript, string emptyContent)
         {
+            if (rootItems == null)
+            {
+                throw new ArgumentNullException(nameof(rootItems));
+            }
+
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("<ul id='{0}'>\r\n", treeId);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "<ul id='{0}'>\r\n", treeId);
 
             if (rootItems.Count() == 0)
             {
-                sb.AppendFormat("<li id='{0}'>{1}</li>", treeItemId, emptyContent);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "<li id='{0}'>{1}</li>", treeItemId, emptyContent);
             }
 
             foreach (T item in rootItems)
@@ -178,7 +195,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 
             if (includeJavaScript)
             {
-                sb.AppendFormat(
+                sb.AppendFormat(CultureInfo.InvariantCulture,
                     @"<script type='text/javascript'>
                     $(document).ready(function() {{
                         $('#{0}').treeview({{ animated: 'fast' }});
@@ -200,7 +217,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
                     return;
                 }
 
-                sb.AppendFormat("\r\n<ul id='{0}'>", treeId);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "\r\n<ul id='{0}'>", treeId);
                 foreach (T item in children)
                 {
                     RenderLi(sb, item, itemContent, treeItemId);
@@ -217,7 +234,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 
         private static void RenderLi<T>(StringBuilder sb, T item, Func<T, string> itemContent, string treeItemId)
         {
-            sb.AppendFormat("<li id='{0}'>{1}", treeItemId, itemContent(item));
+            sb.AppendFormat(CultureInfo.InvariantCulture, "<li id='{0}'>{1}", treeItemId, itemContent(item));
         }
 
         /// <summary>
@@ -257,6 +274,11 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
         /// <param name="includeJavaScript">If true, output will automatically into the JavaScript to turn the ul into the treeview</param>    
         public static string HierarchicalListView1<T>(this HtmlHelper html, string treeId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript, string emptyContent)
         {
+            if (rootItems == null)
+            {
+                throw new ArgumentNullException(nameof(rootItems));
+            }
+
             StringBuilder sb = new StringBuilder();
 
             foreach (T item in rootItems)
@@ -269,7 +291,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 
             if (includeJavaScript)
             {
-                sb.AppendFormat(
+                sb.AppendFormat(CultureInfo.InvariantCulture,
                     @"<script type='text/javascript'>
                     $(document).ready(function() {{
                         $('#{0}').treeview({{ animated: 'fast' }});
@@ -308,7 +330,7 @@ namespace JCarrollOnlineV2.HtmlHelperExtensions
 
         private static void RenderTr<T>(StringBuilder sb, T item, Func<T, string> itemContent)
         {
-            sb.AppendFormat("<tr>{0}", itemContent(item));
+            sb.AppendFormat(CultureInfo.InvariantCulture, "<tr>{0}", itemContent(item));
         }
     }
 }

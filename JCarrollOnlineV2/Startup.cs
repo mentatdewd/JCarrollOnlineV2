@@ -11,7 +11,7 @@ namespace JCarrollOnlineV2
         public void Configuration(IAppBuilder app)
         {
             logger.Info("Starting application");
-            ConfigureAuth(app);
+            ConfigureAuthentication(app);
         }
     }
 }

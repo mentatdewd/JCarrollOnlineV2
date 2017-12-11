@@ -6,7 +6,7 @@ namespace JCarrollOnlineV2.ViewModels
     {
         //sourcePropName "Id" will not map to target property name "Id"
         //ie: Keep target property value as it is (not change from mapping)
-        protected override string GetTargetProp(string sourcePropName)
+        protected override string GetTargetProp(string sourceName)
         {
             return "Id";
         }

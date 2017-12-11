@@ -4,6 +4,7 @@ namespace JCarrollOnlineV2.ViewModels.Fora
 {
     public class ForaIndexViewModel : ForaViewModelBase
     {
-        public List<ForaIndexItemViewModel> ForaIndexItems { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ICollection<ForaIndexItemViewModel> ForaIndexItems { get; set; }
     }
 }

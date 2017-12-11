@@ -2,7 +2,7 @@
 @model UserDetailViewModel
 
 @{
-    if (Model.UserStatsViewModel.UserFollowers.Users.Exists(x => x.User.Id == Model.UserInfoViewModel.UserId) == true)
+    if (Model.UserStatsViewModel.UserFollowers.Users.ToList().Exists(x => x.User.Id == Model.UserInfoViewModel.UserId) == true)
     {
         @Html.Partial("_UnfollowPartial", Model.UserInfoViewModel)
     }

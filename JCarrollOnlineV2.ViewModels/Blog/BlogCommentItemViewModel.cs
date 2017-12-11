@@ -20,6 +20,6 @@ namespace JCarrollOnlineV2.ViewModels.Blog
         public DateTime CreatedAt { get; set; }
         public string TimeAgo { get; set; }
 
-        public string ReturnUrl { get; set; }
+        public Uri ReturnUrl { get; set; }
     }
 }

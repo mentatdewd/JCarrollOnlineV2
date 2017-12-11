@@ -96,15 +96,17 @@ namespace JCarrollOnlineV2.Controllers
             {
                 if (user.MicroPostEmailNotifications == true)
                 {
-                    //var mneVM = GenerateViewModel(micropost, currentUser, user);
+                    var microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, user);
                     
-                    //await SendEmail(mneVM);
+                    await SendEmail(microPostNotificationEmailViewModel);
                 }
             }
+
             if (currentUser.MicroPostEmailNotifications == true)
             {
-                //var mneVM = GenerateViewModel(micropost, currentUser, currentUser);
-                //await SendEmail(mneVM);
+                var microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, currentUser);
+
+                await SendEmail(microPostNotificationEmailViewModel);
             }
         }
 
@@ -127,9 +129,10 @@ namespace JCarrollOnlineV2.Controllers
             var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
             var templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicroPostNotificationPage.cshtml");
             var templateService = RazorEngineService.Create();
-            //mneVM.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "microPostTemplatekey", null, mneVM);
 
-            //await SendEmailAsync(mneVM);
+            microPostNotificationEmailViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "microPostTemplatekey", null, microPostNotificationEmailViewModel);
+
+            await SendEmailAsync(microPostNotificationEmailViewModel);
         }
 
         public static async Task SendEmailAsync(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
@@ -140,9 +143,10 @@ namespace JCarrollOnlineV2.Controllers
                 Destination = microPostNotificationEmailViewModel.TargetUser.Email,
                 Subject = microPostNotificationEmailViewModel.MicroPostAuthor.UserName + " has added a new micropost"
             };
-            //var emailService = new EmailService();
+            
+            var emailService = new EmailService();
 
-            //await emailService.SendAsync(email);
+            await emailService.SendAsync(email);
         }
 
         // GET: MicroPosts/Edit/5
@@ -168,17 +172,17 @@ namespace JCarrollOnlineV2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] MicroPost micropost)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Content,UserId,CreatedAt,UpdatedAt")] MicroPost microPost)
         {
             if (ModelState.IsValid)
             {
-                _data.Entry(micropost).State = EntityState.Modified;
+                _data.Entry(microPost).State = EntityState.Modified;
                 await _data.SaveChangesAsync();
 
                 return RedirectToAction("Index");
             }
 
-            return View(micropost);
+            return View(microPost);
         }
 
         // GET: MicroPosts/Delete/5

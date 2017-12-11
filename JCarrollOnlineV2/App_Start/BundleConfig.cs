@@ -13,6 +13,11 @@ namespace JCarrollOnlineV2
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+            if (bundles == null)
+            {
+                throw new System.ArgumentNullException(nameof(bundles));
+            }
+
             bundles.UseCdn = true;
 
             var nullBuilder = new NullBuilder();

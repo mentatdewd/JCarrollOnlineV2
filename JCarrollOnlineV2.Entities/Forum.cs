@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -26,7 +27,9 @@ namespace JCarrollOnlineV2.Entities
         [Required]
         public DateTime UpdatedAt { get; set; } //:null => false
 
-        public virtual List<ThreadEntry> ForumThreadEntries { get; set; }
-        public virtual List<ForumModerator> ForumModerators { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public virtual Collection<ThreadEntry> ForumThreadEntries { get; private set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public virtual Collection<ForumModerator> ForumModerators { get; private set; }
     }
 }
