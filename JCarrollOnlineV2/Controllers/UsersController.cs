@@ -178,6 +178,7 @@ namespace JCarrollOnlineV2.Controllers
             return RedirectToAction("Details", new { userid = followUser.UserId });
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Unfollow")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Unfollow([Bind(Include = "UserId")]  UserItemViewModel followUser)
@@ -198,7 +199,7 @@ namespace JCarrollOnlineV2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> UserSettings([Bind(Include = "UserId,MicroPostEmailNotifications,MicroPostSMSNotifications")] UserItemViewModel userItemViewModel)
+        public async Task<ActionResult> UserSettings([Bind(Include = "UserId,MicroPostEmailNotifications,MicroPostSmsNotifications")] UserItemViewModel userItemViewModel)
         {
             if (ModelState.IsValid)
             {

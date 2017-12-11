@@ -11,12 +11,12 @@ namespace JCarrollOnlineV2.CustomLinqExtensions
     {
         public delegate void InjectorDelegate<TDom, TView>(TDom domModel, TView viewModel);
 
-        public static async Task<IEnumerable<HierarchyNodesViewModel<TView>>> ProjectToViewAsync<TDom, TView>(this IEnumerable<HierarchyNode<TDom>> query, InjectorDelegate<TDom, TView> EntityInjector)
+        public static async Task<IEnumerable<HierarchyNodesViewModel<TView>>> ProjectToViewAsync<TDom, TView>(this IEnumerable<HierarchyNode<TDom>> query, InjectorDelegate<TDom, TView> entityInjector)
             where TView : class, new()
             where TDom : class
         {
             List<HierarchyNodesViewModel<TView>> viewList = new List<HierarchyNodesViewModel<TView>>();
-            await ConstructTreeAsync<TDom, TView>(query, viewList, null, EntityInjector);
+            await ConstructTreeAsync<TDom, TView>(query, viewList, null, entityInjector);
             return viewList;
         }
         private static async Task ConstructTreeAsync<TDom, TView>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNodesViewModel<TView>> viewList, TView parent, InjectorDelegate<TDom, TView> EntityInjector)
@@ -49,7 +49,7 @@ namespace JCarrollOnlineV2.CustomLinqExtensions
                 }
             }
         }
-        public static async Task AppendChildrenAsync<TView, TDom>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNodesViewModel<TView>> viewList, TView parent, bool hasSibblings, InjectorDelegate<TDom, TView> handler)
+        public static async Task AppendChildrenAsync<TView, TDom>(IEnumerable<HierarchyNode<TDom>> dataModel, List<HierarchyNodesViewModel<TView>> viewList, TView parent, bool hasSiblings, InjectorDelegate<TDom, TView> handler)
             where TView : class, new()
             where TDom : class
         {
@@ -76,7 +76,7 @@ namespace JCarrollOnlineV2.CustomLinqExtensions
 
                 for (int i = 0; i < item.Depth - 2; i++)
                 {
-                    if (hasSibblings)
+                    if (hasSiblings)
                         hierarchyNodesViewModel.ImageList.Insert(0, "/Content/images/rtable-line.gif");
                     else
                         hierarchyNodesViewModel.ImageList.Insert(0, "/Content/images/rtable-space.gif");

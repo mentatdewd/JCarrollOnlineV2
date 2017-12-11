@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -135,6 +136,7 @@
     <Compile Include="ForumThreadEntries\ThreadEntryIndexItemViewModel.cs" />
     <Compile Include="ForumThreadEntries\ThreadEntryIndexViewModel.cs" />
     <Compile Include="ForumThreadEntries\ThreadEntryViewModel.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Home\AboutViewModel.cs" />
     <Compile Include="Account\RegistrationNotificationViewModel.cs" />
     <Compile Include="Home\AnonHomePageViewModel.cs" />

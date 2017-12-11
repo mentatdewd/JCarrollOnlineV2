@@ -15,14 +15,9 @@ namespace JCarrollOnlineV2.Controllers
     {
         private IJCarrollOnlineV2Context _data { get; set; }
 
-        public ForaController() : this(null)
+        public ForaController()
         {
-
-        }
-
-        public ForaController(IJCarrollOnlineV2Context dataContext = null)
-        {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
+            _data = new JCarrollOnlineV2Connection();
         }
 
         // GET: Fora

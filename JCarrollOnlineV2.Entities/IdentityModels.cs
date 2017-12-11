@@ -19,15 +19,20 @@ namespace JCarrollOnlineV2.Entities
 
 
         public bool MicroPostEmailNotifications { get; set; }
-        public bool MicroPostSMSNotifications { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Sms")]
+        public bool MicroPostSmsNotifications { get; set; }
 
         // Navigation Property
-        public virtual ICollection<ThreadEntry> ForumThreadEntries { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public virtual ICollection<ThreadEntry> ForumThreadEntries { get; private set; }
 
-        public virtual ICollection<MicroPost> MicroPosts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public virtual ICollection<MicroPost> MicroPosts { get; private set; }
 
-        public virtual ICollection<ApplicationUser> Following { get; set; }
-        public virtual ICollection<ApplicationUser> Followers { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public virtual ICollection<ApplicationUser> Following { get; private set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public virtual ICollection<ApplicationUser> Followers { get; private set; }
     }
 
     //public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IContext

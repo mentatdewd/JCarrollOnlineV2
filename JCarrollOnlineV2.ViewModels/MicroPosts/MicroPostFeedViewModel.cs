@@ -9,7 +9,8 @@ namespace JCarrollOnlineV2.ViewModels.MicroPosts
         {
             MicroPostFeedItems = new List<MicroPostFeedItemViewModel>();
         }
-        public List<MicroPostFeedItemViewModel> MicroPostFeedItems { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ICollection<MicroPostFeedItemViewModel> MicroPostFeedItems { get; set; }
         public IPagedList<MicroPostFeedItemViewModel> OnePageOfMicroPosts { get; set; }
     }
 }

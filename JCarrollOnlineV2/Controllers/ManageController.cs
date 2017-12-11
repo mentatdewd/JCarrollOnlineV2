@@ -77,6 +77,8 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Manage/RemoveLogin
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RemoveLogin(string loginProvider, string providerKey)
@@ -309,6 +311,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Manage/LinkLogin
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LinkLogin(string provider)
@@ -319,6 +322,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Manage/LinkLoginCallback
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         public async Task<ActionResult> LinkLoginCallback()
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(XsrfKey, User.Identity.GetUserId());
@@ -387,6 +391,7 @@ namespace JCarrollOnlineV2.Controllers
             ChangePasswordSuccess,
             SetTwoFactorSuccess,
             SetPasswordSuccess,
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
             RemoveLoginSuccess,
             RemovePhoneSuccess,
             Error

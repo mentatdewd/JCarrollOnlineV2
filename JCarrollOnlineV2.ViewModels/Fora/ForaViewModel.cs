@@ -24,7 +24,9 @@ namespace JCarrollOnlineV2.ViewModels.Fora
         [DataType(DataType.DateTime)]
         public DateTime UpdatedAt { get; set; } //:null => false
 
-        public List<ThreadEntryViewModel> ForumThreadEntries { get; set; }
-        public List<ForumModeratorsViewModel> ForumModerators { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public ICollection<ThreadEntryViewModel> ForumThreadEntries { get; private set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public ICollection<ForumModeratorsViewModel> ForumModerators { get; private set; }
     }
 }

@@ -18,10 +18,11 @@ namespace JCarrollOnlineV2.ViewModels.Users
         public bool MicroPostEmailNotifications { get; set; }
 
         [Display(Name = "MicroPost SMS Notifications")]
-        public bool MicroPostSMSNotifications { get; set; }
+        public bool MicroPostSmsNotifications { get; set; }
 
         public int? MicroPostsAuthored { get; set; }
-        public List<MicroPostFeedItemViewModel> MicroPosts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ICollection<MicroPostFeedItemViewModel> MicroPosts { get; set; }
         public Logger Logger { get; set; }
     }
 }

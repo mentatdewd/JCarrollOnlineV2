@@ -8,6 +8,7 @@ namespace JCarrollOnlineV2.ViewModels.Users
         {
             Users = new List<UserItemViewModel>();
         }
-        public List<UserItemViewModel> Users { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ICollection<UserItemViewModel> Users { get; set; }
     }
 }

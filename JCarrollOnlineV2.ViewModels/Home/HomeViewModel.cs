@@ -17,7 +17,7 @@ namespace JCarrollOnlineV2.ViewModels
         public BlogFeedViewModel BlogFeed { get; set; }
 
         public int? MicroPostPage { get; set; }
-        public List<MicroPostFeedItemViewModel> OnePageOfMicroPosts { get; set; }
+ //       public List<MicroPostFeedItemViewModel> OnePageOfMicroPosts { get; private set; }
         public int? PageNumber { get; set; }
     }
 }

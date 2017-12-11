@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.ViewModels
 {
-    public class AnonHomePageViewModelBase : ViewModelBase
+    public class AnonHomepageViewModelBase : ViewModelBase
     {
 
     }
 
-    public class AnonHomePageViewModel : AnonHomePageViewModelBase
+    public class AnonHomepageViewModel : AnonHomepageViewModelBase
     {
         public BlogFeedViewModel BlogFeed { get; set; }
     }

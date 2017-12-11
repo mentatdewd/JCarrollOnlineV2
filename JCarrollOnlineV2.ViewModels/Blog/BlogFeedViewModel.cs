@@ -8,6 +8,6 @@ namespace JCarrollOnlineV2.ViewModels.Blog
         {
             BlogFeedItemViewModels = new List<BlogFeedItemViewModel>();
         }
-        public List<BlogFeedItemViewModel> BlogFeedItemViewModels { get; set; }
+        public ICollection<BlogFeedItemViewModel> BlogFeedItemViewModels { get; private set; }
     }
 }

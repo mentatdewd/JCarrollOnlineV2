@@ -45,11 +45,6 @@ namespace JCarrollOnlineV2.Controllers
             threadEntryDetailsItemViewModel.PostCount = _data.ForumThreadEntry.Where(m => m.Author.Id == threadEntry.Author.Id).Count();
         }
 
-        public void Format()
-        {
-            System.Diagnostics.Debug.WriteLine("");
-        }
-
         // GET: ForumOriginalPost
         public async Task<ActionResult> Index(int forumId)
         {

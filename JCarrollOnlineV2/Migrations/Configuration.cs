@@ -24,7 +24,7 @@ namespace JCarrollOnlineV2.Migrations
             //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (Fora, RESEED, 0)");
             //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
 
-            context.Database.ExecuteSqlCommand(@"TRUNCATE TABLE dbo.NLog");
+            //context.Database.ExecuteSqlCommand(@"TRUNCATE TABLE dbo.NLog");
             AddAdminRoleAndUser(context);
         }
 
@@ -33,31 +33,33 @@ namespace JCarrollOnlineV2.Migrations
 
         private bool AddAdminRoleAndUser(JCarrollOnlineV2Connection context)
         {
-            var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
-            var PasswordHash = new PasswordHasher();
-            var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
-
-            if (!context.ApplicationUser.Any(u => u.UserName == adminName))
+            using(var userStore = new UserStore<ApplicationUser>(context))
+            using (var userManager = new UserManager<ApplicationUser>(userStore))
+            using (var roleStore = new RoleStore<IdentityRole>(context))
+            using (var roleManager = new RoleManager<IdentityRole>(roleStore))
             {
-                var adminUser = new ApplicationUser
+
+                if (!context.ApplicationUser.Any(u => u.UserName == adminName))
                 {
-                    UserName = adminName,
-                    Email = "mentatdewd@comcast.net",
-                    EmailConfirmed = true
-                };
+                    var adminUser = new ApplicationUser
+                    {
+                        UserName = adminName,
+                        Email = "mentatdewd@comcast.net",
+                        EmailConfirmed = true
+                    };
 
-                string password = "password";
-                var pwHash = PasswordHash.HashPassword(password);
-                UserManager.Create(adminUser, password);
+                    string password = "password";
 
+                    userManager.Create(adminUser, password);
 
-                if (!RoleManager.RoleExists(adminRole))
-                {
-                    IdentityRole adminIdentityRole = new IdentityRole(adminRole);
-                    RoleManager.Create(adminIdentityRole);
+                    if (!roleManager.RoleExists(adminRole))
+                    {
+                        IdentityRole adminIdentityRole = new IdentityRole(adminRole);
+                        roleManager.Create(adminIdentityRole);
+                    }
+
+                    userManager.AddToRole(adminUser.Id, adminRole);
                 }
-
-                UserManager.AddToRole(adminUser.Id, adminRole);
             }
 
             return true;

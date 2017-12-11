@@ -6,6 +6,10 @@ namespace JCarrollOnlineV2
     {
         public static void Register(HttpConfiguration config)
         {
+            if (config == null)
+            {
+                throw new System.ArgumentNullException(nameof(config));
+            }
             // Web API configuration and services
 
             // Web API routes

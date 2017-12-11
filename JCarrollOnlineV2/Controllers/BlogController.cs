@@ -67,7 +67,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: BlogItemComment/CreateComment
-        public ActionResult CreateComment(int blogItemId, string returnUrl)
+        public ActionResult CreateComment(int blogItemId, Uri returnUrl)
         {
             BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
 
@@ -93,7 +93,7 @@ namespace JCarrollOnlineV2.Controllers
                 _data.BlogItemComment.Add(blogItemComment);
                 await _data.SaveChangesAsync();
                
-                return new RedirectResult(blogCommentItemViewModel.ReturnUrl);
+                return new RedirectResult(blogCommentItemViewModel.ReturnUrl.ToString());
             }
 
             return View(blogCommentItemViewModel);

@@ -17,6 +17,7 @@ namespace JCarrollOnlineV2.ViewModels.HierarchyNode
         [Required]
         public T Parent { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public List<string> ImageList { get; set; }
     }
 }

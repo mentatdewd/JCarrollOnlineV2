@@ -45,6 +45,7 @@ namespace JCarrollOnlineV2.Entities
         [MaxLength(100)]
         public string Port { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings")]
         [MaxLength(2000)]
         public string Url { get; set; }
 
@@ -58,7 +59,7 @@ namespace JCarrollOnlineV2.Entities
         public string RemoteAddress { get; set; }
 
         [MaxLength(300)]
-        public string Callsite { get; set; }
+        public string CallSite { get; set; }
 
         public string Exception { get; set; }
     }
