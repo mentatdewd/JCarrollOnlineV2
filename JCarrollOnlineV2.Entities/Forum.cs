@@ -26,7 +26,7 @@ namespace JCarrollOnlineV2.Entities
         [Required]
         public DateTime UpdatedAt { get; set; } //:null => false
 
-        public virtual List<ForumThreadEntry> ForumThreadEntries { get; set; }
+        public virtual List<ThreadEntry> ForumThreadEntries { get; set; }
         public virtual List<ForumModerator> ForumModerators { get; set; }
     }
 }

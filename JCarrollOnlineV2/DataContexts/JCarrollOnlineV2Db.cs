@@ -24,9 +24,9 @@ namespace JCarrollOnlineV2.DataContexts
 
         public static JCarrollOnlineV2Connection Create()
         {
-            //logger.Info(string.Format(CultureInfo.InvariantCulture, "Creating new db context, call stack: {0}", new System.Diagnostics.StackTrace()));
             var context = new JCarrollOnlineV2Connection();
-            //logger.Info(string.Format(CultureInfo.InvariantCulture, "Using connection string: {0}", context.Database.Connection.ConnectionString));
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "Creating new db context, call stack: {0}", new System.Diagnostics.StackTrace()));
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "Using connection string: {0}", context.Database.Connection.ConnectionString));
             return context;
         }
 
@@ -61,7 +61,7 @@ namespace JCarrollOnlineV2.DataContexts
             modelBuilder.Entity<ForumModerator>()
                 .ToTable("ForumModerator");
 
-            modelBuilder.Entity<ForumThreadEntry>()
+            modelBuilder.Entity<ThreadEntry>()
                 .ToTable("ForumThreadEntry");
 
             modelBuilder.Entity<Entities.NLog>()
@@ -82,7 +82,7 @@ namespace JCarrollOnlineV2.DataContexts
 
         public DbSet<Forum> Forum { get; set; }
         public DbSet<ForumModerator> ForumModerator { get; set; }
-        public DbSet<ForumThreadEntry> ForumThreadEntry { get; set; }
+        public DbSet<ThreadEntry> ForumThreadEntry { get; set; }
         public DbSet<MicroPost> MicroPost { get; set; }
         public DbSet<BlogItem> BlogItem { get; set; }
         public DbSet<BlogItemComment> BlogItemComment { get; set; }

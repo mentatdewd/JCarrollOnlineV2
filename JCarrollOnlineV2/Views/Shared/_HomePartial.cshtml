@@ -5,21 +5,21 @@
     <div class="row" xmlns="http://www.w3.org/1999/html">
         <aside class="col-md-4">
             <section>
-                @Html.Partial("_UserInfoPartial", Model.UserInfoVM)
+                @Html.Partial("_UserInfoPartial", Model.UserInfoViewModel)
             </section>
             <section>
-                @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
+                @Html.Partial("_UserStatsPartial", Model.UserStatsViewModel)
             </section>
             <section>
-                @Html.Partial("_MicroPostFormPartial", Model.MicroPostCreateVM)
+                @Html.Partial("_MicroPostFormPartial", Model.MicroPostCreateViewModel)
             </section>
         </aside>
         <div class="col-md-5">
             <h2>Posts</h2>
-            @Html.Partial("_MicroPostFeedPartial", Model.MicroPostFeedVM)
+            @Html.Partial("_MicroPostFeedPartial", Model.MicroPostFeedViewModel)
         </div>
         <aside class="col-md-3">
-                @Html.Partial("_RssFeedPartial", Model.RssFeedVM)
+                @Html.Partial("_RssFeedPartial", Model.RssFeedViewModel)
         </aside>
     </div>
     <hr />

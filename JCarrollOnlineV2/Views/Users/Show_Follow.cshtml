@@ -1,4 +1,4 @@
-﻿@using JCarrollOnlineV2.ViewModels
+﻿@using JCarrollOnlineV2.ViewModels.Users
 @model UserDetailViewModel
 
 @{
@@ -9,10 +9,10 @@
     <div class="row" xmlns="http://www.w3.org/1999/html">
         <aside class="col-md-4">
             <section>
-                @Html.Partial("_UserInfoPartial", Model.UserInfoVM)
+                @Html.Partial("_UserInfoPartial", Model.UserInfoViewModel)
             </section>
             <section>
-                @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
+                @Html.Partial("_UserStatsPartial", Model.UserStatsViewModel)
             </section>
         </aside>
         <aside class="col-md-4">
@@ -24,14 +24,14 @@
                     <ul>
                         @if (Model.PageTitle == "Following")
                         {
-                            foreach (var user in Model.UserStatsVM.UsersFollowing.Users)
+                            foreach (var user in Model.UserStatsViewModel.UsersFollowing.Users)
                             {
                                 @Html.Partial("_UserInfoPartial", user)
                             }
                         }
                         else
                         {
-                            foreach (var user in Model.UserStatsVM.UserFollowers.Users)
+                            foreach (var user in Model.UserStatsViewModel.UserFollowers.Users)
                             {
                                 @Html.Partial("_UserInfoPartial", user)
                             }

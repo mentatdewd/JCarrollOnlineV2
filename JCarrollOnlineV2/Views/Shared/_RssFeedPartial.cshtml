@@ -1,4 +1,4 @@
-﻿@using JCarrollOnlineV2.ViewModels
+﻿@using JCarrollOnlineV2.ViewModels.Rss
 @model RssFeedViewModel
 
 <section>
@@ -8,8 +8,8 @@
     </row>
 </section>
 <ul class="rss_ul">
-    @foreach (RssFeedItemViewModel rssItemVM in Model.RssFeedItems.Take(10))
+    @foreach (RssFeedItemViewModel rssItemViewModel in Model.RssFeedItems.Take(10))
     {
-        @Html.Partial("_RssFeedItemPartial", rssItemVM)
+        @Html.Partial("_RssFeedItemPartial", rssItemViewModel)
     }
 </ul>

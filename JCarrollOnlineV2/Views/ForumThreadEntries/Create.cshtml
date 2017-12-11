@@ -1,6 +1,5 @@
-﻿@using JCarrollOnlineV2.ViewModels
-@using JCarrollOnlineV2.HtmlHelperExtensions
-@model ForumThreadEntriesCreateViewModel
+﻿@using JCarrollOnlineV2.ViewModels.ForumThreadEntries
+@model ThreadEntriesCreateViewModel
 
 @Html.HiddenFor(model => model.ForumId, new { @Value = Model.ForumId })
 @Html.HiddenFor(model => model.ParentId, new { @Value = Model.ParentId })

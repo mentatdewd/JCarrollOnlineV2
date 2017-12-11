@@ -1,15 +1,15 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.ViewModels;
+using JCarrollOnlineV2.ViewModels.Fora;
+using JCarrollOnlineV2.ViewModels.Rss;
+using JCarrollOnlineV2.ViewModels.Users;
 using NLog;
 using Omu.ValueInjecter;
-using RazorEngine.Templating;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2
@@ -32,7 +32,7 @@ namespace JCarrollOnlineV2
         {
             if (rootId != null)
             {
-                ForumThreadEntry fte = await data.ForumThreadEntry.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
+                ThreadEntry fte = await data.ForumThreadEntry.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
                 return fte.UpdatedAt;
             }
             else return DateTime.Now;
@@ -40,33 +40,43 @@ namespace JCarrollOnlineV2
 
         public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, IJCarrollOnlineV2Context data)
         {
-            LastThreadViewModel ltVM = new LastThreadViewModel();
+            LastThreadViewModel lastThreadViewModel = new LastThreadViewModel();
 
-            var fte = await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id)
+            var forumThreadEntry = await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id)
                 .Include(i => i.Author)
                 .OrderByDescending(i => i.UpdatedAt)
                 .FirstOrDefaultAsync();
 
-            if (fte != null)
+            if (forumThreadEntry != null)
             {
-                ltVM.InjectFrom(fte);
-                ltVM.Author = new ApplicationUserViewModel();
-                ltVM.Author.InjectFrom(fte.Author);
-                ltVM.Forum = new ForaViewModel();
-                ltVM.Forum.InjectFrom(fte.Forum);
+                lastThreadViewModel.InjectFrom(forumThreadEntry);
+                lastThreadViewModel.Author = new ApplicationUserViewModel();
+                lastThreadViewModel.Author.InjectFrom(forumThreadEntry.Author);
+                lastThreadViewModel.Forum = new ForaViewModel();
+                lastThreadViewModel.Forum.InjectFrom(forumThreadEntry.Forum);
 
                 bool rootNotFound = true;
-                if (fte.ParentId != null)
+
+                if (forumThreadEntry.ParentId != null)
+                {
                     while (rootNotFound)
                     {
-                        fte = await data.ForumThreadEntry.FindAsync(fte.ParentId);
-                        if (fte != null)
-                            if (fte.ParentId == null)
+                        forumThreadEntry = await data.ForumThreadEntry.FindAsync(forumThreadEntry.ParentId);
+                        if (forumThreadEntry != null)
+                        {
+                            if (forumThreadEntry.ParentId == null)
+                            {
                                 rootNotFound = false;
+                            }
+                        }
                     }
-                ltVM.PostRoot = fte.Id;
-                return ltVM;
+                }
+
+                lastThreadViewModel.PostRoot = forumThreadEntry.Id;
+
+                return lastThreadViewModel;
             }
+
             return null;
         }
 
@@ -76,20 +86,22 @@ namespace JCarrollOnlineV2
             TNX.RssReader.RssFeed rssFeed = await TNX.RssReader.RssHelper.ReadFeedAsync("http://m.mariners.mlb.com/partnerxml/gen/news/rss/sea.xml");
 
             logger.Info("Processing rss data");
-            RssFeedViewModel rssFeedVM = new RssFeedViewModel();
-            rssFeedVM.RssFeedItems = new List<RssFeedItemViewModel>();
+            RssFeedViewModel rssFeedViewModel = new RssFeedViewModel();
+
+            rssFeedViewModel.RssFeedItems = new List<RssFeedItemViewModel>();
+
             foreach (var item in rssFeed.Items)
             {
                 RssFeedItemViewModel rss = new RssFeedItemViewModel();
 
                 rss.InjectFrom(item);
                 rss.UpdatedAt = DateTime.Now;
-                rssFeedVM.RssFeedItems.Add(rss);
+                rssFeedViewModel.RssFeedItems.Add(rss);
             }
 
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "Processed {0} rss records", rssFeedVM.RssFeedItems.Count));
-            return rssFeedVM;
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "Processed {0} rss records", rssFeedViewModel.RssFeedItems.Count));
+
+            return rssFeedViewModel;
         }
     }
-
 }

@@ -83,7 +83,7 @@ input[type="checkbox"].input-validation-error {
 }
 .stats a:hover {
   text-decoration: none;
-  color: $blue;
+  color: blue;
 }
 .stats strong {
   display: block;
@@ -168,7 +168,7 @@ table#fora_index th {
 .threadinfo {
   text-align: right !important;
 }
-#forumThreadEntry {
+#threadEntry {
   list-style-type: none;
 }
 .header_wrapper {

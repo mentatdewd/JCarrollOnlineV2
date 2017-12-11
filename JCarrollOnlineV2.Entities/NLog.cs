@@ -31,6 +31,7 @@ namespace JCarrollOnlineV2.Entities
         public string UserName { get; set; }
 
         [Required]
+        [MaxLength(int.MaxValue)]
         public string Message { get; set; }
 
         [MaxLength(300)]

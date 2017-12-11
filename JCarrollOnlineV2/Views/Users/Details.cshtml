@@ -1,4 +1,4 @@
-﻿@using JCarrollOnlineV2.ViewModels
+﻿@using JCarrollOnlineV2.ViewModels.Users
 @using Microsoft.AspNet.Identity
 @model UserDetailViewModel
 
@@ -11,21 +11,21 @@
     <aside class="col-md-4">
         <section>
             @{
-                Model.UserInfoVM.PageTitle = Model.PageTitle;
+                Model.UserInfoViewModel.PageTitle = Model.PageTitle;
             }
-            @Html.Partial("_UserInfoPartial", Model.UserInfoVM)
+            @Html.Partial("_UserInfoPartial", Model.UserInfoViewModel)
         </section>
         <section>
-            @Html.Partial("_UserStatsPartial", Model.UserStatsVM)
+            @Html.Partial("_UserStatsPartial", Model.UserStatsViewModel)
         </section>
         <section>
-            @if (@Model.UserInfoVM.UserId != @Model.UserInfoVM.User.Id)
+            @if (@Model.UserInfoViewModel.UserId != @Model.UserInfoViewModel.User.Id)
             {
                 @Html.Partial("_FollowFormPartial", Model)
             }
             else
             {
-                @Html.Partial("_UserSettingsPartial", Model.UserInfoVM)
+                @Html.Partial("_UserSettingsPartial", Model.UserInfoViewModel)
             }
         </section>
     </aside>
@@ -37,11 +37,11 @@
             <section>
                 <h2>Following</h2>
                 <ul>
-                    @if (Model.UserStatsVM.UsersFollowing.Users.Count > 0)
+                    @if (Model.UserStatsViewModel.UsersFollowing.Users.Count > 0)
                     {
-                        foreach (var user in Model.UserStatsVM.UsersFollowing.Users)
+                        foreach (var user in Model.UserStatsViewModel.UsersFollowing.Users)
                         {
-                            if (user.User.Id != Model.UserInfoVM.UserId)
+                            if (user.User.Id != Model.UserInfoViewModel.UserId)
                             {
                                 @Html.Partial("_UserInfoPartial", user)
                             }
@@ -54,11 +54,11 @@
                 </ul>
                 <h2>Followers</h2>
                 <ul>
-                    @if (Model.UserStatsVM.UserFollowers.Users.Count > 0)
+                    @if (Model.UserStatsViewModel.UserFollowers.Users.Count > 0)
                     {
-                        foreach (var user in Model.UserStatsVM.UserFollowers.Users)
+                        foreach (var user in Model.UserStatsViewModel.UserFollowers.Users)
                         {
-                            if (user.User.Id != Model.UserInfoVM.UserId)
+                            if (user.User.Id != Model.UserInfoViewModel.UserId)
                             {
                                 @Html.Partial("_UserInfoPartial", user)
                             }

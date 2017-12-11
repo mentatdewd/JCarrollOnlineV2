@@ -1,15 +1,13 @@
-﻿@using Microsoft.AspNet.Identity
-@using JCarrollOnlineV2.ViewModels
-@using JCarrollOnlineV2
+﻿@using JCarrollOnlineV2.ViewModels.Users
 @model UserDetailViewModel
 
 @{
-    if (Model.UserStatsVM.UserFollowers.Users.Exists(x => x.User.Id == Model.UserInfoVM.UserId) == true)
+    if (Model.UserStatsViewModel.UserFollowers.Users.Exists(x => x.User.Id == Model.UserInfoViewModel.UserId) == true)
     {
-        @Html.Partial("_UnfollowPartial", Model.UserInfoVM)
+        @Html.Partial("_UnfollowPartial", Model.UserInfoViewModel)
     }
     else
     {
-        @Html.Partial("_FollowPartial", Model.UserInfoVM)
+        @Html.Partial("_FollowPartial", Model.UserInfoViewModel)
     }
 }
