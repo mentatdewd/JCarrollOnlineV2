@@ -32,9 +32,10 @@ namespace JCarrollOnlineV2.Controllers
         // GET: Users
         public async Task<ActionResult> Index()
         {
-            UsersIndexViewModel usersIndexViewModel = new UsersIndexViewModel();
-
-            usersIndexViewModel.PageTitle = "Users";
+            UsersIndexViewModel usersIndexViewModel = new UsersIndexViewModel
+            {
+                PageTitle = "Users"
+            };
 
             var users = await _data.ApplicationUser.Include("Following").Include("Followers").ToListAsync();
 
@@ -65,8 +66,11 @@ namespace JCarrollOnlineV2.Controllers
             //udVM.UserInfoVM.MicroPostSMSNotifications = user.MicroPostSMSNotifications;
             userDetailViewModel.UserInfoViewModel.UserId = currentUserId;
 
-            userDetailViewModel.UserStatsViewModel = new UserStatsViewModel();
-            userDetailViewModel.UserStatsViewModel.UsersFollowing = new UserFollowingViewModel();
+            userDetailViewModel.UserStatsViewModel = new UserStatsViewModel
+            {
+                UsersFollowing = new UserFollowingViewModel()
+            };
+
             userDetailViewModel.UserStatsViewModel.User.InjectFrom(user);
 
             foreach (var following in user.Following)
@@ -94,10 +98,11 @@ namespace JCarrollOnlineV2.Controllers
 
         public async Task<ActionResult> Following(string userId)
         {
-            UserDetailViewModel userDetailViewModel = new UserDetailViewModel();
-
-            userDetailViewModel.PageTitle = "Following";
-            userDetailViewModel.UserInfoViewModel = new UserItemViewModel(logger);
+            UserDetailViewModel userDetailViewModel = new UserDetailViewModel
+            {
+                PageTitle = "Following",
+                UserInfoViewModel = new UserItemViewModel(logger)
+            };
 
             ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
 
@@ -127,10 +132,11 @@ namespace JCarrollOnlineV2.Controllers
 
         public async Task<ActionResult> Followed(string userId)
         {
-            UserDetailViewModel userDetailViewModel = new UserDetailViewModel();
-
-            userDetailViewModel.PageTitle = "Followers";
-            userDetailViewModel.UserInfoViewModel = new UserItemViewModel(logger);
+            UserDetailViewModel userDetailViewModel = new UserDetailViewModel
+            {
+                PageTitle = "Followers",
+                UserInfoViewModel = new UserItemViewModel(logger)
+            };
 
             ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
 

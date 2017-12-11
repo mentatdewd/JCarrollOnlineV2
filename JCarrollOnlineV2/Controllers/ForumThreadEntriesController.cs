@@ -89,15 +89,17 @@ namespace JCarrollOnlineV2.Controllers
             // Retreive the Detail data
             if (id == null)
             {
-                return RedirectToAction("index", new { forumId = forumId });
+                return RedirectToAction("index", routeValues: new {  forumId });
             }
 
             var detailItemInjector = new IEnumerableExtensions.InjectorDelegate<ThreadEntry, ThreadEntryDetailsItemViewModel>(DetailItemInjector);
 
             // Create the details view model
-            ThreadEntryDetailsViewModel threadEntryDetailsViewModel = new ThreadEntryDetailsViewModel();
+            ThreadEntryDetailsViewModel threadEntryDetailsViewModel = new ThreadEntryDetailsViewModel
+            {
+                ForumThreadEntryDetailItems = new ThreadEntryDetailItemsViewModel()
+            };
 
-            threadEntryDetailsViewModel.ForumThreadEntryDetailItems = new ThreadEntryDetailItemsViewModel();
             threadEntryDetailsViewModel.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntry.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ThreadEntry, ThreadEntryDetailsItemViewModel>(detailItemInjector);
 
             threadEntryDetailsViewModel.Forum = new ForaDetailsViewModel();
@@ -113,11 +115,12 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize]
         public  ActionResult Create(int forumId, int? parentId, int? rootId)
         {
-            ThreadEntriesCreateViewModel threadEntriesCreateViewModel = new ThreadEntriesCreateViewModel();
-
-            threadEntriesCreateViewModel.ForumId = forumId;
-            threadEntriesCreateViewModel.ParentId = parentId;
-            threadEntriesCreateViewModel.RootId = rootId;
+            ThreadEntriesCreateViewModel threadEntriesCreateViewModel = new ThreadEntriesCreateViewModel
+            {
+                ForumId = forumId,
+                ParentId = parentId,
+                RootId = rootId
+            };
 
             return View(threadEntriesCreateViewModel);
         }

@@ -31,13 +31,15 @@ namespace JCarrollOnlineV2.Controllers
         public async Task<ActionResult> Index(int? microPostPage)
         {
             logger.Info("In Home/Index");
-            HomeViewModel homeViewModel = new HomeViewModel();
-            homeViewModel.Message = "JCarrollOnlineV2 Home - Index";
-            homeViewModel.MicroPostCreateViewModel = new MicroPostCreateViewModel();
-            homeViewModel.MicroPostFeedViewModel = new MicroPostFeedViewModel();
-            homeViewModel.UserStatsViewModel = new UserStatsViewModel();
-            homeViewModel.UserInfoViewModel = new UserItemViewModel(logger);
-            homeViewModel.BlogFeed = new BlogFeedViewModel();
+            HomeViewModel homeViewModel = new HomeViewModel
+            {
+                Message = "JCarrollOnlineV2 Home - Index",
+                MicroPostCreateViewModel = new MicroPostCreateViewModel(),
+                MicroPostFeedViewModel = new MicroPostFeedViewModel(),
+                UserStatsViewModel = new UserStatsViewModel(),
+                UserInfoViewModel = new UserItemViewModel(logger),
+                BlogFeed = new BlogFeedViewModel()
+            };
 
             homeViewModel.UserStatsViewModel.UserFollowers = new UserFollowersViewModel();
             homeViewModel.UserStatsViewModel.UsersFollowing = new UserFollowingViewModel();
@@ -141,30 +143,33 @@ namespace JCarrollOnlineV2.Controllers
 
         public ActionResult About()
         {
-            AboutViewModel aboutViewModel = new AboutViewModel();
-
-            aboutViewModel.Message = "About JCarrollOnlineV2";
-            aboutViewModel.PageContainer = "AboutPage";
+            AboutViewModel aboutViewModel = new AboutViewModel
+            {
+                Message = "About JCarrollOnlineV2",
+                PageContainer = "AboutPage"
+            };
 
             return View(aboutViewModel);
         }
 
         public ActionResult Contact()
         {
-            ContactViewModel contactViewModel = new ContactViewModel();
-
-            contactViewModel.Message = "JCarrollOnlineV2 Contact";
-            contactViewModel.PageContainer = "ContactPater";
+            ContactViewModel contactViewModel = new ContactViewModel
+            {
+                Message = "JCarrollOnlineV2 Contact",
+                PageContainer = "ContactPater"
+            };
 
             return View(contactViewModel);
         }
 
         public async Task<ActionResult> Welcome()
         {
-            HomeViewModel homeViewModel = new HomeViewModel();
-
-            homeViewModel.Message = "JCarrollOnlineV2 Home - Welcome";
-            homeViewModel.PageContainer = "Welcome";
+            HomeViewModel homeViewModel = new HomeViewModel
+            {
+                Message = "JCarrollOnlineV2 Home - Welcome",
+                PageContainer = "Welcome"
+            };
 
             return await Task.Run<ActionResult>(() =>
             {

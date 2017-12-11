@@ -98,11 +98,14 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
-            LoginViewModel vm = new LoginViewModel();
+            LoginViewModel loginViewModel = new LoginViewModel
+            {
+                ReturnUrl = returnUrl
+            };
 
-            vm.ReturnUrl = returnUrl;
             logger.Info("In Login(get)");
-            return View(vm);
+
+            return View(loginViewModel);
         }
 
         //
@@ -144,7 +147,7 @@ namespace JCarrollOnlineV2.Controllers
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction("SendCode", routeValues: new { ReturnUrl = returnUrl,  model.RememberMe });
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
@@ -225,7 +228,7 @@ namespace JCarrollOnlineV2.Controllers
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    Uri callbackUri = new Uri(Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme));
+                    Uri callbackUri = new Uri(Url.Action("ConfirmEmail", "Account", routeValues: new { userId = user.Id,  code }, protocol: Request.Url.Scheme));
 
 //#if DEBUG
 //                    var cleanUrl = callbackUri;
@@ -350,7 +353,7 @@ namespace JCarrollOnlineV2.Controllers
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                var callbackUrl = Url.Action("ResetPassword", "Account", routeValues: new { userId = user.Id,  code }, protocol: Request.Url.Scheme);
                 await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
@@ -460,7 +463,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View("Error");
             }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction("VerifyCode", routeValues: new { Provider = model.SelectedProvider,  model.ReturnUrl,  model.RememberMe });
         }
 
         //
@@ -489,9 +492,12 @@ namespace JCarrollOnlineV2.Controllers
                 case SignInStatus.Failure:
                 default:
                     // If the user does not have an account, then prompt the user to create an account
-                    LoginViewModel vm = new LoginViewModel();
-                    vm.ReturnUrl = returnUrl;
-                    vm.LoginProvider = loginInfo.Login.LoginProvider;
+                    LoginViewModel loginViewModel = new LoginViewModel
+                    {
+                        ReturnUrl = returnUrl,
+                        LoginProvider = loginInfo.Login.LoginProvider
+                    };
+
                     return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
             }
         }

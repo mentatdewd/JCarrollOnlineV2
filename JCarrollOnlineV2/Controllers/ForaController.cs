@@ -23,9 +23,10 @@ namespace JCarrollOnlineV2.Controllers
         // GET: Fora
         public async Task<ActionResult> Index()
         {
-            ForaIndexViewModel foraIndexViewModel = new ForaIndexViewModel();
-
-            foraIndexViewModel.ForaIndexItems = new List<ForaIndexItemViewModel>();
+            ForaIndexViewModel foraIndexViewModel = new ForaIndexViewModel
+            {
+                ForaIndexItems = new List<ForaIndexItemViewModel>()
+            };
 
             var fora = await _data.Forum.ToListAsync();
 

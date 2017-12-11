@@ -69,10 +69,11 @@ namespace JCarrollOnlineV2.Controllers
         // GET: BlogItemComment/CreateComment
         public ActionResult CreateComment(int blogItemId, Uri returnUrl)
         {
-            BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
-
-            blogCommentItemViewModel.BlogItemId = blogItemId;
-            blogCommentItemViewModel.ReturnUrl = returnUrl;
+            BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel
+            {
+                BlogItemId = blogItemId,
+                ReturnUrl = returnUrl
+            };
 
             return View("_BlogCommentFormPartial", blogCommentItemViewModel);
         }
