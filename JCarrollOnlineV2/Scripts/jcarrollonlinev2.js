@@ -17,7 +17,7 @@
         text: "Add Comment",
         click: function () {
             if ($("#dialog-message").valid())
-                $(this).dialog("close")
+                $(this).dialog("close");
         },
         type: "submit",
         form: "commentForm" // <-- Make the association

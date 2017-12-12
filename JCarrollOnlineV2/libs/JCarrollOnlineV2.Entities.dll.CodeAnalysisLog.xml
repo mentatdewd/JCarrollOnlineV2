@@ -6,28 +6,39 @@
    <Modules>
     <Module Name="jcarrollonlinev2.entities.dll">
      <Messages>
-      <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Status="Active" Created="2017-12-11 23:25:21Z" FixCategory="NonBreaking">
+      <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Status="Active" Created="2017-12-12 16:21:20Z" FixCategory="NonBreaking">
        <Issue Name="NoStrongName" Certainty="95" Level="CriticalError">Sign 'JCarrollOnlineV2.Entities.dll' with a strong name key.</Issue>
       </Message>
      </Messages>
      <Namespaces>
       <Namespace Name="JCarrollOnlineV2.Entities">
        <Types>
+        <Type Name="ApplicationUser" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ForumThreadEntries" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="CollectionPropertiesShouldBeReadOnly" Category="Microsoft.Usage" CheckId="CA2227" Status="Active" Created="2017-12-12 16:21:20Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Warning" Path="C:\Users\john\source\repos\JCarrollOnlineV2\JCarrollOnlineV2.Entities" File="IdentityModels.cs" Line="26">Change 'ApplicationUser.ForumThreadEntries' to be read-only by removing the property setter.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
         <Type Name="HierarchyNode`1" Kind="Class" Accessibility="Public" ExternallyVisible="True">
          <Members>
           <Member Name="#ChildNodes" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
            <Messages>
-            <Message TypeName="DoNotExposeGenericLists" Category="Microsoft.Design" CheckId="CA1002" Status="Active" Created="2017-12-11 23:25:21Z" FixCategory="Breaking">
+            <Message TypeName="DoNotExposeGenericLists" Category="Microsoft.Design" CheckId="CA1002" Status="Active" Created="2017-12-12 16:21:20Z" FixCategory="Breaking">
              <Issue Certainty="95" Level="Error" Path="C:\Users\john\source\repos\JCarrollOnlineV2\JCarrollOnlineV2.Entities" File="HierarchyNode.cs" Line="9">Change 'List&lt;HierarchyNode&lt;T&gt;&gt;' in 'HierarchyNode&lt;T&gt;.ChildNodes' to use Collection&lt;T&gt;, ReadOnlyCollection&lt;T&gt; or KeyedCollection&lt;K,V&gt;</Issue>
             </Message>
-            <Message TypeName="DoNotNestGenericTypesInMemberSignatures" Category="Microsoft.Design" CheckId="CA1006" Status="Active" Created="2017-12-11 23:25:21Z" FixCategory="Breaking">
+            <Message TypeName="DoNotNestGenericTypesInMemberSignatures" Category="Microsoft.Design" CheckId="CA1006" Status="Active" Created="2017-12-12 16:21:20Z" FixCategory="Breaking">
              <Issue Certainty="95" Level="CriticalError" Path="C:\Users\john\source\repos\JCarrollOnlineV2\JCarrollOnlineV2.Entities" File="HierarchyNode.cs" Line="9">Consider a design where 'HierarchyNode&lt;T&gt;.ChildNodes' doesn't nest generic type 'List&lt;HierarchyNode&lt;T&gt;&gt;'.</Issue>
             </Message>
            </Messages>
           </Member>
           <Member Name="#ImageList" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
            <Messages>
-            <Message TypeName="DoNotExposeGenericLists" Category="Microsoft.Design" CheckId="CA1002" Status="Active" Created="2017-12-11 23:25:21Z" FixCategory="Breaking">
+            <Message TypeName="DoNotExposeGenericLists" Category="Microsoft.Design" CheckId="CA1002" Status="Active" Created="2017-12-12 16:21:20Z" FixCategory="Breaking">
              <Issue Certainty="95" Level="Error" Path="C:\Users\john\source\repos\JCarrollOnlineV2\JCarrollOnlineV2.Entities" File="HierarchyNode.cs" Line="12">Change 'List&lt;string&gt;' in 'HierarchyNode&lt;T&gt;.ImageList' to use Collection&lt;T&gt;, ReadOnlyCollection&lt;T&gt; or KeyedCollection&lt;K,V&gt;</Issue>
             </Message>
            </Messages>
@@ -51,6 +62,16 @@
    <Email>[none]</Email>
    <MessageLevel Certainty="95">CriticalError</MessageLevel>
    <File Name="designrules.dll" Version="15.0.0.0" />
+  </Rule>
+  <Rule TypeName="CollectionPropertiesShouldBeReadOnly" Category="Microsoft.Usage" CheckId="CA2227">
+   <Name>Collection properties should be read only</Name>
+   <Description>Properties that return collections should be read-only so that users cannot entirely replace the backing store. Users can still modify the contents of the collection by calling relevant methods on the collection. Note that the XmlSerializer class has special support for deserializing read-only collections. See the XmlSerializer overview for more information.</Description>
+   <Resolution Name="Default">Change {0} to be read-only by removing the property setter.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182327.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="usagerules.dll" Version="15.0.0.0" />
   </Rule>
   <Rule TypeName="DoNotExposeGenericLists" Category="Microsoft.Design" CheckId="CA1002">
    <Name>Do not expose generic lists</Name>

@@ -1,10 +1,6 @@
 ﻿@using JCarrollOnlineV2.ViewModels.MicroPosts
 @model MicroPostFeedItemViewModel
 
-@*<script src="jquery.js"></script>
-<script src="moment.js"></script>
-<script src="livestamp.js"></script>*@
-
 <li class="micropost">
     <span class="gravatar">
         <a href='@Url.Action("Details", "Users", new { userId =  Model.Author.Id })' />

@@ -14,7 +14,7 @@
                     {
                         if (Model.Author.Id == User.Identity.GetUserId() || (User.IsInRole("Administrator")))
                         {
-                            if (Model.Locked != true)
+                            if (Model.Locked != true || User.IsInRole("Administrator"))
                             {
                                 <div>
                                     @Html.ActionLink("Edit", "Edit", "ForumThreadEntries", new { id = Model.Id }, null) | @Html.ActionLink("Delete", "Delete", "ForumThreadEntries", new { id = Model.Id }, null)

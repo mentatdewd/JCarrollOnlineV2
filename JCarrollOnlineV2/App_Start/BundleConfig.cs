@@ -60,31 +60,33 @@ namespace JCarrollOnlineV2
             bundles.Add(cssBundle);
 
             var jqueryBundle = new ScriptBundle("~/bundles/jquery");
-            //jqueryBundle.Include("~/Scripts/jquery-3.2.1.js");
-            //jqueryBundle.Include("~/Scripts/moment.js");
-            //jqueryBundle.Include("~/Scripts/livestamp.js");
-            //jqueryBundle.Include("~/Scripts/jquery.unobtrusive-ajax.js");
+            jqueryBundle.Include("~/Scripts/less.js");
+            jqueryBundle.Include("~/Scripts/jquery/jquery.js");
+            jqueryBundle.Include("~/Scripts/moment.js");
+            jqueryBundle.Include("~/Scripts/livestamp.js");
+            jqueryBundle.Include("~/Scripts/jquery.unobtrusive-ajax.js");
+            jqueryBundle.Include("~/Scripts/jquery-ui/jquery-ui.js");
             jqueryBundle.Transforms.Add(scriptTransformer);
             jqueryBundle.Orderer = nullOrderer;
             bundles.Add(jqueryBundle);
 
             var jqueryUIBundle = new ScriptBundle("~/bundles/jquery-ui");
-            jqueryUIBundle.Include("~/Scripts/jquery-ui-1.11.4.js");
             jqueryUIBundle.Transforms.Add(scriptTransformer);
             jqueryUIBundle.Orderer = nullOrderer;
             bundles.Add(jqueryUIBundle);
 
             var jqueryvalBundle = new ScriptBundle("~/bundles/jqueryval");
-            jqueryvalBundle.Include("~/Scripts/jquery.validate");
+            jqueryvalBundle.Include("~/Scripts/jquery.validate.js");
+            jqueryvalBundle.Include("~/Scripts/jquery.validate.unobtrusive.js");
             jqueryvalBundle.Include("~/Scripts/jquery.validate.unobtrusive.ajax.js");
             jqueryvalBundle.Transforms.Add(scriptTransformer);
             jqueryvalBundle.Orderer = nullOrderer;
             bundles.Add(jqueryvalBundle);
 
             var myjsbundle = new ScriptBundle("~/bundles/myjsbundle");
-            //myjsbundle.Include("~/Scripts/prism.js");
-            //myjsbundle.Include("~/Scripts/jcarrollonlinev2.js");
-            //myjsbundle.Include("~/Scripts/MarkdownDeepLib.min.js");
+            myjsbundle.Include("~/Scripts/prism.js");
+            myjsbundle.Include("~/Scripts/jcarrollonlinev2.js");
+            myjsbundle.Include("~/Scripts/MarkdownDeepLib.min.js");
             myjsbundle.Transforms.Add(scriptTransformer);
             myjsbundle.Orderer = nullOrderer;
             bundles.Add(myjsbundle);
@@ -99,8 +101,8 @@ namespace JCarrollOnlineV2
             bundles.Add(modernizrBundle);
 
             var bootstrapBundle = new ScriptBundle("~/bundles/bootstrap");
-            //bootstrapBundle.Include("~/Scripts/bootstrap.js",);
-            //bootstrapBundle.Include("~/Scripts/respond.js");
+            bootstrapBundle.Include("~/Scripts/bootstrap.js");
+            bootstrapBundle.Include("~/Scripts/respond.js");
             bootstrapBundle.Transforms.Add(scriptTransformer);
             bootstrapBundle.Orderer = nullOrderer;
             bundles.Add(bootstrapBundle);

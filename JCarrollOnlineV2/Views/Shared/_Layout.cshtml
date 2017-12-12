@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+@using MvcSiteMapProvider.Web.Html
 
 <!DOCTYPE html>
 <html>
@@ -9,10 +10,10 @@
     <meta name="description" content="JCarrollOnlineV2 Website" />
     <link rel="stylesheet/less"
       type="text/css"
-      href="@Url.Content("~/site.less")" />
-    <script type="text/javascript"
+      @*href="@Url.Content("~/site.less")" />*@
+    @*<script type="text/javascript"
         src="@Url.Content("~/content/scripts/less.js")">
-    </script>
+    </script>*@
     @Styles.Render("~/bundles/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -53,6 +54,7 @@
     </div>
     <div class="@Model.PageContainer">
         <div class="container body-content">
+            @Html.MvcSiteMap().SiteMapPath()
             @RenderBody()
             @Html.Partial("_FooterPartial")
         </div>
