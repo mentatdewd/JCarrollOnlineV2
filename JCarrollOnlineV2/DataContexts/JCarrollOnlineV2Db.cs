@@ -51,6 +51,9 @@ namespace JCarrollOnlineV2.DataContexts
                 .HasKey(p => p.UserId)
                 .ToTable("IdentityUserRole");
 
+            modelBuilder.Entity<ApplicationUser>()
+                .HasKey(m => m.Id);
+
             modelBuilder.Entity<MicroPost>()
                 .ToTable("MicroPost")
                 .HasRequired(m => m.Author)
@@ -68,6 +71,7 @@ namespace JCarrollOnlineV2.DataContexts
 
             modelBuilder.Entity<ThreadEntry>()
                 .ToTable("ForumThreadEntry");
+                
 
             modelBuilder.Entity<Entities.NLog>()
                 .HasKey(k => k.Id)

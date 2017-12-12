@@ -17,10 +17,10 @@ namespace JCarrollOnlineV2.Entities
         public bool Locked { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; } //           :null => false
+        public DateTime CreatedAt { get; set; }
 
         [Required]
-        public DateTime UpdatedAt { get; set; } //          :null => false
+        public DateTime UpdatedAt { get; set; }
 
         [Required]
         public int PostNumber { get; set; }

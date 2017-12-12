@@ -51,33 +51,27 @@ namespace JCarrollOnlineV2.Controllers
             ThreadEntryIndexViewModel threadEntryIndexViewModel = new ThreadEntryIndexViewModel();
 
             // Retrieve forum data
-            Forum forum = _data.Forum.Find(forumId);
+            Forum currentForum = await _data.Forum
+                .Include(forum => forum.ForumThreadEntries
+                .Select(forumThreadEntry => forumThreadEntry.Author))              
+                .FirstAsync(forum => forum.Id == forumId);
 
             threadEntryIndexViewModel.Forum = new ForaViewModel();
-            threadEntryIndexViewModel.Forum.InjectFrom(forum);
-
-            var forumThreads = _data.ForumThreadEntry.ToList();
+            threadEntryIndexViewModel.Forum.InjectFrom(currentForum);
 
             // Create the view model
-            threadEntryIndexViewModel.ForumThreadEntryIndex = new List<ThreadEntryIndexItemViewModel>();
 
-            var forumThreadList = await _data.ForumThreadEntry.Where(p => p.Forum.Id == forumId && p.ParentId == null)
-                .Include(p => p.Author)
-                .Include(p => p.Forum)
-                .ToListAsync();
-
-            foreach (var forumThread in forumThreadList)
+            foreach (var forumThread in currentForum.ForumThreadEntries.Where(forumThreadEntry => forumThreadEntry.ParentId == null))
             {
                 var threadEntryIndexItemViewModel = new ThreadEntryIndexItemViewModel();
 
                 threadEntryIndexItemViewModel.InjectFrom(forumThread);
-                threadEntryIndexItemViewModel.Author = new ApplicationUserViewModel();
+                threadEntryIndexItemViewModel.Forum.InjectFrom(currentForum);
                 threadEntryIndexItemViewModel.Author.InjectFrom(forumThread.Author);
-                threadEntryIndexItemViewModel.Forum = new ForaViewModel();
-                threadEntryIndexItemViewModel.Forum.InjectFrom(forumThread.Forum);
-                threadEntryIndexItemViewModel.Replies = await ControllerHelpers.GetThreadPostCountAsync(forumThread.Id, _data);
-                threadEntryIndexItemViewModel.LastReply = await ControllerHelpers.GetLastReplyAsync(forumThread.RootId, _data);
-                threadEntryIndexViewModel.ForumThreadEntryIndex.Add(threadEntryIndexItemViewModel);
+                
+                threadEntryIndexItemViewModel.Replies = currentForum.ForumThreadEntries.Where(forumThreadEntry => forumThreadEntry.RootId == forumThread.Id && forumThreadEntry.ParentId != null).Count();
+                threadEntryIndexItemViewModel.LastReply = currentForum.ForumThreadEntries.Where(m => m.RootId == forumThread.Id).OrderBy(m => m.UpdatedAt.ToFileTime()).FirstOrDefault().UpdatedAt;
+                threadEntryIndexViewModel.ThreadEntryIndex.Add(threadEntryIndexItemViewModel);
             }
 
             return View(threadEntryIndexViewModel);
@@ -95,17 +89,18 @@ namespace JCarrollOnlineV2.Controllers
             var detailItemInjector = new IEnumerableExtensions.InjectorDelegate<ThreadEntry, ThreadEntryDetailsItemViewModel>(DetailItemInjector);
 
             // Create the details view model
-            ThreadEntryDetailsViewModel threadEntryDetailsViewModel = new ThreadEntryDetailsViewModel
-            {
-                ForumThreadEntryDetailItems = new ThreadEntryDetailItemsViewModel()
-            };
+            ThreadEntryDetailsViewModel threadEntryDetailsViewModel = new ThreadEntryDetailsViewModel();
 
-            threadEntryDetailsViewModel.ForumThreadEntryDetailItems.ForumThreadEntries = await _data.ForumThreadEntry.Include("Author").Include("Forum").AsHierarchy("Id", "ParentId", id, 10).ProjectToViewAsync<ThreadEntry, ThreadEntryDetailsItemViewModel>(detailItemInjector);
+            var forumThreadEntries = _data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Author)
+                .Include(forumThreadEntry => forumThreadEntry.Forum)
+                .Where(forumThreadEntry => forumThreadEntry.Forum.Id == forumId);
 
-            threadEntryDetailsViewModel.Forum = new ForaDetailsViewModel();
+            threadEntryDetailsViewModel.ForumThreadEntryDetailItems.ForumThreadEntries = 
+                await forumThreadEntries.AsHierarchy("Id", "ParentId", id, 10)
+                .ProjectToViewAsync(detailItemInjector);
 
-            threadEntryDetailsViewModel.Forum.InjectFrom(_data.Forum.Find(forumId));
-            
+            threadEntryDetailsViewModel.Forum.InjectFrom(_data.Forum.Find(forumId)); 
+
             threadEntryDetailsViewModel.ForumThreadEntryDetailItems.NumberOfReplies = _data.ForumThreadEntry.Where(b => b.RootId == id).Count();
 
             return View(threadEntryDetailsViewModel);
