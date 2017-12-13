@@ -36,7 +36,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
             builder.MergeAttribute("class", "ShowCommentsDialogButton btn btn-large btn-primary");
             builder.MergeAttribute("id", "showCommentsDialogButton" + blogItemId);
             builder.MergeAttribute("data-BlogItemId", blogItemId.ToString(CultureInfo.InvariantCulture));
-            builder.SetInnerText("Add Comment");
+            builder.SetInnerText("Add a Comment");
             return new MvcHtmlString(builder.ToString());
         }
 

@@ -8,12 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@Model.PageTitle - JCarrollOnline</title>
     <meta name="description" content="JCarrollOnlineV2 Website" />
-    <link rel="stylesheet/less"
-      type="text/css"
-      @*href="@Url.Content("~/site.less")" />*@
-    @*<script type="text/javascript"
-        src="@Url.Content("~/content/scripts/less.js")">
-    </script>*@
+
     @Styles.Render("~/bundles/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -21,6 +16,10 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/myjsbundle")
+
+    @*<link rel="stylesheet/less"
+          type="text/css"
+          href="@Url.Content("~/site.less")" />*@
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">

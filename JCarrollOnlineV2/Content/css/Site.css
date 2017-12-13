@@ -147,10 +147,10 @@ table#fora_index th {
     border-style: solid;*/
 }
 .blogEntryContainer {
-  /*border-width: 1px;
+  border-width: 1px;
     border-color: #dedede;
     border-style: solid;
-    border-collapse: collapse;*/
+    border-collapse: collapse;
 }
 .reply-border {
   border: solid;
