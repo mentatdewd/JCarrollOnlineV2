@@ -90,6 +90,13 @@ namespace JCarrollOnlineV2
             myjsbundle.Transforms.Add(scriptTransformer);
             myjsbundle.Orderer = nullOrderer;
             bundles.Add(myjsbundle);
+
+            var blogjsbundle = new ScriptBundle("~/bundles/blogjsbundle");
+            //blogjsbundle.Include("~/Scripts/blogscripts.js");
+            bundles.Add(blogjsbundle);
+
+
+
             
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.

@@ -1,20 +1,20 @@
 ﻿@using JCarrollOnlineV2.ViewModels.Blog
-@model BlogCommentItemViewModel
-           @{
-               Layout = "";
-           }
+@model BlogFeedItemViewModel
+@{
+    Layout = "";
+}
 
-<div id="dialog-message" class="commentFormClassDiv" title="Add Comment">
+<div id="comment-dialog" class="commentFormClassDiv" title="Add Comment">
     @using (Html.BeginForm("CreateComment", "Blog", FormMethod.Post, new { @id = "commentForm", @class = "commentFormClass" }))
     {
         @Html.ValidationSummary(true)
-        
+
         @Html.AntiForgeryToken()
 
         <span><span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 0 0;"></span>Enter your comment here:</span>
         <div style="margin-left: 23px;">
-            @Html.Hidden("BlogItemId", Model.BlogItemId)
-            @Html.Hidden("ReturnUrl", Model.ReturnUrl)
+            @Html.Hidden("BlogItemId", Model.Id)
+            @*@Html.Hidden("ReturnUrl", Model.ReturnUrl)*@
             @Html.TextArea("Author", "", 1, 40, new { @placeholder = "Name you want to be known by", @maxlength = 16 })
             @Html.ValidationMessageFor(m => m.Author, "", new { @class = "text-danger" })
 
@@ -24,9 +24,5 @@
             @*<button type="submit" style="background: none">Add Comment</button>*@
         </div>
     }
+    <button type="submit" form="commentForm">Add Comment</button>
 </div>
-<script>
-    $(document).ready(function () {
-        $.validator.unobtrusive.parse("#commentForm");
-    })
-</script>

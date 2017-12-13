@@ -1,34 +1,10 @@
 ﻿@using JCarrollOnlineV2.ViewModels.Blog
 @model BlogFeedViewModel
 
-<script type="text/javascript">
 
-    $(document).ready(function () {
-        $('.blogComments').hide();
-        $('.showCommentsButton').click(function () {
-            var commentList = event.target.id;
-            var cmtList = event.target.getAttribute("data-BlogItemId");
-            $("#" + cmtList).toggle(400);
-            return false;
-        });
-        $(".ShowCommentsDialogButton").click(function (event) {
-            var data = event.target.id;
-            var blogItemId = event.target.getAttribute("data-BlogItemId")
-            $("#dialog-message").data('param_1', '@Url.Action("CreateComment", "Blog")' + "?blogItemId=" + blogItemId + "&returnUrl=" + window.location.href);
-            $("#dialog-message").dialog('open');
-            $(this).find("[type=submit]").hide();
-           // $.validator.unobtrusive.parse(this);
-        });
-    });
+@foreach (var item in Model.BlogFeedItemViewModels)
+{
+    @Html.Partial("_BlogFeedItemPartial", item)
+    <hr />
+}
 
-</script>
-
-<div id="dialog-message" title="Add Comment" style="overflow: hidden;">
-
-</div>
-
-    @foreach (var item in Model.BlogFeedItemViewModels)
-    {
-        @Html.Partial("_BlogFeedItemPartial", item)
-        <hr />
-    }
