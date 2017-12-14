@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JCarrollOnlineV2.Entities
+namespace JCarrollOnlineV2.ViewModels.Blog
 {
-    public class BlogItemComment
+    public class BlogCommentViewModel
     {
-        [Key]
-        public int Id { get; set; }
         public string Author { get; set; }
-        public DateTime CreatedAt { get; set; }
         public string Content { get; set; }
         public int BlogItemId { get; set; }
-        public virtual BlogItem BlogItem { get; set; }
     }
 }

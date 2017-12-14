@@ -2,13 +2,20 @@
 @using JCarrollOnlineV2.HtmlHelpers
 @model BlogCommentsViewModel
 
+
 @Html.BlogCommentsDivTag(Model.BlogItemId)
+
 
 @foreach (var item in Model.BlogComments)
 {
     @Html.Partial("_BlogCommentItemPartial", item)
+
 }
 @Html.BlogShowCommentsDialogButton(Model.BlogItemId)
 
 @Html.Raw("</div>")
+
+<div style="display:none;" id="partial">
+    @Html.Partial("_BlogCommentFormPartial", new BlogCommentItemViewModel(Model.BlogItemId))
+</div>
 

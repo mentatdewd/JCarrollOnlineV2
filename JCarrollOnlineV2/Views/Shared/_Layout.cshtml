@@ -16,10 +16,6 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/myjsbundle")
-
-    @*<link rel="stylesheet/less"
-          type="text/css"
-          href="@Url.Content("~/site.less")" />*@
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -43,7 +39,7 @@
                     <li>@Html.ActionLink("Sandbox", "Index", "Sandbox")</li>
                     @if (User.IsInRole("Administrator"))
                     {
-                         <li>@Html.ActionLink("Blog", "Index", "Blog")</li>
+                        <li>@Html.ActionLink("Blog", "Index", "Blog")</li>
                     }
 
                 </ul>
@@ -60,5 +56,9 @@
 
         @RenderSection("scripts", required: false)
     </div>
+
+    <script type="text/javascript">
+    InitializeBlogComments();
+    </script>
 </body>
 </html>

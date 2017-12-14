@@ -12,6 +12,7 @@ namespace JCarrollOnlineV2.ViewModels.Blog
             Author = new ApplicationUserViewModel();
             Comments = new BlogCommentsViewModel();
         }
+
         public int Id { get; set; }
         public ApplicationUserViewModel Author { get; set; }
 
@@ -22,9 +23,13 @@ namespace JCarrollOnlineV2.ViewModels.Blog
 
         [Display(Name = "Content")]
         [DataType(DataType.MultilineText)]
-
         [AllowHtml]
-        public string Content { get; set; }
+        public string Content
+        {
+            get;
+            set;
+        }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

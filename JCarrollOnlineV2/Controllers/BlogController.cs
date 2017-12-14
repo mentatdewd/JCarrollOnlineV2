@@ -43,11 +43,10 @@ namespace JCarrollOnlineV2.Controllers
 
                 blogFeedItemViewModel.InjectFrom(blogItem);
                 blogFeedItemViewModel.Author.InjectFrom(blogItem.Author);
-                blogFeedItemViewModel.Comments.BlogItemId = blogItem.Id;
 
                 foreach(var blogItemComment in blogItem.BlogItemComments.ToList())
                 {
-                    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
+                    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel(blogItem.Id);
 
                     blogCommentItemViewModel.InjectFrom(blogItemComment);
                     blogCommentItemViewModel.TimeAgo = blogCommentItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
@@ -67,20 +66,26 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: BlogItemComment/CreateComment
-        public ActionResult CreateComment(int blogItemId, Uri returnUrl)
-        {
-            BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel
-            {
-                BlogItemId = blogItemId,
-                ReturnUrl = returnUrl
-            };
+        //public ActionResult CreateComment(int blogItemId, Uri returnUrl)
+        //{
+        //    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
 
-            return View("_BlogCommentFormPartial", blogCommentItemViewModel);
-        }
+        //    blogCommentItemViewModel.BlogItemId = blogItemId;
+        //    blogCommentItemViewModel.ReturnUrl = returnUrl;
+
+        //    return View("_BlogCommentFormPartial", blogCommentItemViewModel);
+        //}
+
+        // POST: BlogItemComment/CreateComment
+        //[HttpPost]
+        //public void CreateComment()
+        //{
+        //    System.Diagnostics.Debug.WriteLine("CreateComment called");
+        //}
 
         // POST: BlogItemComment/CreateComment
         [HttpPost]
-        public async Task<ActionResult> CreateComment([Bind(Include = "Author,Content,BlogItemId,ReturnUrl")] BlogCommentItemViewModel blogCommentItemViewModel)
+        public void CreateComment(BlogCommentItemViewModel blogCommentItemViewModel)
         {
             if(ModelState.IsValid)
             {
@@ -89,15 +94,11 @@ namespace JCarrollOnlineV2.Controllers
                 blogItemComment.InjectFrom(blogCommentItemViewModel);
                 blogItemComment.CreatedAt = DateTime.Now;
 
-                blogItemComment.BlogItem = await _data.BlogItem.FindAsync(blogCommentItemViewModel.BlogItemId);
+                blogItemComment.BlogItem = _data.BlogItem.Find(blogCommentItemViewModel.Id);
 
                 _data.BlogItemComment.Add(blogItemComment);
-                await _data.SaveChangesAsync();
-               
-                return new RedirectResult(blogCommentItemViewModel.ReturnUrl.ToString());
+                _data.SaveChanges();
             }
-
-            return View(blogCommentItemViewModel);
         }
 
         // GET: BlogItemId/Create
@@ -156,14 +157,14 @@ namespace JCarrollOnlineV2.Controllers
 
         // POST: BlogItemId/Edit/5
         [HttpPost]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,AuthorId,Title,Content,CreatedAt")] BlogFeedItemViewModel blogItemViewModel)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,AuthorId,Title,Content,CreatedAt")] BlogFeedItemViewModel blogItemVM)
         {
             if (ModelState.IsValid)
             {
                 BlogItem blogItem = new BlogItem();
 
-                blogItem.InjectFrom(blogItemViewModel);
-                blogItem.Author = await _data.ApplicationUser.FindAsync(blogItemViewModel.AuthorId);
+                blogItem.InjectFrom(blogItemVM);
+                blogItem.Author = await _data.ApplicationUser.FindAsync(blogItemVM.AuthorId);
                 blogItem.UpdatedAt = DateTime.Now;
 
                 _data.Entry(blogItem).State = EntityState.Modified;
@@ -172,7 +173,7 @@ namespace JCarrollOnlineV2.Controllers
                 return Redirect(Url.RouteUrl(new { controller = "Blog", action = "Index"}));
             }
 
-            return View(blogItemViewModel);
+            return View(blogItemVM);
         }
 
         // GET: BlogItemId/Delete/5

@@ -59,7 +59,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 foreach(var comment in item.BlogItemComments.ToList())
                 {
-                    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
+                    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel(item.Id);
 
                     blogCommentItemViewModel.InjectFrom(comment);
                     blogCommentItemViewModel.BlogItemId = comment.BlogItem.Id;
