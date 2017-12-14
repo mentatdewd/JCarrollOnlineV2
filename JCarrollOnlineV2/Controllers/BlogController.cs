@@ -65,24 +65,6 @@ namespace JCarrollOnlineV2.Controllers
             return View();
         }
 
-        // GET: BlogItemComment/CreateComment
-        //public ActionResult CreateComment(int blogItemId, Uri returnUrl)
-        //{
-        //    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel();
-
-        //    blogCommentItemViewModel.BlogItemId = blogItemId;
-        //    blogCommentItemViewModel.ReturnUrl = returnUrl;
-
-        //    return View("_BlogCommentFormPartial", blogCommentItemViewModel);
-        //}
-
-        // POST: BlogItemComment/CreateComment
-        //[HttpPost]
-        //public void CreateComment()
-        //{
-        //    System.Diagnostics.Debug.WriteLine("CreateComment called");
-        //}
-
         // POST: BlogItemComment/CreateComment
         [HttpPost]
         public void CreateComment(BlogCommentItemViewModel blogCommentItemViewModel)
