@@ -1,10 +1,58 @@
 ﻿@using JCarrollOnlineV2.ViewModels.Blog
 @model BlogFeedViewModel
 
-
 @foreach (var item in Model.BlogFeedItemViewModels)
 {
     @Html.Partial("_BlogFeedItemPartial", item)
     <hr />
 }
+
+<script type="text/javascript">
+    function ShowMyDialog(item) {
+        var targetForm = "#commentForm" + item;
+
+        $("#commentForm" + item).dialog({
+            width: 450,
+            open: function (event, ui) {
+                $(this).find("[type=submit]").hide();
+            },
+
+            buttons:
+            [
+                {
+                    text: "Add a Comment or 2",
+                    click: function () {
+                        var mydata = $("#commentForm" + item).serialize();
+
+                        if ($("#commentForm" + item).valid()) {
+                            console.log("serialized commentForm: ", mydata);
+                            $.ajax(
+                                {
+                                    url: "@Url.Action("CreateComment", "Blog")",
+                                    type: "POST",
+                                    data: mydata,
+                                }
+                            );
+                            $(this).dialog("close");
+                        }
+                    }
+                },
+                {
+                    text: "Close",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    }
+
+    $(function () {
+        //or to give the parser some context, supply it with a selector
+        //jQuery validator will parse all child elements (deep) starting
+        //from the selector element supplied
+        jQuery.validator.unobtrusive.parse("#commentForm");
+    });
+
+</script>
 

@@ -118,6 +118,7 @@
     <Compile Include="Account\SendCodeViewModel.cs" />
     <Compile Include="Account\VerifyCodeViewModel.cs" />
     <Compile Include="Blog\BlogCommentsViewModel.cs" />
+    <Compile Include="Blog\BlogCommentViewModel.cs" />
     <Compile Include="Blog\BlogFeedItemViewModel.cs" />
     <Compile Include="Blog\BlogFeedViewModel.cs" />
     <Compile Include="Blog\BlogFeedViewModelBase.cs" />

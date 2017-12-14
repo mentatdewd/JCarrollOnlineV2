@@ -52,6 +52,18 @@ namespace JCarrollOnlineV2.HtmlHelpers
             return new MvcHtmlString(builder.ToString());
         }
 
+        public static MvcHtmlString BlogFormDivTag(this HtmlHelper helper, int blogItemId)
+        {
+            var builder = new StringBuilder("<div id=\"comment-dialog" + blogItemId + "\" class=\"commentFormClassDiv\" title=\"Add Comment\">");
+
+            return new MvcHtmlString(builder.ToString());
+        }
+
+        public static MvcHtmlString BlogEndDiv(this HtmlHelper helper)
+        {
+            return new MvcHtmlString("<\\div>");
+        }
+
         public static string ExternalLink(this HtmlHelper helper, Uri uri, string label)
         {
             return string.Format(CultureInfo.InvariantCulture, "<a href='{0}'>{1}</a>", uri, label);
