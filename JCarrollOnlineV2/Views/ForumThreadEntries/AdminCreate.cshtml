@@ -1,12 +1,10 @@
 ﻿@using JCarrollOnlineV2.ViewModels.ForumThreadEntries
-@model ThreadEntriesCreateViewModel
+@model AdminThreadEntriesCreateViewModel
 
 @Html.HiddenFor(model => model.ForumId, new { @Value = Model.ForumId })
 @Html.HiddenFor(model => model.ParentId, new { @Value = Model.ParentId })
 @Html.HiddenFor(model => model.RootId, new { @Value = Model.RootId })
 
-<link href="~/Content/css/toastr.css" rel="stylesheet" />
-<script src="~/Scripts/toastr.js"></script>
 <script>
     $(function () {
         $("textarea.mdd_editor").MarkdownDeep({
@@ -16,12 +14,7 @@
     });
 </script>
 <h2>Create</h2>
-<script type="text/javascript">
-    $(function () {
-        toastr.info("This is a fine pickle");
-    });
-</script>
-toastr.info("Why can't I get this?")
+
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()

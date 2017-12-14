@@ -93,6 +93,9 @@ namespace JCarrollOnlineV2.Controllers
 
         // POST: BlogItemId/Create
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Create([Bind(Include = "Title,Content")]  BlogFeedItemViewModel blogFeedItemViewModel)
         {
             if (ModelState.IsValid)
