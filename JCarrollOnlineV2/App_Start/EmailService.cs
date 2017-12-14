@@ -15,7 +15,14 @@ namespace JCarrollOnlineV2
 
             using (var smtpClient = new SmtpClient())
             {
-                await smtpClient.SendMailAsync(mailMessage);
+                try
+                {
+                    await smtpClient.SendMailAsync(mailMessage);
+                }
+                catch(SmtpException smtpException)
+                {
+                    System.Diagnostics.Debug.WriteLine("Failed to send email. Exception: {0}", smtpException);
+                }
             }
         }
 
