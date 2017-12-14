@@ -7,6 +7,7 @@ namespace JCarrollOnlineV2.ViewModels.Users
 {
     public class UserItemViewModel : UserViewModelBase
     {
+        public UserItemViewModel() { }
         public UserItemViewModel(Logger logger)
         {
             Logger = logger;
