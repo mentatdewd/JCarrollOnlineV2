@@ -360,6 +360,18 @@
     <Content Include="Content\css\bootstrap\theme.css" />
     <Content Include="Content\css\bootstrap\variables.css" />
     <Content Include="Content\css\bootstrap\vendor-prefixes.css" />
+    <Content Include="Content\css\images\mdd_ajax_loader.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\css\images\mdd_gripper.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\css\images\mdd_modal_background.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\css\images\mdd_toolbar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\css\MarkdownDeep.css" />
     <Content Include="Content\css\PagedList.css" />
     <Content Include="Content\css\Prism.css" />
