@@ -67,7 +67,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Fora/Create
-        [Authorize]
+        [Authorize(Roles ="Administrator")]
         public ActionResult Create()
         {
             ForaCreateViewModel foraCreateViewModel = new ForaCreateViewModel();

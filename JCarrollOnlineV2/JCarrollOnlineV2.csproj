@@ -508,6 +508,8 @@
     <Content Include="Content\less\themes\tabs.less" />
     <Content Include="Content\less\themes\theme.less" />
     <Content Include="Content\less\themes\tooltip.less" />
+    <Content Include="Content\css\toastr.css" />
+    <Content Include="Content\css\toastr.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <None Include="Content\less\Site.less" />
@@ -532,6 +534,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Mvc.sitemap" />
+    <Content Include="Content\toastr.scss" />
+    <Content Include="Content\less\toastr.less" />
     <None Include="MvcSiteMapSchema.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -581,6 +585,8 @@
     <Content Include="Content\images\mdd_toolbar.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\toastr.js" />
+    <Content Include="Scripts\toastr.min.js" />
     <Content Include="StoredProcedures\dbo.WriteLog.sql" />
     <Content Include="StoredProcedures\dbo.DropWriteLog.sql" />
     <Content Include="Web.config">
@@ -694,6 +700,7 @@
     <Content Include="Views\Shared\DisplayTemplates\MetaRobotsHelperModel.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\MenuHelperModel.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\CanonicalHelperModel.cshtml" />
+    <Content Include="Views\ForumThreadEntries\AdminCreate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

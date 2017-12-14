@@ -62,5 +62,12 @@
     }
 </table>
 <p class="text-center">
-    @Html.ActionLink("Create New", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
+    @if (User.IsInRole("Administrator"))
+    {
+        @Html.ActionLink("Create New", "AdminCreate", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
+    }
+    else
+    {
+        @Html.ActionLink("Create New", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
+    }
 </p>

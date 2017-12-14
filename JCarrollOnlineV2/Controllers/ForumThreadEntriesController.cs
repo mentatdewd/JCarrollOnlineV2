@@ -168,6 +168,85 @@ namespace JCarrollOnlineV2.Controllers
             return View(forumThreadEntryViewModel);
         }
 
+        [Authorize(Roles = "Administrator")]
+        public ActionResult AdminCreate(int forumId, int? parentId, int? rootId)
+        {
+            AdminThreadEntriesCreateViewModel threadEntriesCreateViewModel = new AdminThreadEntriesCreateViewModel
+            {
+                ForumId = forumId,
+                ParentId = parentId,
+                RootId = rootId
+            };
+
+            return View(threadEntriesCreateViewModel);
+        }
+
+        // POST: ForumOriginalPost/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> AdminCreate([Bind(Include = "Title,RootId,ForumId,Content,ParentId,Id")]  AdminThreadEntriesCreateViewModel forumThreadEntryViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                ThreadEntry threadEntry = new ThreadEntry();
+
+                threadEntry.InjectFrom(forumThreadEntryViewModel);
+
+                threadEntry.CreatedAt = DateTime.Now;
+                threadEntry.UpdatedAt = DateTime.Now;
+
+                string currentUserId = User.Identity.GetUserId();
+                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
+
+                threadEntry.Author = currentUser;
+                threadEntry.Forum = _data.Forum.Find(forumThreadEntryViewModel.ForumId);
+
+                if (threadEntry.ParentId != null)
+                {
+                    threadEntry.PostNumber = await _data.ForumThreadEntry.Where(m => m.RootId == threadEntry.RootId).CountAsync() + 1;
+                }
+                else
+                {
+                    threadEntry.PostNumber = 1;
+                }
+
+                _data.ForumThreadEntry.Add(threadEntry);
+                await _data.SaveChangesAsync();
+
+                if (threadEntry.ParentId == null)
+                {
+                    threadEntry.UpdatedAt = threadEntry.CreatedAt;
+                    threadEntry.RootId = threadEntry.Id;
+                    await _data.SaveChangesAsync();
+                }
+
+                return new RedirectResult(Url.Action("Details", new { forumId = threadEntry.Forum.Id, id = threadEntry.RootId }) + "#post" + threadEntry.PostNumber);
+            }
+
+            return View(forumThreadEntryViewModel);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // GET: ForumOriginalPost/Edit/5
         [Authorize]
         public async Task<ActionResult> Edit(int? id)
