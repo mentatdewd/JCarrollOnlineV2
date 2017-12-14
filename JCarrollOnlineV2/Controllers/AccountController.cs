@@ -234,10 +234,10 @@ namespace JCarrollOnlineV2.Controllers
 //                    var cleanUrl = callbackUri;
 //#else
                     var cleanUrl = new Uri(callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
-//#endif
+                    //#endif
 
-                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
-                    //await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
                     ApplicationUserViewModel appplicationUserViewModel = new ApplicationUserViewModel();
 
                     appplicationUserViewModel.InjectFrom(user);
