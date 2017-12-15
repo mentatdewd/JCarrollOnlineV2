@@ -13,6 +13,9 @@ namespace JCarrollOnlineV2.Entities
         [AllowHtml]
         [Required]
         public string Content { get; set; }
+
+        public string Title { get; set; }
+
         [Required]
         public DateTime CreatedAt { get; set; }
         [Required]

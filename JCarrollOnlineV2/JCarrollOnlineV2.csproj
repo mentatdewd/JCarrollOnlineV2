@@ -312,6 +312,10 @@
     <Compile Include="Migrations\201712140038062_add-migration addedblogitemidtoblogcommentitems.Designer.cs">
       <DependentUpon>201712140038062_add-migration addedblogitemidtoblogcommentitems.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712151247554_addblogtitle.cs" />
+    <Compile Include="Migrations\201712151247554_addblogtitle.Designer.cs">
+      <DependentUpon>201712151247554_addblogtitle.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Sql.Designer.cs">
@@ -413,6 +417,7 @@
     <Content Include="Content\images\feed-icon-28x28.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\graybar.gif" />
     <Content Include="Content\images\post-downarrow.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -732,6 +737,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712140038062_add-migration addedblogitemidtoblogcommentitems.resx">
       <DependentUpon>201712140038062_add-migration addedblogitemidtoblogcommentitems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712151247554_addblogtitle.resx">
+      <DependentUpon>201712151247554_addblogtitle.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Sql.resx">
       <Generator>ResXFileCodeGenerator</Generator>

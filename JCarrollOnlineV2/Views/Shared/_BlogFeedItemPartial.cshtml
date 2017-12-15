@@ -2,8 +2,11 @@
 @model BlogFeedItemViewModel
 
 <div class="blogEntryContainer" style="position: relative">
+    <div class="blogTitle"><h2>@Model.Title</h2></div>
+    <img src="~/Content/images/graybar.gif" />
     @Html.Partial("_BlogFeedItemContentPartial")
     @Html.Partial("_BlogFeedItemFooterPartial")
     @Html.Partial("_BlogCommentsPartial", Model.Comments)
+    <img src="~/Content/images/graybar.gif" />
 </div>
 
