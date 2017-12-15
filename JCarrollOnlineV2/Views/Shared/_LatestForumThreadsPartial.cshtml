@@ -1,0 +1,16 @@
+﻿@using JCarrollOnlineV2.ViewModels
+@model LatestForumThreadsViewModel
+
+<div>
+    <div class="text-center">
+        <h3>Latest Forum Posts</h3>
+    </div>
+
+    <ul class="rss_ul">
+        @foreach (var item in Model.LatestForumThreads)
+        {
+            @Html.Partial("_LatestForumThreadItemPartial", item)
+        }
+    </ul>
+
+</div>

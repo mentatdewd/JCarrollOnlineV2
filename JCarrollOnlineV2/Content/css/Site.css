@@ -16,6 +16,17 @@ table {
   max-height: 100%;
   max-width: 100%;
 }
+
+.image-span  {
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    height:auto;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-size:cover; 
+}
+
 /* Set width on the form input elements since they're 100% wide by default */
 /*input,
 select,
