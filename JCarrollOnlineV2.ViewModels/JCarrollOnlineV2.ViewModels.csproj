@@ -142,6 +142,8 @@
     <Compile Include="Home\AboutViewModel.cs" />
     <Compile Include="Account\RegistrationNotificationViewModel.cs" />
     <Compile Include="Home\AnonHomePageViewModel.cs" />
+    <Compile Include="Home\LatestForumThreadItemViewModel.cs" />
+    <Compile Include="Home\LatestForumThreadsViewModel.cs" />
     <Compile Include="Manage\ManageAddPhoneNumberViewModel.cs" />
     <Compile Include="Manage\ManageChangePasswordViewModel.cs" />
     <Compile Include="Manage\ManageFactorViewModel.cs" />
