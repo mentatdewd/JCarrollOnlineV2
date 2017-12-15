@@ -1,6 +1,7 @@
 ﻿using JCarrollOnlineV2.CustomLinqExtensions;
 using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.Extensions;
 using JCarrollOnlineV2.ViewModels.Fora;
 using JCarrollOnlineV2.ViewModels.ForumThreadEntries;
@@ -20,16 +21,16 @@ namespace JCarrollOnlineV2.Controllers
 
     public class ForumThreadEntriesController : Controller
     {
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public ForumThreadEntriesController() : this(null)
         {
 
         }
 
-        public ForumThreadEntriesController(IJCarrollOnlineV2Context dataContext)
+        public ForumThreadEntriesController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
+            _data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         private void DetailItemInjector(ThreadEntry threadEntry, ThreadEntryDetailsItemViewModel threadEntryDetailsItemViewModel)

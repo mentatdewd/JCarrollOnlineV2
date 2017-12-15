@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Fora;
 using JCarrollOnlineV2.ViewModels.Rss;
 using JCarrollOnlineV2.ViewModels.Users;
@@ -23,7 +24,7 @@ namespace JCarrollOnlineV2
             return await data.ForumThreadEntry.Where(i => i.RootId == thread).AsQueryable().CountAsync();
         }
 
-        public static async Task<int> GetThreadCountAsync(Forum forum, IJCarrollOnlineV2Context data)
+        public static async Task<int> GetThreadCountAsync(Forum forum, JCarrollOnlineV2DbContext data)
         {
             return await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync();
         }
@@ -38,7 +39,7 @@ namespace JCarrollOnlineV2
             else return DateTime.Now;
         }
 
-        public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, IJCarrollOnlineV2Context data)
+        public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, JCarrollOnlineV2DbContext data)
         {
             LastThreadViewModel lastThreadViewModel = new LastThreadViewModel();
 

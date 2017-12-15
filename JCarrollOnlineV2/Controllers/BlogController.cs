@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Blog;
 using Microsoft.AspNet.Identity;
 using Omu.ValueInjecter;
@@ -15,7 +16,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles = "Administrator")]
     public class BlogController : Controller
     {
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public BlogController()
             : this(null)
@@ -23,9 +24,9 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        public BlogController(IJCarrollOnlineV2Context dataContext)
+        public BlogController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
+            _data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: BlogItemId

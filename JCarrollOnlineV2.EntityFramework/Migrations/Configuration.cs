@@ -1,13 +1,12 @@
-namespace JCarrollOnlineV2.Migrations
+namespace JCarrollOnlineV2.EntityFramework.Migrations
 {
-    using JCarrollOnlineV2.DataContexts;
     using JCarrollOnlineV2.Entities;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<JCarrollOnlineV2.DataContexts.JCarrollOnlineV2Connection>
+    internal sealed class Configuration : DbMigrationsConfiguration<JCarrollOnlineV2DbContext>
     {
         public Configuration()
         {
@@ -15,7 +14,7 @@ namespace JCarrollOnlineV2.Migrations
             AutomaticMigrationDataLossAllowed = true;
         }
 
-        protected override void Seed(DataContexts.JCarrollOnlineV2Connection context)
+        protected override void Seed(JCarrollOnlineV2DbContext context)
         {
             //Deletes all data, from all tables, except for __MigrationHistory
             //context.Database.ExecuteSqlCommand("sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
@@ -31,7 +30,7 @@ namespace JCarrollOnlineV2.Migrations
         const string adminRole = "Administrator";
         const string adminName = "administrator";
 
-        private bool AddAdminRoleAndUser(JCarrollOnlineV2Connection context)
+        private bool AddAdminRoleAndUser(JCarrollOnlineV2DbContext context)
         {
             using(var userStore = new UserStore<ApplicationUser>(context))
             using (var userManager = new UserManager<ApplicationUser>(userStore))

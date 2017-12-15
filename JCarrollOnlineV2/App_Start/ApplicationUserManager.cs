@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -26,7 +27,7 @@ namespace JCarrollOnlineV2
 
             ApplicationUserManager manager = null;
 
-            var userStore = new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2Connection>());
+            var userStore = new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2DbContext>());
 
             manager = new ApplicationUserManager(userStore);
 

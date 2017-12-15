@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Fora;
 using Omu.ValueInjecter;
 using System;
@@ -13,11 +14,11 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class ForaController : Controller
     {
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public ForaController()
         {
-            _data = new JCarrollOnlineV2Connection();
+            _data = new JCarrollOnlineV2DbContext();
         }
 
         // GET: Fora

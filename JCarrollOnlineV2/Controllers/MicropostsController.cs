@@ -1,6 +1,7 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.EmailViewModels;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
@@ -17,7 +18,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class MicroPostsController : Controller
     {
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public MicroPostsController()
             : this(null)
@@ -25,9 +26,9 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        public MicroPostsController(IJCarrollOnlineV2Context dataContext)
+        public MicroPostsController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
+            _data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: MicroPosts

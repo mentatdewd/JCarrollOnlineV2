@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Blog;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
@@ -21,11 +22,11 @@ namespace JCarrollOnlineV2.Controllers
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public HomeController()
         {
-            _data = new JCarrollOnlineV2Connection();
+            _data = new JCarrollOnlineV2DbContext();
         }
 
         public async Task<ActionResult> Index(int? microPostPage)

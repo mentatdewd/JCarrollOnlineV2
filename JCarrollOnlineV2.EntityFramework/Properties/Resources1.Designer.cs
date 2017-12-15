@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace JCarrollOnlineV2.Properties {
+namespace JCarrollOnlineV2.EntityFramework.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace JCarrollOnlineV2.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("JCarrollOnlineV2.Properties.Sql", typeof(Sql).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("JCarrollOnlineV2.EntityFramework.Properties.Resources", typeof(Sql).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -1,4 +1,5 @@
 ﻿using JCarrollOnlineV2.DataContexts;
+using JCarrollOnlineV2.EntityFramework;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
@@ -12,7 +13,7 @@ namespace JCarrollOnlineV2
         public void ConfigureAuthentication(IAppBuilder app)
         {
             // Configure the db context, user manager and signin manager to use a single instance per request
-            app.CreatePerOwinContext(JCarrollOnlineV2Connection.Create);
+            app.CreatePerOwinContext(JCarrollOnlineV2DbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
             app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
 
