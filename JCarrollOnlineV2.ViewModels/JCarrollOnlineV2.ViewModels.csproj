@@ -129,6 +129,7 @@
     <Compile Include="ForumModerators\ForumModeratorsCreateViewModel.cs" />
     <Compile Include="ForumModerators\ForumModeratorsViewModel.cs" />
     <Compile Include="ForumModerators\ForumModeratorViewModelBase.cs" />
+    <Compile Include="ForumThreadEntries\AdminThreadEntriesCreateViewModel.cs" />
     <Compile Include="ForumThreadEntries\ThreadEntriesCreateViewModel.cs" />
     <Compile Include="ForumThreadEntries\ThreadEntriesViewModelBase.cs" />
     <Compile Include="ForumThreadEntries\ThreadEntryDetailItemsViewModel.cs" />
@@ -141,6 +142,8 @@
     <Compile Include="Home\AboutViewModel.cs" />
     <Compile Include="Account\RegistrationNotificationViewModel.cs" />
     <Compile Include="Home\AnonHomePageViewModel.cs" />
+    <Compile Include="Home\LatestForumThreadItemViewModel.cs" />
+    <Compile Include="Home\LatestForumThreadsViewModel.cs" />
     <Compile Include="Manage\ManageAddPhoneNumberViewModel.cs" />
     <Compile Include="Manage\ManageChangePasswordViewModel.cs" />
     <Compile Include="Manage\ManageFactorViewModel.cs" />

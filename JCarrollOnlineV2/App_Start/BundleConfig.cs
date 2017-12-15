@@ -52,7 +52,8 @@ namespace JCarrollOnlineV2
                 "~/Content/css/themes/base/tabs.css",
                 "~/Content/css/themes/base/theme.css",
                 "~/Content/css/themes/base/tooltip.css",
-                "~/Content/css/MarkdownDeep.css");
+                "~/Content/css/MarkdownDeep.css",
+                "~/Content/css/toastr.css");
 
             cssBundle.Builder = nullBuilder;
             cssBundle.Transforms.Add(styleTransformer);
@@ -85,6 +86,7 @@ namespace JCarrollOnlineV2
 
             var myjsbundle = new ScriptBundle("~/bundles/myjsbundle");
             myjsbundle.Include("~/Scripts/prism.js");
+            myjsbundle.Include("~/Scripts/toastr.js");
             myjsbundle.Include("~/Scripts/jcarrollonlinev2.js");
             myjsbundle.Include("~/Scripts/MarkdownDeepLib.min.js");
             myjsbundle.Transforms.Add(scriptTransformer);

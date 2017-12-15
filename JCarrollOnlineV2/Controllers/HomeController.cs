@@ -47,6 +47,21 @@ namespace JCarrollOnlineV2.Controllers
             logger.Info("Checking for blog entries");
             var blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
 
+            homeViewModel.LatestForumThreadsViewModel = new LatestForumThreadsViewModel();
+            var threads = await _data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Forum).OrderByDescending(threadEntry => threadEntry.UpdatedAt).Take(5).ToListAsync();
+
+            foreach(var thread in threads)
+            {
+                LatestForumThreadItemViewModel latestForumThreadItemViewModel = new LatestForumThreadItemViewModel();
+
+                latestForumThreadItemViewModel.ThreadTitle = thread.Title;
+                latestForumThreadItemViewModel.ForumTitle = thread.Forum.Title;
+                latestForumThreadItemViewModel.ForumId = thread.Forum.Id;
+                latestForumThreadItemViewModel.ThreadId = thread.Id;
+
+                homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(latestForumThreadItemViewModel);
+            }
+
             logger.Info("Processing blog entries");
 
             foreach (var item in blogItems)

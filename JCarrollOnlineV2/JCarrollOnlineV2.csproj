@@ -312,6 +312,10 @@
     <Compile Include="Migrations\201712140038062_add-migration addedblogitemidtoblogcommentitems.Designer.cs">
       <DependentUpon>201712140038062_add-migration addedblogitemidtoblogcommentitems.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712151247554_addblogtitle.cs" />
+    <Compile Include="Migrations\201712151247554_addblogtitle.Designer.cs">
+      <DependentUpon>201712151247554_addblogtitle.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Sql.Designer.cs">
@@ -410,9 +414,11 @@
     <Content Include="Content\images\Deception_Pass_Bridge_in_fog2.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\doubleblueline.gif" />
     <Content Include="Content\images\feed-icon-28x28.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\graybar.gif" />
     <Content Include="Content\images\post-downarrow.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -508,6 +514,8 @@
     <Content Include="Content\less\themes\tabs.less" />
     <Content Include="Content\less\themes\theme.less" />
     <Content Include="Content\less\themes\tooltip.less" />
+    <Content Include="Content\css\toastr.css" />
+    <Content Include="Content\css\toastr.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <None Include="Content\less\Site.less" />
@@ -532,6 +540,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Mvc.sitemap" />
+    <Content Include="Content\toastr.scss" />
+    <Content Include="Content\less\toastr.less" />
     <None Include="MvcSiteMapSchema.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -581,6 +591,8 @@
     <Content Include="Content\images\mdd_toolbar.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\toastr.js" />
+    <Content Include="Scripts\toastr.min.js" />
     <Content Include="StoredProcedures\dbo.WriteLog.sql" />
     <Content Include="StoredProcedures\dbo.DropWriteLog.sql" />
     <Content Include="Web.config">
@@ -694,6 +706,9 @@
     <Content Include="Views\Shared\DisplayTemplates\MetaRobotsHelperModel.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\MenuHelperModel.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\CanonicalHelperModel.cshtml" />
+    <Content Include="Views\ForumThreadEntries\AdminCreate.cshtml" />
+    <Content Include="Views\Shared\_LatestForumThreadsPartial.cshtml" />
+    <Content Include="Views\Shared\_LatestForumThreadItemPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -725,6 +740,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712140038062_add-migration addedblogitemidtoblogcommentitems.resx">
       <DependentUpon>201712140038062_add-migration addedblogitemidtoblogcommentitems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712151247554_addblogtitle.resx">
+      <DependentUpon>201712151247554_addblogtitle.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Sql.resx">
       <Generator>ResXFileCodeGenerator</Generator>

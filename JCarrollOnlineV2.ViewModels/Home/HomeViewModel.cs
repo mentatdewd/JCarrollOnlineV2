@@ -15,6 +15,7 @@ namespace JCarrollOnlineV2.ViewModels
         public RssFeedViewModel RssFeedViewModel { get; set; }
         public int MicroPosts { get; set; }
         public BlogFeedViewModel BlogFeed { get; set; }
+        public LatestForumThreadsViewModel LatestForumThreadsViewModel { get; set; }
 
         public int? MicroPostPage { get; set; }
  //       public List<MicroPostFeedItemViewModel> OnePageOfMicroPosts { get; private set; }
