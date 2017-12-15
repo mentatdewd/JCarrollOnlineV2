@@ -296,7 +296,7 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomLinqExtensions\EnumerableExtensions.cs" />
     <Compile Include="CustomLinqExtensions\LinqToSqlExtensionMethods.cs" />
-    <Compile Include="DataContexts\JCarrollOnlineV2Db.cs" />
+    <None Include="DataContexts\JCarrollOnlineV2Db.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -304,25 +304,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HtmlHelperExtensions\HtmlHelperExtensions.cs" />
     <Compile Include="HtmlHelperExtensions\MarkdownHelper.cs" />
-    <Compile Include="Migrations\201712101515297_Initial.cs" />
-    <Compile Include="Migrations\201712101515297_Initial.Designer.cs">
-      <DependentUpon>201712101515297_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712140038062_add-migration addedblogitemidtoblogcommentitems.cs" />
-    <Compile Include="Migrations\201712140038062_add-migration addedblogitemidtoblogcommentitems.Designer.cs">
-      <DependentUpon>201712140038062_add-migration addedblogitemidtoblogcommentitems.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712151247554_addblogtitle.cs" />
-    <Compile Include="Migrations\201712151247554_addblogtitle.Designer.cs">
-      <DependentUpon>201712151247554_addblogtitle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Sql.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Sql.resx</DependentUpon>
-    </Compile>
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -593,8 +575,6 @@
     </Content>
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
-    <Content Include="StoredProcedures\dbo.WriteLog.sql" />
-    <Content Include="StoredProcedures\dbo.DropWriteLog.sql" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -726,6 +706,10 @@
       <Project>{5d0cbbda-1f49-4c1b-a508-fdab11b4d72f}</Project>
       <Name>JCarrollOnlineV2.Entities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\JCarrollOnlineV2.EntityFramework\JCarrollOnlineV2.EntityFramework.csproj">
+      <Project>{3CCE3FF1-19A7-4A5E-BF7F-0DEA4239FF3D}</Project>
+      <Name>JCarrollOnlineV2.EntityFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JCarrollOnlineV2.ViewModels\JCarrollOnlineV2.ViewModels.csproj">
       <Project>{a4675e34-6310-4fef-9ad8-498cdc8c7757}</Project>
       <Name>JCarrollOnlineV2.ViewModels</Name>
@@ -733,21 +717,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201712101515297_Initial.resx">
-      <DependentUpon>201712101515297_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712140038062_add-migration addedblogitemidtoblogcommentitems.resx">
-      <DependentUpon>201712140038062_add-migration addedblogitemidtoblogcommentitems.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712151247554_addblogtitle.resx">
-      <DependentUpon>201712151247554_addblogtitle.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Sql.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Sql.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
