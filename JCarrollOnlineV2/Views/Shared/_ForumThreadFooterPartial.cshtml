@@ -12,14 +12,17 @@
                 <div class="threadinfo">
                     @if (User.Identity.GetUserId() != null)
                     {
-                        if (Model.Author.Id == User.Identity.GetUserId() || (User.IsInRole("Administrator")))
+                        if (User.IsInRole("Administrator"))
                         {
-                            if (Model.Locked != true || User.IsInRole("Administrator"))
-                            {
-                                <div>
-                                    @Html.ActionLink("Edit", "Edit", "ForumThreadEntries", new { id = Model.Id }, null) | @Html.ActionLink("Delete", "Delete", "ForumThreadEntries", new { id = Model.Id }, null)
-                                </div>
-                            }
+                            <div>
+                                @Html.ActionLink("Edit", "AdminEdit", "ForumThreadEntries", new { id = Model.Id }, null) | @Html.ActionLink("Delete", "Delete", "ForumThreadEntries", new { id = Model.Id }, null)
+                            </div>
+                        }
+                        else if (Model.Author.Id == User.Identity.GetUserId() && !Model.Locked)
+                        {
+                            <div>
+                                @Html.ActionLink("Edit", "Edit", "ForumThreadEntries", new { id = Model.Id }, null) | @Html.ActionLink("Delete", "Delete", "ForumThreadEntries", new { id = Model.Id }, null)
+                            </div>
                         }
                     }
                     <div>

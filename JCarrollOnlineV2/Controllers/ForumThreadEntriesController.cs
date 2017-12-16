@@ -1,6 +1,7 @@
 ﻿using JCarrollOnlineV2.CustomLinqExtensions;
 using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.Extensions;
 using JCarrollOnlineV2.ViewModels.Fora;
 using JCarrollOnlineV2.ViewModels.ForumThreadEntries;
@@ -20,16 +21,16 @@ namespace JCarrollOnlineV2.Controllers
 
     public class ForumThreadEntriesController : Controller
     {
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public ForumThreadEntriesController() : this(null)
         {
 
         }
 
-        public ForumThreadEntriesController(IJCarrollOnlineV2Context dataContext)
+        public ForumThreadEntriesController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
+            _data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         private void DetailItemInjector(ThreadEntry threadEntry, ThreadEntryDetailsItemViewModel threadEntryDetailsItemViewModel)
@@ -230,23 +231,6 @@ namespace JCarrollOnlineV2.Controllers
             return View(forumThreadEntryViewModel);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // GET: ForumOriginalPost/Edit/5
         [Authorize]
         public async Task<ActionResult> Edit(int? id)
@@ -279,6 +263,58 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         public async Task<ActionResult> Edit([Bind(Include = "Id,ParentId,RootId,ForumId,AuthorId,Title,Content,CreatedAt,Locked,PostNumber")] ThreadEntriesEditViewModel forumThreadEntry)
+        {
+            if (ModelState.IsValid)
+            {
+                ThreadEntry threadEntry = new ThreadEntry();
+
+                threadEntry.InjectFrom(forumThreadEntry);
+                threadEntry.Author = await _data.ApplicationUser.FindAsync(forumThreadEntry.AuthorId);
+                threadEntry.Forum = await _data.Forum.FindAsync(forumThreadEntry.ForumId);
+                threadEntry.UpdatedAt = DateTime.Now;
+
+                _data.Entry(threadEntry).State = EntityState.Modified;
+                await _data.SaveChangesAsync();
+
+                return Redirect(Url.RouteUrl(new { controller = "ForumThreadEntries", action = "Details", forumId = threadEntry.Forum.Id, id = threadEntry.RootId }) + "#post" + threadEntry.PostNumber);
+            }
+
+            return View(forumThreadEntry);
+        }
+
+        // GET: ForumOriginalPost/Edit/5
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> AdminEdit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            ThreadEntriesEditViewModel threadEntriesViewModel = new ThreadEntriesEditViewModel();
+
+            var forumThread = await _data.ForumThreadEntry.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
+
+            if (forumThread == null)
+            {
+                return HttpNotFound();
+            }
+
+            threadEntriesViewModel.InjectFrom(forumThread);
+            threadEntriesViewModel.ForumId = forumThread.Forum.Id;
+            threadEntriesViewModel.AuthorId = forumThread.Author.Id;
+
+            return View(threadEntriesViewModel);
+        }
+
+        // POST: ForumOriginalPost/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> AdminEdit([Bind(Include = "Id,ParentId,RootId,ForumId,AuthorId,Title,Content,CreatedAt,Locked,PostNumber")] ThreadEntriesEditViewModel forumThreadEntry)
         {
             if (ModelState.IsValid)
             {

@@ -16,17 +16,25 @@ table {
   max-height: 100%;
   max-width: 100%;
 }
-
-.image-span  {
-    display:block;
-    margin-left:auto;
-    margin-right:auto;
-    height:auto;
-    background-position:center;
-    background-repeat:no-repeat;
-    background-size:cover; 
+.image_span img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
-
+.videoWrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+}
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 /* Set width on the form input elements since they're 100% wide by default */
 /*input,
 select,

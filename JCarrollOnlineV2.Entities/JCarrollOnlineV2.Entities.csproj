@@ -88,7 +88,7 @@
     <Compile Include="BlogItemComment.cs" />
     <Compile Include="Forum.cs" />
     <Compile Include="ForumModerator.cs" />
-    <Compile Include="ForumThreadEntry.cs" />
+    <Compile Include="ThreadEntry.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HierarchyNode.cs" />
     <Compile Include="IContext.cs" />

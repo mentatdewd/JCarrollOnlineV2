@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
 using NLog;
@@ -16,7 +17,7 @@ namespace JCarrollOnlineV2.Controllers
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public UsersController()
             : this(null)
@@ -24,9 +25,9 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        public UsersController(IJCarrollOnlineV2Context dataContext)
+        public UsersController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
+            _data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: Users

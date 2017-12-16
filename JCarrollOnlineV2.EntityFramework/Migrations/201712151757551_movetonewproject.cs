@@ -1,20 +1,19 @@
-namespace JCarrollOnlineV2.Migrations
+namespace JCarrollOnlineV2.EntityFramework.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class movetonewproject : DbMigration
     {
         public override void Up()
         {
-            this.Sql(Properties.Sql.dbo_WriteLog);
             CreateTable(
                 "dbo.ApplicationUser",
                 c => new
                     {
                         Id = c.String(nullable: false, maxLength: 128),
                         MicroPostEmailNotifications = c.Boolean(nullable: false),
-                        MicroPostSMSNotifications = c.Boolean(nullable: false),
+                        MicroPostSmsNotifications = c.Boolean(nullable: false),
                         Email = c.String(),
                         EmailConfirmed = c.Boolean(nullable: false),
                         PasswordHash = c.String(),
@@ -138,6 +137,7 @@ namespace JCarrollOnlineV2.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Content = c.String(nullable: false),
+                        Title = c.String(),
                         CreatedAt = c.DateTime(nullable: false),
                         UpdatedAt = c.DateTime(nullable: false),
                         Author_Id = c.String(nullable: false, maxLength: 128),
@@ -154,11 +154,11 @@ namespace JCarrollOnlineV2.Migrations
                         Author = c.String(),
                         CreatedAt = c.DateTime(nullable: false),
                         Content = c.String(),
-                        BlogItem_Id = c.Int(),
+                        BlogItemId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.BlogItem", t => t.BlogItem_Id)
-                .Index(t => t.BlogItem_Id);
+                .ForeignKey("dbo.BlogItem", t => t.BlogItemId, cascadeDelete: true)
+                .Index(t => t.BlogItemId);
             
             CreateTable(
                 "dbo.IdentityRole",
@@ -188,7 +188,7 @@ namespace JCarrollOnlineV2.Migrations
                         Https = c.Byte(nullable: false),
                         ServerAddress = c.String(maxLength: 100),
                         RemoteAddress = c.String(maxLength: 100),
-                        Callsite = c.String(maxLength: 300),
+                        CallSite = c.String(maxLength: 300),
                         Exception = c.String(),
                     })
                 .PrimaryKey(t => t.Id);
@@ -210,9 +210,8 @@ namespace JCarrollOnlineV2.Migrations
         
         public override void Down()
         {
-            this.Sql(Properties.Sql.dbo_DropWriteLog);
             DropForeignKey("dbo.IdentityUserRole", "IdentityRole_Id", "dbo.IdentityRole");
-            DropForeignKey("dbo.BlogItemComment", "BlogItem_Id", "dbo.BlogItem");
+            DropForeignKey("dbo.BlogItemComment", "BlogItemId", "dbo.BlogItem");
             DropForeignKey("dbo.BlogItem", "Author_Id", "dbo.ApplicationUser");
             DropForeignKey("dbo.IdentityUserRole", "ApplicationUser_Id", "dbo.ApplicationUser");
             DropForeignKey("dbo.MicroPost", "Author_Id", "dbo.ApplicationUser");
@@ -225,7 +224,7 @@ namespace JCarrollOnlineV2.Migrations
             DropForeignKey("dbo.IdentityUserClaim", "ApplicationUser_Id", "dbo.ApplicationUser");
             DropIndex("dbo.ApplicationUserApplicationUser", new[] { "ApplicationUser_Id1" });
             DropIndex("dbo.ApplicationUserApplicationUser", new[] { "ApplicationUser_Id" });
-            DropIndex("dbo.BlogItemComment", new[] { "BlogItem_Id" });
+            DropIndex("dbo.BlogItemComment", new[] { "BlogItemId" });
             DropIndex("dbo.BlogItem", new[] { "Author_Id" });
             DropIndex("dbo.IdentityUserRole", new[] { "IdentityRole_Id" });
             DropIndex("dbo.IdentityUserRole", new[] { "ApplicationUser_Id" });

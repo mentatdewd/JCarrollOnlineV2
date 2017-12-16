@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.EntityFramework;
 using System.Data.Entity;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,16 +11,16 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles="Administrator")]
     public class ForumModeratorsController : Controller
     {
-        private IJCarrollOnlineV2Context _data { get; set; }
+        private JCarrollOnlineV2DbContext _data { get; set; }
 
         public ForumModeratorsController() : this(null)
         {
 
         }
 
-        public ForumModeratorsController(IJCarrollOnlineV2Context dataContext)
+        public ForumModeratorsController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2Connection();
+            _data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: ForumModerators
