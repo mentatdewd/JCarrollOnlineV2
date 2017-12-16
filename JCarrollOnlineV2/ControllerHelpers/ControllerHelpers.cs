@@ -94,11 +94,15 @@ namespace JCarrollOnlineV2
 
             foreach (var item in rssFeed.Items)
             {
-                RssFeedItemViewModel rss = new RssFeedItemViewModel();
+                if (!string.IsNullOrWhiteSpace(item.Link))
+                {
+                    RssFeedItemViewModel rss = new RssFeedItemViewModel();
 
-                rss.InjectFrom(item);
-                rss.UpdatedAt = DateTime.Now;
-                rssFeedViewModel.RssFeedItems.Add(rss);
+                    rss.InjectFrom(item);
+                    rss.Link = new Uri(item.Link);
+                    rss.UpdatedAt = DateTime.Now;
+                    rssFeedViewModel.RssFeedItems.Add(rss);
+                }
             }
 
             logger.Info(string.Format(CultureInfo.InvariantCulture, "Processed {0} rss records", rssFeedViewModel.RssFeedItems.Count));

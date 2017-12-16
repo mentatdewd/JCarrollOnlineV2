@@ -1,9 +1,10 @@
 ﻿@using JCarrollOnlineV2.ViewModels.ForumThreadEntries
-@model ThreadEntriesCreateViewModel
+@model ThreadEntriesEditViewModel
 
-@Html.HiddenFor(model => model.ForumId, new { @Value = Model.ForumId })
-@Html.HiddenFor(model => model.ParentId, new { @Value = Model.ParentId })
-@Html.HiddenFor(model => model.RootId, new { @Value = Model.RootId })
+@{
+    Model.PageTitle = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
 <script>
     $(function () {
@@ -13,7 +14,8 @@
         })
     });
 </script>
-<h2>Create</h2>
+<h2>Edit</h2>
+
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -22,7 +24,14 @@
         <h4>ForumThread</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.ParentId)
+        @Html.HiddenFor(model => model.RootId)
+        @Html.HiddenFor(model => model.ForumId)
+        @Html.HiddenFor(model => model.AuthorId)
+        @Html.HiddenFor(model => model.CreatedAt)
+        @Html.HiddenFor(model => model.Locked)
+        @Html.HiddenFor(model => model.PostNumber)
 
         <div class="form-group">
             @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -41,16 +50,17 @@
                 <div class="mdd_preview"></div>
             </div>
         </div>
+
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.ParentPostNumber, new { forumId = Model.ForumId, id = Model.RootId }, null)
+    @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.ForumId, id = Model.RootId }, null);
 </div>
 
 @section Scripts {
