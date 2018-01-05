@@ -3,7 +3,20 @@
             xmlns="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0"
             xsi:schemaLocation="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0 MvcSiteMapSchema.xsd">
 
-  <mvcSiteMapNode title="Home" controller="Home" action="Index">
+  <mvcSiteMapNode title="Home" controller="Home" action="Index" key="Home">
+    <mvcSiteMapNode title="Fora" controller="Fora" action="Index" key="Fora" >
+    <!--<mvcSiteMapNode title="Fora" controller="Fora" action="Index" dynamicNodeProvider="JCarrollOnlineV2.SiteMapProviders.ForaIndexDynamicNodeProvider, JCarrollOnlineV2">-->
+    <mvcSiteMapNode title="ForumThread" controller="ForumThreadEntries" action="Index" dynamicNodeProvider="JCarrollOnlineV2.SiteMapProviders.ForumThreadEntriesIndexDynamicNodeProvider, JCarrollOnlineV2" preservedRouteParameters="forumId"/>
+      <mvcSiteMapNode title="ForumThreadDetails" controller="ForumThreadEntries" action="Details" dynamicNodeProvider="JCarrollOnlineV2.SiteMapProviders.ForumThreadEntriesDetailsDynamicNodeProvider, JCarrollOnlineV2"/>
+    </mvcSiteMapNode>
+    <mvcSiteMapNode title="Users" controller="Users" action="Index"/>
+    <mvcSiteMapNode title ="Profile" controller="Users" action="Details"/>
+    <mvcSiteMapNode title="Contact" controller="Home" action="Contact"/>
+    <mvcSiteMapNode title="Sandbox" controller="Sandbox" action="Index"/>
+    <mvcSiteMapNode title="Blog Posts" controller="Blog" action="Index"/>
+    <mvcSiteMapNode title="Manage Profile" controller="Manage" action="Index"/>
+    <mvcSiteMapNode title="Register" controller="Account" action="Register"/>
+    <mvcSiteMapNode title="Log in" controller="Account" action="Login"/>
     <mvcSiteMapNode title="About" controller="Home" action="About"/>
   </mvcSiteMapNode>
 

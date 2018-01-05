@@ -26,10 +26,11 @@
         </aside>
     </div>
     <hr />
-    <div class="blogFeed">
-        <h1>Blog</h1>
-        <hr width="25%" size="6" />
-        @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
+    <div class="col-md-12">
+        <div class="blogFeed">
+            <h1>Blog</h1>
+            @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
+        </div>
     </div>
 </div>
 

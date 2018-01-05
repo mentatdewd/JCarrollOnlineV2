@@ -8,8 +8,8 @@
     <a href='@Url.Action("Details", "Users", new { userId = Model.User.Id })'>
         @Html.Gravatar(Model.User.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" })
     </a>
-    <span class="user_name">
-        @*<h1>@Model.User.UserName</h1>*@
+    <span class="user_name" style="font-size:large">
+        @Model.User.UserName
     </span>
     <span>
         @{Model.Logger.Info(string.Format("Model.UserId is {0}, User.Identity.GetUserId is {1}", Model.UserId, User.Identity.GetUserId()));}
