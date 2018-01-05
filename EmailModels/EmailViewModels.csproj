@@ -48,6 +48,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JCarrollOnlineV2.Entities\JCarrollOnlineV2.Entities.csproj">
+      <Project>{5D0CBBDA-1F49-4C1B-A508-FDAB11B4D72F}</Project>
+      <Name>JCarrollOnlineV2.Entities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JCarrollOnlineV2.ViewModels\JCarrollOnlineV2.ViewModels.csproj">
       <Project>{a4675e34-6310-4fef-9ad8-498cdc8c7757}</Project>
       <Name>JCarrollOnlineV2.ViewModels</Name>

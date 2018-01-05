@@ -5,12 +5,14 @@ using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Omu.ValueInjecter;
 using RazorEngine.Templating;
 using System;
 using System.Data.Entity;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Controllers
@@ -18,6 +20,20 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class MicroPostsController : Controller
     {
+        private ApplicationUserManager _userManager;
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
+
         private JCarrollOnlineV2DbContext _data { get; set; }
 
         public MicroPostsController()
@@ -91,7 +107,7 @@ namespace JCarrollOnlineV2.Controllers
             return View(microPostCreateViewModel);
         }
 
-        private static async Task SendMicroPostNotification(MicroPost micropost, ApplicationUser currentUser)
+        private async Task SendMicroPostNotification(MicroPost micropost, ApplicationUser currentUser)
         {
             foreach (var user in currentUser.Followers)
             {
@@ -111,22 +127,18 @@ namespace JCarrollOnlineV2.Controllers
             }
         }
 
-        private static MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
+        private MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
         {
-            var microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel
-            {
-                TargetUser = new ApplicationUserViewModel()
-            };
+            var microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel();
 
-            microPostNotificationEmailViewModel.TargetUser.InjectFrom(user);
-            microPostNotificationEmailViewModel.MicroPostAuthor = new ApplicationUserViewModel();
-            microPostNotificationEmailViewModel.MicroPostAuthor.InjectFrom(currentUser);
+            microPostNotificationEmailViewModel.TargetUser = user;
+            microPostNotificationEmailViewModel.MicroPostAuthor = currentUser;
             microPostNotificationEmailViewModel.MicroPostContent = micropost.Content;
 
             return microPostNotificationEmailViewModel;
         }
 
-        private static async Task SendEmail(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
+        private async Task SendEmail(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
         {
 
             var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
@@ -138,18 +150,16 @@ namespace JCarrollOnlineV2.Controllers
             await SendEmailAsync(microPostNotificationEmailViewModel);
         }
 
-        public static async Task SendEmailAsync(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
+        public async Task SendEmailAsync(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
         {
             var email = new IdentityMessage()
             {
                 Body = microPostNotificationEmailViewModel.Content,
-                Destination = microPostNotificationEmailViewModel.TargetUser.Email,
+                Destination = microPostNotificationEmailViewModel.TargetUser.UserName + " " + microPostNotificationEmailViewModel.TargetUser.Email,
                 Subject = microPostNotificationEmailViewModel.MicroPostAuthor.UserName + " has added a new micropost"
             };
             
-            var emailService = new EmailService();
-
-            await emailService.SendAsync(email);
+            await  UserManager.EmailService.SendAsync(email);
         }
 
         // GET: MicroPosts/Edit/5

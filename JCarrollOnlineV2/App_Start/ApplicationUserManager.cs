@@ -1,6 +1,7 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
+using Mailgun.AspNet.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -64,7 +65,8 @@ namespace JCarrollOnlineV2
             //    Subject = "Security Code",
             //    BodyFormat = "Your security code is {0}"
             //});
-            manager.EmailService = new EmailService();
+            manager.EmailService = new MailService();
+
             manager.SmsService = new SmsService();
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
