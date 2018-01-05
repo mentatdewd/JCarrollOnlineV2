@@ -50,7 +50,7 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.ParentPostNumber, new { forumId = Model.ForumId, id = Model.RootId }, null)
+    @Html.ActionLink("Back to Threads", "Details", "ForumThreadEntries", null, null, "post" + Model.ParentPostNumber, new { forumId = Model.ForumId, id = Model.RootId }, null)
 </div>
 
 @section Scripts {

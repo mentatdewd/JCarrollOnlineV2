@@ -18,6 +18,8 @@
 }
 @Html.Raw(Html.TreeView("forumThreads", "forumThreadEntry", Model.ForumThreadEntryDetailItems.ForumThreadEntries.First().ChildNodes, l => l.ChildNodes, l => Html.Raw(Html.Partial("_ForumThreadPartial", l)).ToString()))
 
+@Html.ActionLink("Back to threads", "Index", "ForumThreadEntries", null, null, null, new { forumId = Model.Forum.Id }, null)
+
 <script type="text/javascript">
     // Find all YouTube videos
     var $allVideos = $("iframe[src^='https://www.youtube.com']"),
