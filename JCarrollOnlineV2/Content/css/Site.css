@@ -150,11 +150,11 @@ table#fora_index th {
   margin-left: 50px;
 }
 .blogSeparator {
-    display: block;
-    margin: auto;
+  display: block;
+  margin: auto;
 }
 .blogTitle {
-    text-align:center;
+  text-align: center;
 }
 .showCommentsButton {
   background: none;
