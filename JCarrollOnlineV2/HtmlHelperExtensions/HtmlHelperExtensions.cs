@@ -211,15 +211,15 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
             sb.AppendLine("</ul>");
 
-            if (includeJavaScript)
-            {
-                sb.AppendFormat(CultureInfo.InvariantCulture,
-                    @"<script type='text/javascript'>
-                    $(document).ready(function() {{
-                        $('#{0}').treeview({{ animated: 'fast' }});
-                    }});
-                </script>", treeId);
-            }
+            //if (includeJavaScript)
+            //{
+            //    sb.AppendFormat(CultureInfo.InvariantCulture,
+            //        @"<script type='text/javascript'>
+            //        $(document).ready(function() {{
+            //            $('#{0}').treeview({{ animated: 'fast' }});
+            //        }});
+            //    </script>", treeId);
+            //}
 
             return sb.ToString();
         }
@@ -307,15 +307,15 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
             sb.AppendLine("</tr>");
 
-            if (includeJavaScript)
-            {
-                sb.AppendFormat(CultureInfo.InvariantCulture,
-                    @"<script type='text/javascript'>
-                    $(document).ready(function() {{
-                        $('#{0}').treeview({{ animated: 'fast' }});
-                    }});
-                </script>", treeId);
-            }
+            //if (includeJavaScript)
+            //{
+            //    sb.AppendFormat(CultureInfo.InvariantCulture,
+            //        @"<script type='text/javascript'>
+            //        $(document).ready(function() {{
+            //            $('#{0}').treeview({{ animated: 'fast' }});
+            //        }});
+            //    </script>", treeId);
+            //}
 
             return sb.ToString();
         }
