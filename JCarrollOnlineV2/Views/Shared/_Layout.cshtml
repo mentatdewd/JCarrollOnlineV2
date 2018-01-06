@@ -11,11 +11,6 @@
 
     @Styles.Render("~/bundles/css")
     @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/jquery-ui")
-    @Scripts.Render("~/bundles/myjsbundle")
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -57,7 +52,14 @@
         @RenderSection("scripts", required: false)
     </div>
 
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jquery-ui")
+    @Scripts.Render("~/bundles/myjsbundle")
+    <script src="~/Content/lib/angular.js"></script>
     <script type="text/javascript">
+
     InitializeBlogComments();
     </script>
 </body>

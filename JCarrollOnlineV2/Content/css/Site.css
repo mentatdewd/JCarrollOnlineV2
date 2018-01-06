@@ -148,6 +148,8 @@ table#fora_index th {
 }
 .blogComments {
   margin-left: 50px;
+  margin-right: auto;
+  margin-top: auto;
 }
 .blogSeparator {
   display: block;

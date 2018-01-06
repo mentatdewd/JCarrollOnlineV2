@@ -2,17 +2,6 @@
 @using JCarrollOnlineV2.HtmlHelpers
 @model ThreadEntryDetailItemsViewModel
 
-<script>
-    $(document).ready(function () {
-        $('#postDownArrow').click(function () {
-            $(this)
-               .closest('tbody')
-               .next('.section')
-            $(".section").toggle(400);
-            return false;
-        });
-    });
-</script>
 <table id="TOCTable">
     <tr id="TOCTableRow">
         <th id="TOCTableHeader">

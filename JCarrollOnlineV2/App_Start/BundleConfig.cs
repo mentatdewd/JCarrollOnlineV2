@@ -97,7 +97,8 @@ namespace JCarrollOnlineV2
             //blogjsbundle.Include("~/Scripts/blogscripts.js");
             bundles.Add(blogjsbundle);
 
-
+            var angularBundle = new ScriptBundle("~/bundles/angularbundle");
+            angularBundle.Include("~/Content/lib/angular.js");
 
             
             // Use the development version of Modernizr to develop with and learn from. Then, when you're

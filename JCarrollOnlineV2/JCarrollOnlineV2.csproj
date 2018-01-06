@@ -328,6 +328,8 @@
     <Compile Include="SiteMapProviders\ForumThreadEntriesDetailsDynamicNodeProvider.cs" />
     <Compile Include="SiteMapProviders\ForumThreadEntriesIndexDynamicNodeProvider.cs" />
     <Compile Include="Startup.cs" />
+    <Content Include="Content\lib\angular.js" />
+    <Content Include="Content\lib\angular.min.js" />
     <Content Include="Views\ForumThreadEntries\AdminEdit.cshtml" />
   </ItemGroup>
   <ItemGroup>
