@@ -10,38 +10,32 @@
     <meta name="description" content="JCarrollOnlineV2 Website" />
 
     @Styles.Render("~/bundles/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top navbar-expand-sm">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("JCarrollOnline", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Users", "Index", "Users")</li>
-                    <li>@Html.ActionLink("Fora", "Index", "Fora")</li>
-                    <li>@Html.ActionLink("Profile", "Details", "Users", new { userId = User.Identity.GetUserId() }, null)</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("Sandbox", "Index", "Sandbox")</li>
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <li>@Html.ActionLink("Blog", "Index", "Blog")</li>
-                    }
-
-                </ul>
-                @Html.Partial("_LoginPartial")
-            </div>
+    <nav class="navbar fixed top navbar-toggleable-md navbar-inverse bg-inverse">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            @Html.ActionLink("JCarrollOnline", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Users", "Index", "Users", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Fora", "Index", "Fora", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Profile", "Details", "Users", new { userId = User.Identity.GetUserId() }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Sandbox", "Index", "Sandbox", new { area = "" }, new { @class = "nav-link" })</li>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <li>@Html.ActionLink("Blog", "Index", "Blog", new { area = "" }, new { @class = "nav-link" })</li>
+                }
+            </ul>
+            @Html.Partial("_LoginPartial")
         </div>
-    </div>
+    </nav>
     <div class="@Model.PageContainer">
         <div class="container body-content">
             @Html.MvcSiteMap().SiteMapPath()
@@ -51,16 +45,14 @@
 
         @RenderSection("scripts", required: false)
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/jquery-ui")
-    @Scripts.Render("~/bundles/myjsbundle")
     <script src="~/Content/lib/angular.js"></script>
     <script type="text/javascript">
 
-    InitializeBlogComments();
+        InitializeBlogComments();
     </script>
 </body>
 </html>
