@@ -8,6 +8,13 @@
 
 <h1 class="text-center">Fora</h1>
 
+@if (User.IsInRole("Administrator"))
+{
+    <p class="float-right">
+        @Html.ActionLink("Create New Forum", "Create", "Fora", new { @class = "btn btn-large btn-primary" })
+    </p>
+}
+
 <div class="center-block">
     <table class="table-striped table-bordered" cellpadding="10" id="fora_index">
         <tr>
@@ -41,23 +48,17 @@
                 </td>
                 <td>
                     @{
-            if (item.LastThread != null)
-            {
-                @Html.Partial("_LastThreadPartial", item.LastThread);
-            }
-            else
-            {
-                @Html.Raw("None");
-            }
+                        if (item.LastThread != null)
+                        {
+                            @Html.Partial("_LastThreadPartial", item.LastThread);
+                        }
+                        else
+                        {
+                            @Html.Raw("None");
+                        }
                     }
                 </td>
             </tr>
         }
     </table>
-    @if (User.IsInRole("Administrator"))
-    {
-        <p class="text-center">
-            @Html.ActionLink("Create New", "Create", "Fora", new { @class = "btn btn-large btn-primary" })
-        </p>
-    }
 </div>
