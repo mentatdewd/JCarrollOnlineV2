@@ -94,7 +94,7 @@ function textCounter(field, field2, maxlimit) {
     } else {
         countfield.value = maxlimit - field.value.length;
     }
-    if (countfield.value == 140) {
+    if (countfield.value === 140) {
         document.getElementById("submitbutton").disabled = true;
     }
     else {

@@ -1,4 +1,8 @@
 /* Set padding to keep content from hitting the edges */
+html,
+body {
+    height: 100%;
+}
 .body-content {
   padding-left: 15px;
   padding-right: 15px;
@@ -340,4 +344,14 @@ h1 {
 }
 .ui-dialog > .ui-widget-header {
   background: orange;
+}
+.item img {
+    width: 100%;
+    min-height: 100%;
+}
+
+.carousel-inner img {
+    width: 100%;
+    margin: auto;
+    min-height: 100vh;
 }

@@ -15,8 +15,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
             // "prettyprint" which is what Google Code Prettify uses to identify code blocks.
             // http://google-code-prettify.googlecode.com/svn/trunk/README.html
             var sb = new StringBuilder();
-            var fixedString = String.Format(CultureInfo.InvariantCulture, "<pre><code class=\"language-{0}\">", Language);
-            sb.Append(fixedString);
+            sb.Append("<pre class=\"prettyprint\"><code>");
             sb.Append(code);
             sb.Append("</code></pre>\n\n");
             return sb.ToString();

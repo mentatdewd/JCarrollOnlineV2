@@ -3,7 +3,7 @@
 
 <li class="micropost">
     <span class="gravatar">
-        <a href='@Url.Action("Details", "Users", new { userId =  Model.Author.Id })' />
+        <a href='@Url.Action("Details", "Users", new { userId =  Model.Author.Id })'></a>
         @{
             @Html.Gravatar(Model.Author.Email, 52, new { @class = "gravatar", Title = "My Gravatar", Alt = "Gravatar" })
         }

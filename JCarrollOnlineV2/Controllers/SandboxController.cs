@@ -19,6 +19,17 @@ namespace JCarrollOnlineV2.Controllers
             });
         }
 
+        public async Task<ActionResult> YellowStoneSlideShow()
+        {
+            SandboxViewModel sandboxViewModel = new SandboxViewModel();
+
+            sandboxViewModel.PageTitle = "Yellowstone Slideshow";
+            return await Task.Run<ActionResult>(() =>
+            {
+                return View(sandboxViewModel);
+            });
+        }
+
         // GET: Sandbox/Details/5
         public async Task<ActionResult> Details(int id)
         {
