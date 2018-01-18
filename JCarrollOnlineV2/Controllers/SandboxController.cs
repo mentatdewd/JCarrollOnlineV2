@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web.Hosting;
 using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Controllers
@@ -27,12 +28,15 @@ namespace JCarrollOnlineV2.Controllers
 
             string relativeImagePath = ControllerContext.HttpContext.Server.MapPath("~/Content/images/yellowstone");
             IEnumerable<string> imageFiles = Directory.EnumerateFiles(relativeImagePath, "*.jpg");
+            string uri = Request.Url.AbsoluteUri;
+            string[] uriParts = uri.Split('/');
+            string baseUri = uriParts[0] + "//" + uriParts[2] + "/content/images/yellowstone/";
 
             foreach(string imageFile in imageFiles)
             {
                 yellowstoneViewModel.AddImageFile(new ImageFileMetaData()
                 {
-                    Path = imageFile,
+                    Path = baseUri + Path.GetFileName(imageFile),
                     Caption = "",
                     AltString = Path.GetFileNameWithoutExtension(imageFile)
                 });

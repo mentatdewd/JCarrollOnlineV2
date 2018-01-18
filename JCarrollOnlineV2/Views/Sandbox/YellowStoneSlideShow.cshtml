@@ -9,7 +9,7 @@
 <h2>YellowStoneSlideShow</h2>
 
 
-<div id="carousel-example-generic" class="carousel carousel-fade" data-ride="carousel"  data-interval="10000">
+<div id="carousel-example-generic" class="carousel carousel-fade lazy" data-ride="carousel"  data-interval="10000">
     <div class="carousel-inner" role="listbox">
         <div class="carousel-item active">
             <img class="d-block img-fluid" src=@Model.ImageFiles.FirstOrDefault().Path alt=@Model.ImageFiles.FirstOrDefault().AltString />
@@ -21,7 +21,7 @@
         @foreach (var image in Model.ImageFiles.Skip(1))
         {
             @Html.Raw("<div class='carousel-item'>")
-                @Html.Raw("<img class='d-block img-fluid' src='")
+                @Html.Raw("<img class='d-block img-fluid' data-src='")
                 @image.Path
                 @Html.Raw("' alt='")
                 @image.AltString
