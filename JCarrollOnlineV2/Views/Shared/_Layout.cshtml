@@ -73,6 +73,21 @@
     @RenderSection("scripts", required: false)
 
     <script type="text/javascript">
+        // Set min-height property based on the tallest carousel item.
+        (function () {
+            var $inner = $('.carousel-inner'),
+                $items = $('.carousel-item');
+
+            var maxHeight = Math.max.apply(null,
+                $items.map(function () {
+                    return $(this).outerHeight();
+                })
+            );
+
+            $inner
+                .add($items)
+                .css('min-height', maxHeight);
+        })();
         InitializeBlogComments();
     </script>
 </body>
