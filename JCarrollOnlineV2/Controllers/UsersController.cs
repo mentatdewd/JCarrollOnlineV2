@@ -58,42 +58,52 @@ namespace JCarrollOnlineV2.Controllers
             UserDetailViewModel userDetailViewModel = new UserDetailViewModel();
 
             string currentUserId = User.Identity.GetUserId();
+            
+            if(userId == null)
+            {
+                userId = currentUserId;
+            }
+
             ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
-            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
+            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").FirstOrDefaultAsync(m => m.Id == userId);
 
-            userDetailViewModel.UserInfoViewModel.User.InjectFrom(user);
-
-            //udVM.UserInfoVM.MicroPostEmailNotifications = user.MicroPostEmailNotifications;
-            //udVM.UserInfoVM.MicroPostSMSNotifications = user.MicroPostSMSNotifications;
-            userDetailViewModel.UserInfoViewModel.UserId = currentUserId;
-
-            userDetailViewModel.UserStatsViewModel = new UserStatsViewModel
+            if (user != null)
             {
-                UsersFollowing = new UserFollowingViewModel()
-            };
+                userDetailViewModel.UserInfoViewModel.User.InjectFrom(user);
 
-            userDetailViewModel.UserStatsViewModel.User.InjectFrom(user);
+                userDetailViewModel.UserInfoViewModel.MicroPostEmailNotifications = user.MicroPostEmailNotifications;
+                //udVM.UserInfoVM.MicroPostSMSNotifications = user.MicroPostSMSNotifications;
+                userDetailViewModel.UserInfoViewModel.UserId = currentUserId;
 
-            foreach (var following in user.Following)
-            {
-                UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                userDetailViewModel.UserStatsViewModel = new UserStatsViewModel
+                {
+                    UsersFollowing = new UserFollowingViewModel()
+                };
 
-                userItemViewModel.User.InjectFrom(following);
-                userItemViewModel.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == following.Id).CountAsync();
-                userDetailViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
+                userDetailViewModel.UserStatsViewModel.User.InjectFrom(user);
+
+                foreach (var following in user.Following)
+                {
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+
+                    userItemViewModel.User.InjectFrom(following);
+                    userItemViewModel.UserId = following.Id;
+                    userItemViewModel.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == following.Id).CountAsync();
+                    userDetailViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
+                }
+
+                userDetailViewModel.UserStatsViewModel.UserFollowers = new UserFollowersViewModel();
+
+                foreach (var follower in user.Followers)
+                {
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+
+                    userItemViewModel.User.InjectFrom(follower);
+                    userItemViewModel.UserId = follower.Id;
+                    userItemViewModel.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == follower.Id).CountAsync();
+                    userDetailViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
+                }
             }
-
-            userDetailViewModel.UserStatsViewModel.UserFollowers = new UserFollowersViewModel();
-
-            foreach (var follower in user.Followers)
-            {
-                UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
-
-                userItemViewModel.User.InjectFrom(follower);
-                userItemViewModel.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == follower.Id).CountAsync();
-                userDetailViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
-            }
-
             return View(userDetailViewModel);
         }
 
@@ -212,7 +222,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 ApplicationUser user = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == userItemViewModel.UserId);
 
-                //user.MicroPostEmailNotifications = auVM.MicroPostEmailNotifications;
+                user.MicroPostEmailNotifications = userItemViewModel.MicroPostEmailNotifications;
                 //user.MicroPostSMSNotifications = auVM.MicroPostSMSNotifications;
                 await _data.SaveChangesAsync();
             }

@@ -1,4 +1,6 @@
 ﻿using JCarrollOnlineV2.ViewModels.Sandbox;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -16,6 +18,30 @@ namespace JCarrollOnlineV2.Controllers
             return await Task.Run<ActionResult>(() =>
             {
                 return View(sandboxViewModel);
+            });
+        }
+
+        public async Task<ActionResult> YellowStoneSlideShow()
+        {
+            YellowstoneViewModel yellowstoneViewModel = new YellowstoneViewModel();
+
+            string relativeImagePath = ControllerContext.HttpContext.Server.MapPath("~/Content/images/yellowstone");
+            IEnumerable<string> imageFiles = Directory.EnumerateFiles(relativeImagePath, "*.jpg");
+
+            foreach(string imageFile in imageFiles)
+            {
+                yellowstoneViewModel.AddImageFile(new ImageFileMetaData()
+                {
+                    Path = imageFile,
+                    Caption = "",
+                    AltString = Path.GetFileNameWithoutExtension(imageFile)
+                });
+            }
+
+            yellowstoneViewModel.PageTitle = "Yellowstone Slideshow";
+            return await Task.Run<ActionResult>(() =>
+            {
+                return View(yellowstoneViewModel);
             });
         }
 

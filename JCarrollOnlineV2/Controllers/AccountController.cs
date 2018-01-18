@@ -233,11 +233,11 @@ namespace JCarrollOnlineV2.Controllers
 //#if DEBUG
 //                    var cleanUrl = callbackUri;
 //#else
-                    var cleanUrl = new Uri(callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
+                    //var cleanUrl = new Uri(callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
                     //#endif
 
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
+                    await SendWelcomeEmail(user, callbackUri);
                     ApplicationUserViewModel appplicationUserViewModel = new ApplicationUserViewModel();
 
                     appplicationUserViewModel.InjectFrom(user);
@@ -246,7 +246,8 @@ namespace JCarrollOnlineV2.Controllers
 
                     return RedirectToAction("RegistrationNotification", "Account");
                 }
-                AddErrors(result);
+
+                //AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
@@ -262,46 +263,44 @@ namespace JCarrollOnlineV2.Controllers
             return View(registrationNotificationViewModel);
         }
 
-        //private static async Task SendWelcomeEmail(ApplicationUserViewModel user, Uri callbackUrl)
-        //{
-        //    var userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
+        private async Task SendWelcomeEmail(ApplicationUser user, Uri callbackUrl)
+        {
+            var userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
 
-        //    await SendEmail(userWelcomeViewModel);
-        //}
+            await SendEmail(user, userWelcomeViewModel);
+        }
 
-        //private static UserWelcomeViewModel GenerateViewModel(ApplicationUserViewModel user, Uri callbackUrl)
-        //{
-        //    var userWelcomeViewModel = new UserWelcomeViewModel();
+        private UserWelcomeViewModel GenerateViewModel(ApplicationUser user, Uri callbackUrl)
+        {
+            var userWelcomeViewModel = new UserWelcomeViewModel();
 
-        //    userWelcomeViewModel.TargetUser = user;
-        //    userWelcomeViewModel.CallbackUrl = callbackUrl;
-        //    return userWelcomeViewModel;
-        //}
+            userWelcomeViewModel.TargetUser = user;
+            userWelcomeViewModel.CallbackUrl = callbackUrl;
+            return userWelcomeViewModel;
+        }
 
-        //private static async Task SendEmail(UserWelcomeViewModel userWelcomeViewModel)
-        //{
+        private async Task SendEmail(ApplicationUser user, UserWelcomeViewModel userWelcomeViewModel)
+        {
 
-        //    var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-        //    var templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
-        //    var templateService = RazorEngineService.Create();
+            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
+            var templateService = RazorEngineService.Create();
 
-        //    userWelcomeViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, userWelcomeViewModel);
+            userWelcomeViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, userWelcomeViewModel);
 
-        //    await SendEmailAsync(userWelcomeViewModel);
-        //}
+            await SendEmailAsync(user.Id, userWelcomeViewModel);
+        }
 
-        public static async Task SendEmailAsync(UserWelcomeViewModel userWelcomeViewModel)
+        public async Task SendEmailAsync(string userid, UserWelcomeViewModel userWelcomeViewModel)
         {
             var email = new IdentityMessage()
             {
                 Body = userWelcomeViewModel.Content,
-                Destination = userWelcomeViewModel.TargetUser.Email,
+                Destination = userWelcomeViewModel.TargetUser.UserName + " " + userWelcomeViewModel.TargetUser.Email,
                 Subject = "Welcome to JCarrollOnline"
             };
 
-            var emailService = new EmailService();
-
-            await emailService.SendAsync(email);
+            await UserManager.EmailService.SendAsync(email);
         }
 
         //

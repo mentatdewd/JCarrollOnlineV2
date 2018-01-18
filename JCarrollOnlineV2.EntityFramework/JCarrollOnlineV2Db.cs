@@ -33,7 +33,7 @@ namespace JCarrollOnlineV2.EntityFramework
                 throw new ArgumentNullException(nameof(modelBuilder));
             }
 
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2DbContext, Configuration>());
+            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2DbContext, Configuration>());
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();

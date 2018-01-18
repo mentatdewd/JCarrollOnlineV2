@@ -16,6 +16,10 @@ var paths = {
   webroot: "./Content/"
 };
 
+var itemsToCopy = {
+    './node_modules/angular/angular*.js': paths.webroot + "./Scripts/Angular"
+}
+
 paths.js = "./Scripts/**/*.js";
 paths.minJs = "./Scripts/**/*.min.js";
 paths.css = paths.webroot + "css/**/*.css";
@@ -50,11 +54,26 @@ gulp.task("min:css", function () {
 
 gulp.task("min", ["min:js", "min:css"]);
 
-gulp.task('less', function () {
-    return gulp.src('./Content/less/**/*.less')
-        .pipe(plumber())
-        .pipe(less({
-            paths: [path.join(__dirname, 'less', 'includes')]
-        }))
+//gulp.task('less', function () {
+//    return gulp.src('./Content/less/**/*.less')
+//        .pipe(plumber())
+//        .pipe(less({
+//            paths: [path.join(__dirname, 'less', 'includes')]
+//        }))
+//        .pipe(gulp.dest('./content/css'));
+//});
+
+// Compiles LESS > CSS 
+gulp.task('build-less', function () {
+    return gulp.src('./Content/less/*.less')
+        .pipe(less())
         .pipe(gulp.dest('./content/css'));
+});
+
+gulp.task('copy', function () {
+    for (var src in itemsToCopy) {
+        if (!itemsToCopy.hasOwnProperty(src)) continue;
+        gulp.src(src)
+            .pipe(gulp.dest(itemsToCopy[src]));
+    }
 });

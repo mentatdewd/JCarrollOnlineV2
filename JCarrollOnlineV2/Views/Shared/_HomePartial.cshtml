@@ -18,7 +18,7 @@
             </section>
         </aside>
         <div class="col-md-5">
-            <h2>Posts</h2>
+            <h2>Micro-Posts</h2>
             @Html.Partial("_MicroPostFeedPartial", Model.MicroPostFeedViewModel)
         </div>
         <aside class="col-md-3">
@@ -26,10 +26,11 @@
         </aside>
     </div>
     <hr />
-    <div class="blogFeed">
-        <h1>Blog</h1>
-        <hr width="25%" size="6" />
-        @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
+    <div class="col-md-12">
+        <div class="blogFeed">
+            <h1>Blog</h1>
+            @Html.Partial("_BlogFeedPartial", Model.BlogFeed)
+        </div>
     </div>
 </div>
 

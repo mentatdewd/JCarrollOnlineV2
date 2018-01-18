@@ -5,60 +5,90 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>@Model.PageTitle - JCarrollOnline</title>
     <meta name="description" content="JCarrollOnlineV2 Website" />
 
     @Styles.Render("~/bundles/css")
-    @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/jquery-ui")
-    @Scripts.Render("~/bundles/myjsbundle")
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .red {
+            color: white;
+            background-color: red;
+        }
+
+        .green {
+            color: white;
+            background-color: green;
+        }
+
+        .blue {
+            color: white;
+            background-color: blue;
+        }
+    </style>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("JCarrollOnline", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Users", "Index", "Users")</li>
-                    <li>@Html.ActionLink("Fora", "Index", "Fora")</li>
-                    <li>@Html.ActionLink("Profile", "Details", "Users", new { userId = User.Identity.GetUserId() }, null)</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("Sandbox", "Index", "Sandbox")</li>
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <li>@Html.ActionLink("Blog", "Index", "Blog")</li>
-                    }
-
-                </ul>
-                @Html.Partial("_LoginPartial")
-            </div>
+    <nav class="navbar fixed top navbar-toggleable-md navbar-inverse bg-inverse">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            @Html.ActionLink("JCarrollOnline", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Users", "Index", "Users", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Fora", "Index", "Fora", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Profile", "Details", "Users", new { userId = User.Identity.GetUserId() }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Sandbox", "Index", "Sandbox", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Yellowstone Slideshow", "YellowStoneSlideShow", "Sandbox", new { area = "" }, new { @class = "nav-link" })</li>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <li>@Html.ActionLink("Blog", "Index", "Blog", new { area = "" }, new { @class = "nav-link" })</li>
+                }
+            </ul>
+            @Html.Partial("_LoginPartial")
         </div>
-    </div>
+    </nav>
     <div class="@Model.PageContainer">
         <div class="container body-content">
             @Html.MvcSiteMap().SiteMapPath()
             @RenderBody()
             @Html.Partial("_FooterPartial")
         </div>
-
-        @RenderSection("scripts", required: false)
     </div>
 
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/markdownDeep")
+    @Scripts.Render("~/bundles/livestamp")
+    @Scripts.Render("~/bundles/jcarrollonlinev2")
+
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    
+    @RenderSection("scripts", required: false)
+
     <script type="text/javascript">
-    InitializeBlogComments();
+        // Set min-height property based on the tallest carousel item.
+        (function () {
+            var $inner = $('.carousel-inner'),
+                $items = $('.carousel-item');
+
+            var maxHeight = Math.max.apply(null,
+                $items.map(function () {
+                    return $(this).outerHeight();
+                })
+            );
+
+            $inner
+                .add($items)
+                .css('min-height', maxHeight);
+        })();
+        InitializeBlogComments();
     </script>
 </body>
 </html>

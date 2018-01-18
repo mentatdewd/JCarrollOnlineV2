@@ -1,8 +1,8 @@
-body {
-  padding-top: 50px;
-  padding-bottom: 20px;
-}
 /* Set padding to keep content from hitting the edges */
+html,
+body {
+    height: 100%;
+}
 .body-content {
   padding-left: 15px;
   padding-right: 15px;
@@ -23,7 +23,7 @@ table {
 }
 .videoWrapper {
   position: relative;
-  padding-bottom: 56.25%;
+  /*padding-bottom: 56.25%;*/
   /* 16:9 */
   padding-top: 25px;
   height: 0;
@@ -148,6 +148,15 @@ table#fora_index th {
 }
 .blogComments {
   margin-left: 50px;
+  margin-right: auto;
+  margin-top: auto;
+}
+.blogSeparator {
+  display: block;
+  margin: auto;
+}
+.blogTitle {
+  text-align: center;
 }
 .showCommentsButton {
   background: none;
@@ -336,3 +345,27 @@ h1 {
 .ui-dialog > .ui-widget-header {
   background: orange;
 }
+.item img {
+    width: 100%;
+    min-height: 100%;
+}
+
+.carousel-inner img {
+    width: 100%;
+    margin: auto;
+    min-height: 100vh;
+}
+
+.carousel-fade .carousel-item {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transition: opacity 500ms ease;
+}
+
+    .carousel-fade .carousel-item.active {
+        opacity: 1;
+    }

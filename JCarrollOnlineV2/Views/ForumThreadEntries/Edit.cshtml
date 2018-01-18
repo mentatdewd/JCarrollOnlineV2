@@ -6,14 +6,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<script>
-    $(function () {
-        $("textarea.mdd_editor").MarkdownDeep({
-            help_location: "/Scripts/mdd_help.htm",
-            HtmlClassTitledImages: "markdown_image"
-        })
-    });
-</script>
 <h2>Edit</h2>
 
 @using (Html.BeginForm())
@@ -60,9 +52,6 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.ForumId, id = Model.RootId }, null);
+    @Html.ActionLink("Back to List", "Details", "ForumThreadEntries", null, null, "post" + Model.PostNumber, new { forumId = Model.ForumId, id = Model.RootId }, null)
 </div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}

@@ -3,7 +3,7 @@
 
 <div class="blogEntryContainer" style="position: relative">
     <div class="blogTitle"><h2>@Model.Title</h2></div>
-    <img src="~/Content/images/graybar.gif" />
+    <img src="~/Content/images/graybar.gif" class="blogSeparator"/>
     @Html.Partial("_BlogFeedItemContentPartial")
     @Html.Partial("_BlogFeedItemFooterPartial")
     @Html.Partial("_BlogCommentsPartial", Model.Comments)

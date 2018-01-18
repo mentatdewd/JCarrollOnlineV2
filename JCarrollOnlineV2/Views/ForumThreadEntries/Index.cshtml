@@ -7,6 +7,16 @@
 }
 
 <h1 class="text-center">@Model.Forum.Title</h1>
+<p class="float-right">
+    @if (User.IsInRole("Administrator"))
+    {
+        @Html.ActionLink("Create New Thread", "AdminCreate", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
+    }
+    else
+    {
+        @Html.ActionLink("Create New Thread", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
+    }
+</p>
 
 <table class="table">
     <tr>
@@ -61,13 +71,4 @@
         </tr>
     }
 </table>
-<p class="text-center">
-    @if (User.IsInRole("Administrator"))
-    {
-        @Html.ActionLink("Create New", "AdminCreate", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
-    }
-    else
-    {
-        @Html.ActionLink("Create New", "Create", "ForumThreadEntries", new { forumId = Model.Forum.Id }, new { @class = "btn btn-large btn-primary" })
-    }
-</p>
+@Html.ActionLink("Back to the Fora", "Index", "Fora")
