@@ -160,6 +160,8 @@
     <Compile Include="MicroPosts\MicroPostViewModelBase.cs" />
     <Compile Include="Rss\RssFeedItemViewModel.cs" />
     <Compile Include="Rss\RssFeedViewModelBase.cs" />
+    <Compile Include="Sandbox\ImageFileMetaData.cs" />
+    <Compile Include="Sandbox\YellowstoneViewModel.cs" />
     <Compile Include="Users\ApplicationUserViewModel.cs" />
     <Compile Include="Blog\BlogCommentItemViewModel.cs" />
     <Compile Include="Home\ContactViewModel.cs" />

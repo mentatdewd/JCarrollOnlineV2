@@ -43,6 +43,7 @@
                 <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                 <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                 <li>@Html.ActionLink("Sandbox", "Index", "Sandbox", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Yellowstone Slideshow", "YellowStoneSlideShow", "Sandbox", new { area = "" }, new { @class = "nav-link" })</li>
                 @if (User.IsInRole("Administrator"))
                 {
                     <li>@Html.ActionLink("Blog", "Index", "Blog", new { area = "" }, new { @class = "nav-link" })</li>

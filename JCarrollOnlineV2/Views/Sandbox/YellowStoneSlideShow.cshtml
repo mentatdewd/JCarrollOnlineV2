@@ -1,6 +1,8 @@
-﻿
+﻿@using JCarrollOnlineV2.ViewModels.Sandbox
+@model YellowstoneViewModel
+
 @{
-    ViewBag.Title = "YellowStoneSlideShow";
+    Model.PageTitle = "Yellowstone Slide Show";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -10,83 +12,22 @@
 <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
     <div class="carousel-inner" role="listbox">
         <div class="carousel-item active">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0001.jpg" alt="First Slide" />
+            <img class="d-block img-fluid" src=@Model.ImageFiles.FirstOrDefault().Path alt=@Model.ImageFiles.FirstOrDefault().AltString />
+            <div class="carousel-caption d-none d-md-block">
+                <h3>Arrival in Yellowstone City</h3>
+                <p>The day of our arrival Ally went shopping</p>
+            </div>       
         </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0002.jpg" alt="Second Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0003.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0004.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0005.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0006.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0007.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0008.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0009.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0010.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0011.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0012.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img src="~/Content/images/yellowstone/DSCF0013.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0014.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0015.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0016.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0017.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0018.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0019.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0020.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0021.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0022.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0023.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0024.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0025.jpg" alt="Third Slide" />
-        </div>
-        <div class="carousel-item">
-            <img class="d-block img-fluid" src="~/Content/images/yellowstone/DSCF0026.jpg" alt="Third Slide" />
-        </div>
+        @foreach (var image in Model.ImageFiles.Skip(1))
+        {
+            @Html.Raw("<div class='carousel-item'>")
+                @Html.Raw("<img class='d-block img-fluid' src='")
+                @image.Path
+                @Html.Raw("' alt='")
+                @image.AltString
+                @Html.Raw("' />");
+            @Html.Raw("</div>")
+        }
     </div>
 
     <a class="carousel-control-prev" href="#carousel-example-generic" role="button" data-slide="prev">
