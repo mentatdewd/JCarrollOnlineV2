@@ -29,7 +29,7 @@ namespace JCarrollOnlineV2
 
         public async Task<bool> SendAsync(string fromString, string toString, string subjectString, string message)
         {
-            var apiKey = "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";//Environment.GetEnvironmentVariable("NAME_OF_THE_ENVIRONMENT_VARIABLE_FOR_YOUR_SENDGRID_KEY");
+            var apiKey = string.Empty;//Environment.GetEnvironmentVariable("NAME_OF_THE_ENVIRONMENT_VARIABLE_FOR_YOUR_SENDGRID_KEY");
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("administrator@mail.JCarrollOnline.com", "John");
             var subject = subjectString;
