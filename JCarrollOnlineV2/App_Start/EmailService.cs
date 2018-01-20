@@ -20,7 +20,7 @@ namespace JCarrollOnlineV2
         const string DOMAIN = "mail.JCarrollOnline.com";
 
         // your API Key used to send mail through the Mailgun API
-        const string API_KEY = "key-c4bc39d9819a0b89e2c1e8f77b4ddd1c";
+        const string API_KEY = string.Empty;
 
         Task IIdentityMessageService.SendAsync(IdentityMessage message)
         {
