@@ -247,7 +247,7 @@ namespace JCarrollOnlineV2.Controllers
                     return RedirectToAction("RegistrationNotification", "Account");
                 }
 
-                //AddErrors(result);
+                AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form

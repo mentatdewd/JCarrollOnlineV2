@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,34 +21,36 @@ namespace JCarrollOnlineV2
         const string DOMAIN = "mail.JCarrollOnline.com";
 
         // your API Key used to send mail through the Mailgun API
-        string API_KEY = string.Empty;
+        const string API_KEY = "key-c4bc39d9819a0b89e2c1e8f77b4ddd1c";
 
         Task IIdentityMessageService.SendAsync(IdentityMessage message)
         {
             return SendAsync("Excited User <mailgun@mail.JCarrollOnline.com>", message.Destination, message.Subject, message.Body);
         }
 
-        public async Task<bool> SendAsync(string fromString, string toString, string subjectString, string message)
+        public async Task SendAsync(string fromString, string toString, string subjectString, string message)
         {
-            var apiKey = string.Empty;//Environment.GetEnvironmentVariable("NAME_OF_THE_ENVIRONMENT_VARIABLE_FOR_YOUR_SENDGRID_KEY");
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("administrator@mail.JCarrollOnline.com", "John");
-            var subject = subjectString;
-            var to = new EmailAddress(toString.Split(' ')[1], toString.Split(' ')[0]);
-            //var plainTextContent = "and easy to do anywhere, even with C#";
-            var htmlContent = message;
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
-            var response = await client.SendEmailAsync(msg);
+            MailMessage msg = new MailMessage();
+            msg.Subject = subjectString;
+            msg.From = new MailAddress(fromString);
+            msg.Body = message;
+            msg.To.Add(new MailAddress(toString));
 
-            if (response.StatusCode == HttpStatusCode.OK)
+            //var plainTextContent = "and easy to do anywhere, even with C#";
+            using (var smtp = new SmtpClient())
             {
-                Debug.WriteLine("Success");
-                return true;
-            }
-            else
-            {
-                Debug.WriteLine("StatusCode: " + response.StatusCode);
-                return false;
+                smtp.Host = "smtp.gmail.com";
+                smtp.Port = 587;
+                smtp.EnableSsl = true;
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.UseDefaultCredentials = false;
+                var credential = new NetworkCredential
+                {
+                    UserName = "",  // replace with valid value
+                    Password = ""  // replace with valid value
+                };
+                smtp.Credentials = credential;
+                await smtp.SendMailAsync(msg);
             }
         }
     }
