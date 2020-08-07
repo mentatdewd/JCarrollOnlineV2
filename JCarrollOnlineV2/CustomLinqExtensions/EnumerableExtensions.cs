@@ -25,7 +25,7 @@ namespace JCarrollOnlineV2.CustomLinqExtensions
         {
             if (dataModel != null)
             {
-                foreach (var item in dataModel)
+                foreach (HierarchyNode<TDom> item in dataModel)
                 {
                     HierarchyNodesViewModel<TView> hierarchNodesViewModel = new HierarchyNodesViewModel<TView>();
                     //hnVM.ImageList = new List<string>();
@@ -37,7 +37,7 @@ namespace JCarrollOnlineV2.CustomLinqExtensions
                     hierarchNodesViewModel.Entity.InjectFrom(item.Entity);
 
                     // Call injectordelegate here
-                    var handler = new InjectorDelegate<TDom, TView>(EntityInjector);
+                    InjectorDelegate<TDom, TView> handler = new InjectorDelegate<TDom, TView>(EntityInjector);
                     handler.Invoke(item.Entity, hierarchNodesViewModel.Entity);
 
                     viewList.Add(hierarchNodesViewModel);
@@ -58,7 +58,7 @@ namespace JCarrollOnlineV2.CustomLinqExtensions
             if (dataModel.Count() > 1)
                 hasSibbs = true;
 
-            foreach (var item in dataModel)
+            foreach (HierarchyNode<TDom> item in dataModel)
             {
                 HierarchyNodesViewModel<TView> hierarchyNodesViewModel = new HierarchyNodesViewModel<TView>
                 {

@@ -63,7 +63,7 @@ namespace JCarrollOnlineV2.Extensions
 
                 if ((depth <= maxDepth) || (maxDepth == 0))
                 {
-                    foreach (var item in childs)
+                    foreach (TEntity item in childs)
                         yield return
                           new HierarchyNode<TEntity>()
                           {

@@ -8,10 +8,10 @@ namespace JCarrollOnlineV2.SiteMapProviders
     {
         public override IEnumerable<DynamicNode> GetDynamicNodeCollection(ISiteMapNode node)
         {
-            using (var jCarrollOnlineV2Db = new JCarrollOnlineV2DbContext())
+            using (JCarrollOnlineV2DbContext jCarrollOnlineV2Db = new JCarrollOnlineV2DbContext())
             {
                 // Create a node for each album 
-                foreach (var forum in jCarrollOnlineV2Db.Forum)
+                foreach (Entities.Forum forum in jCarrollOnlineV2Db.Forum)
                 {
                     DynamicNode dynamicNode = new DynamicNode();
                     dynamicNode.Title = forum.Title;

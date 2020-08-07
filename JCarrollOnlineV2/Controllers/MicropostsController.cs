@@ -24,14 +24,8 @@ namespace JCarrollOnlineV2.Controllers
 
         public ApplicationUserManager UserManager
         {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
+            get => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            private set => _userManager = value;
         }
 
         private JCarrollOnlineV2DbContext _data { get; set; }
@@ -109,11 +103,11 @@ namespace JCarrollOnlineV2.Controllers
 
         private async Task SendMicroPostNotification(MicroPost micropost, ApplicationUser currentUser)
         {
-            foreach (var user in currentUser.Followers)
+            foreach (ApplicationUser user in currentUser.Followers)
             {
                 if (user.MicroPostEmailNotifications == true)
                 {
-                    var microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, user);
+                    MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, user);
                     
                     await SendEmail(microPostNotificationEmailViewModel);
                 }
@@ -121,7 +115,7 @@ namespace JCarrollOnlineV2.Controllers
 
             if (currentUser.MicroPostEmailNotifications == true)
             {
-                var microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, currentUser);
+                MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, currentUser);
 
                 await SendEmail(microPostNotificationEmailViewModel);
             }
@@ -129,7 +123,7 @@ namespace JCarrollOnlineV2.Controllers
 
         private MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
         {
-            var microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel();
+            MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel();
 
             microPostNotificationEmailViewModel.TargetUser = user;
             microPostNotificationEmailViewModel.MicroPostAuthor = currentUser;
@@ -141,9 +135,9 @@ namespace JCarrollOnlineV2.Controllers
         private async Task SendEmail(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
         {
 
-            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicroPostNotificationPage.cshtml");
-            var templateService = RazorEngineService.Create();
+            string templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+            string templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicroPostNotificationPage.cshtml");
+            IRazorEngineService templateService = RazorEngineService.Create();
 
             microPostNotificationEmailViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "microPostTemplatekey", null, microPostNotificationEmailViewModel);
 
@@ -152,7 +146,7 @@ namespace JCarrollOnlineV2.Controllers
 
         public async Task SendEmailAsync(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
         {
-            var email = new IdentityMessage()
+            IdentityMessage email = new IdentityMessage()
             {
                 Body = microPostNotificationEmailViewModel.Content,
                 Destination = microPostNotificationEmailViewModel.TargetUser.UserName + " " + microPostNotificationEmailViewModel.TargetUser.Email,

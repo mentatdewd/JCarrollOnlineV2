@@ -6,13 +6,7 @@ namespace JCarrollOnlineV2.ViewModels.Sandbox
     {
         private List<ImageFileMetaData> _imageFiles = new List<ImageFileMetaData>();
 
-        public IEnumerable<ImageFileMetaData> ImageFiles
-        {
-            get
-            {
-                return _imageFiles;
-            }
-        }
+        public IEnumerable<ImageFileMetaData> ImageFiles => _imageFiles;
 
         public void AddImageFile(ImageFileMetaData imageFileMetaData)
         {

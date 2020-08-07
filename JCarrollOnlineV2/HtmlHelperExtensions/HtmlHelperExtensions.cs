@@ -19,7 +19,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
         public static MvcHtmlString BlogShowCommentsButton(this HtmlHelper helper, int blogItemId)
         {
             //<button id="blogCommentsButton" class="commentButton">Comments</button>
-            var builder = new TagBuilder("button");
+            TagBuilder builder = new TagBuilder("button");
 
             builder.MergeAttribute("class", "showCommentsButton");
             builder.MergeAttribute("id", "showCommentsButton" + blogItemId);
@@ -31,7 +31,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
         public static MvcHtmlString BlogShowCommentsDialogButton(this HtmlHelper helper, int blogItemId)
         {
             //<button id="blogCommentsButton" class="commentButton">Comments</button>
-            var builder = new TagBuilder("button");
+            TagBuilder builder = new TagBuilder("button");
 
             builder.MergeAttribute("class", "ShowCommentsDialogButton btn btn-large btn-primary");
             builder.MergeAttribute("id", "showCommentsDialogButton" + blogItemId);
@@ -43,7 +43,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Div")]
         public static MvcHtmlString BlogCommentsDivTag(this HtmlHelper helper, int blogItemId)
         {
-            var builder = new StringBuilder("<div id= \"");
+            StringBuilder builder = new StringBuilder("<div id= \"");
 
             builder.Append("commentId" + blogItemId);
             builder.Append("\" class=\"");
@@ -54,7 +54,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
         public static MvcHtmlString BlogFormDivTag(this HtmlHelper helper, int blogItemId)
         {
-            var builder = new StringBuilder("<div id=\"comment-dialog" + blogItemId + "\" class=\"commentFormClassDiv\" title=\"Add Comment\">");
+            StringBuilder builder = new StringBuilder("<div id=\"comment-dialog" + blogItemId + "\" class=\"commentFormClassDiv\" title=\"Add Comment\">");
 
             return new MvcHtmlString(builder.ToString());
         }
@@ -78,13 +78,13 @@ namespace JCarrollOnlineV2.HtmlHelpers
                 throw new ArgumentNullException(nameof(input));
             }
             // Try to extract the language from the first line
-            var match = rxExtractLanguage.Match(input);
+            Match match = rxExtractLanguage.Match(input);
             string language = null;
 
             if (match.Success)
             {
                 // Save the language
-                var g = (Group)match.Groups[2];
+                Group g = (Group)match.Groups[2];
                 language = g.ToString();
 
                 // Remove the first line
@@ -93,7 +93,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
             if(language != null)
                 MarkdownHelper.Language = language.Replace("{{","").Replace("}}","");
 
-            var markDown = new MarkdownDeep.Markdown
+            MarkdownDeep.Markdown markDown = new MarkdownDeep.Markdown
             {
                 FormatCodeBlock = MarkdownHelper.FormatCodeBlock,
                 ExtraMode = true,
@@ -129,9 +129,9 @@ namespace JCarrollOnlineV2.HtmlHelpers
                 throw new ArgumentNullException(nameof(html));
             }
 
-            var urlHelper = new UrlHelper(html.ViewContext.RequestContext);
-            var url = urlHelper.Action(action, controller, routeValues);
-            var anchor = new TagBuilder("a")
+            UrlHelper urlHelper = new UrlHelper(html.ViewContext.RequestContext);
+            string url = urlHelper.Action(action, controller, routeValues);
+            TagBuilder anchor = new TagBuilder("a")
             {
                 InnerHtml = linkText
             };
@@ -143,7 +143,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
         public static string Pluralize(this HtmlHelper html, int? count, string word)
         {
             string retWord = word;
-            var cnt = count ?? 0;
+            int cnt = count ?? 0;
             if (cnt == 0 || cnt > 1)
             {
                 PluralizationService ps = PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-us"));
@@ -226,7 +226,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
         private static void AppendChildren<T>(StringBuilder sb, T root, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, string treeId, string treeItemId)
         {
-            var children = childrenProperty(root);
+            IEnumerable<T> children = childrenProperty(root);
             if (children != null)
             {
                 if (children.Count() == 0)
@@ -322,7 +322,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
         private static void AppendListChildren<T>(StringBuilder sb, T root, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent)
         {
-            var children = childrenProperty(root);
+            IEnumerable<T> children = childrenProperty(root);
             if (children != null)
             {
                 if (children.Count() == 0)

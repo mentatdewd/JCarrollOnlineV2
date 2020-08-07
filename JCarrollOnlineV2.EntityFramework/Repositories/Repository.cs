@@ -13,10 +13,7 @@ namespace JCarrollOnlineV2.EntityFramework.Repositories
 
         internal Repository(JCarrollOnlineV2DbContext dbContext) { _dbContext = dbContext; }
 
-        internal DbSet<TEntity> Set
-        {
-            get { return _dbContext.Set<TEntity>(); }
-        }
+        internal DbSet<TEntity> Set => _dbContext.Set<TEntity>();
 
         public Repository(TEntity entity, DbContext context) { }
 
@@ -92,7 +89,7 @@ namespace JCarrollOnlineV2.EntityFramework.Repositories
 
         public void Update(TEntity entity)
         {
-            var entry = _dbContext.Entry(entity);
+            System.Data.Entity.Infrastructure.DbEntityEntry<TEntity> entry = _dbContext.Entry(entity);
 
             if (entry.State == EntityState.Detached)
             {

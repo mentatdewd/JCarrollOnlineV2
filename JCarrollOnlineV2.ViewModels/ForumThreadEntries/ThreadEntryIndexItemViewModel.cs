@@ -10,7 +10,7 @@ namespace JCarrollOnlineV2.ViewModels.ForumThreadEntries
         private ApplicationUserViewModel _author = new ApplicationUserViewModel();
         private ForaViewModel _forum = new ForaViewModel();
 
-        public ForaViewModel Forum { get { return _forum; } }
+        public ForaViewModel Forum => _forum;
 
         [Display(Name = "Replies")]
         public int Replies { get; set; }
@@ -25,7 +25,7 @@ namespace JCarrollOnlineV2.ViewModels.ForumThreadEntries
         public int Views { get; set; }
 
         [Display(Name = "Author")]
-        public ApplicationUserViewModel Author { get { return _author; } }
+        public ApplicationUserViewModel Author => _author;
 
         [Display(Name = "Title")]
         public string Title { get; set; }

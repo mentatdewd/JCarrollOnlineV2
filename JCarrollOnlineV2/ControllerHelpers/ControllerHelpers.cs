@@ -43,7 +43,7 @@ namespace JCarrollOnlineV2
         {
             LastThreadViewModel lastThreadViewModel = new LastThreadViewModel();
 
-            var forumThreadEntry = await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id)
+            ThreadEntry forumThreadEntry = await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id)
                 .Include(i => i.Author)
                 .OrderByDescending(i => i.UpdatedAt)
                 .FirstOrDefaultAsync();
@@ -92,7 +92,7 @@ namespace JCarrollOnlineV2
                 RssFeedItems = new List<RssFeedItemViewModel>()
             };
 
-            foreach (var item in rssFeed.Items)
+            foreach (TNX.RssReader.RssItem item in rssFeed.Items)
             {
                 if (!string.IsNullOrWhiteSpace(item.Link))
                 {

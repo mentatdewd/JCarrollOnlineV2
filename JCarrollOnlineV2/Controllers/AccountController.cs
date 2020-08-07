@@ -24,7 +24,7 @@ namespace JCarrollOnlineV2.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         public AccountController()
         {
@@ -38,26 +38,14 @@ namespace JCarrollOnlineV2.Controllers
 
         public ApplicationSignInManager SignInManager
         {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set
-            {
-                _signInManager = value;
-            }
+            get => _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+            private set => _signInManager = value;
         }
 
         public ApplicationUserManager UserManager
         {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
+            get => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            private set => _userManager = value;
         }
 
         [Authorize(Roles = "Administrator")]
@@ -103,7 +91,7 @@ namespace JCarrollOnlineV2.Controllers
                 ReturnUrl = returnUrl
             };
 
-            logger.Info("In Login(get)");
+            _logger.Info("In Login(get)");
 
             return View(loginViewModel);
         }
@@ -118,7 +106,7 @@ namespace JCarrollOnlineV2.Controllers
         [OutputCache(NoStore = true, Location = OutputCacheLocation.None)]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            logger.Info("In Login(post)");
+            _logger.Info("In Login(post)");
 
             if (!ModelState.IsValid)
             {
@@ -127,9 +115,9 @@ namespace JCarrollOnlineV2.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            SignInStatus result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
 
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "PasswordSignInAsync with UserName {0}, Password {1}, returned {2}", model.UserName, model.Password, result));
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "PasswordSignInAsync with UserName {0}, Password {1}, returned {2}", model.UserName, model.Password, result));
 
             switch (result)
             {
@@ -141,7 +129,7 @@ namespace JCarrollOnlineV2.Controllers
                         return View(model);
                     }
 
-                    logger.Info(string.Format(CultureInfo.InvariantCulture, "Redirecting to local {0}", returnUrl));
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture, "Redirecting to local {0}", returnUrl));
 
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
@@ -185,7 +173,7 @@ namespace JCarrollOnlineV2.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
+            SignInStatus result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -265,14 +253,14 @@ namespace JCarrollOnlineV2.Controllers
 
         private async Task SendWelcomeEmail(ApplicationUser user, Uri callbackUrl)
         {
-            var userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
+            UserWelcomeViewModel userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
 
             await SendEmail(user, userWelcomeViewModel);
         }
 
         private UserWelcomeViewModel GenerateViewModel(ApplicationUser user, Uri callbackUrl)
         {
-            var userWelcomeViewModel = new UserWelcomeViewModel();
+            UserWelcomeViewModel userWelcomeViewModel = new UserWelcomeViewModel();
 
             userWelcomeViewModel.TargetUser = user;
             userWelcomeViewModel.CallbackUrl = callbackUrl;
@@ -282,9 +270,9 @@ namespace JCarrollOnlineV2.Controllers
         private async Task SendEmail(ApplicationUser user, UserWelcomeViewModel userWelcomeViewModel)
         {
 
-            var templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-            var templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
-            var templateService = RazorEngineService.Create();
+            string templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+            string templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
+            IRazorEngineService templateService = RazorEngineService.Create();
 
             userWelcomeViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, userWelcomeViewModel);
 
@@ -293,7 +281,7 @@ namespace JCarrollOnlineV2.Controllers
 
         public async Task SendEmailAsync(string userid, UserWelcomeViewModel userWelcomeViewModel)
         {
-            var email = new IdentityMessage()
+            IdentityMessage email = new IdentityMessage()
             {
                 Body = userWelcomeViewModel.Content,
                 Destination = userWelcomeViewModel.TargetUser.UserName + " " + userWelcomeViewModel.TargetUser.Email,
@@ -314,7 +302,7 @@ namespace JCarrollOnlineV2.Controllers
             }
 
             LoginConfirmationViewModel loginConfirmationViewModel = new LoginConfirmationViewModel();
-            var result = await UserManager.ConfirmEmailAsync(userId, code);
+            IdentityResult result = await UserManager.ConfirmEmailAsync(userId, code);
 
             return View(result.Succeeded ? "ConfirmEmail" : "Error", loginConfirmationViewModel);
         }
@@ -339,7 +327,7 @@ namespace JCarrollOnlineV2.Controllers
             if (ModelState.IsValid)
             {
                 //var user = await UserManager.FindByNameAsync(model.Email);
-                var user = await UserManager.FindByEmailAsync(model.Email);
+                ApplicationUser user = await UserManager.FindByEmailAsync(model.Email);
 
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
@@ -352,7 +340,7 @@ namespace JCarrollOnlineV2.Controllers
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                var callbackUrl = Url.Action("ResetPassword", "Account", routeValues: new { userId = user.Id,  code }, protocol: Request.Url.Scheme);
+                string callbackUrl = Url.Action("ResetPassword", "Account", routeValues: new { userId = user.Id,  code }, protocol: Request.Url.Scheme);
                 await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
@@ -392,13 +380,13 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View(model);
             }
-            var user = await UserManager.FindByEmailAsync(model.Email);
+            ApplicationUser user = await UserManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+            IdentityResult result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
@@ -435,13 +423,13 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
-            var userId = await SignInManager.GetVerifiedUserIdAsync();
+            string userId = await SignInManager.GetVerifiedUserIdAsync();
             if (userId == null)
             {
                 return View("Error");
             }
-            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
-            var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
+            System.Collections.Generic.IList<string> userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
+            System.Collections.Generic.List<SelectListItem> factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
@@ -472,14 +460,14 @@ namespace JCarrollOnlineV2.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
                 return RedirectToAction("JCarrollOnlineV2Service");
             }
 
             // Sign in the user with this external login provider if the user already has a login
-            var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
+            SignInStatus result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -518,13 +506,13 @@ namespace JCarrollOnlineV2.Controllers
             if (ModelState.IsValid)
             {
                 // Get the information about the user from the external login provider
-                var info = await AuthenticationManager.GetExternalLoginInfoAsync();
+                ExternalLoginInfo info = await AuthenticationManager.GetExternalLoginInfoAsync();
                 if (info == null)
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.SiteUserName, Email = model.Email };
-                var result = await UserManager.CreateAsync(user);
+                ApplicationUser user = new ApplicationUser { UserName = model.SiteUserName, Email = model.Email };
+                IdentityResult result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
@@ -582,19 +570,13 @@ namespace JCarrollOnlineV2.Controllers
 
         #region Helpers
         // Used for XSRF protection when adding external logins
-        private const string XsrfKey = "XsrfId";
+        private const string _xsrfKey = "XsrfId";
 
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
+        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
 
         private void AddErrors(IdentityResult result)
         {
-            foreach (var error in result.Errors)
+            foreach (string error in result.Errors)
             {
                 ModelState.AddModelError("", error);
             }
@@ -634,11 +616,11 @@ namespace JCarrollOnlineV2.Controllers
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                var properties = new AuthenticationProperties { RedirectUri = RedirectUri };
+                AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = RedirectUri };
 
                 if (UserId != null)
                 {
-                    properties.Dictionary[XsrfKey] = UserId;
+                    properties.Dictionary[_xsrfKey] = UserId;
                 }
 
                 context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);

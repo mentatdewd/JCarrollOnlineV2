@@ -38,14 +38,14 @@ namespace JCarrollOnlineV2.Controllers
             ApplicationUser user = await _data.ApplicationUser.FindAsync(currentUserId);
             List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").ToListAsync();
 
-            foreach(var blogItem in blogItems.OrderByDescending(m => m.UpdatedAt))
+            foreach(BlogItem blogItem in blogItems.OrderByDescending(m => m.UpdatedAt))
             {
                 BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
                 blogFeedItemViewModel.InjectFrom(blogItem);
                 blogFeedItemViewModel.Author.InjectFrom(blogItem.Author);
 
-                foreach(var blogItemComment in blogItem.BlogItemComments.ToList())
+                foreach(BlogItemComment blogItemComment in blogItem.BlogItemComments.ToList())
                 {
                     BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel(blogItem.Id);
 
@@ -127,7 +127,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
-            var blogItem = await _data.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId);
+            BlogItem blogItem = await _data.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId);
 
             if (blogItem == null)
             {

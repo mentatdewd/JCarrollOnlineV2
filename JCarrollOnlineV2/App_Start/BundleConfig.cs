@@ -20,14 +20,14 @@ namespace JCarrollOnlineV2
 
             bundles.UseCdn = true;
 
-            var nullBuilder = new NullBuilder();
-            var styleTransformer = new StyleTransformer();
-            var scriptTransformer = new ScriptTransformer();
-            var nullOrderer = new NullOrderer();
+            NullBuilder nullBuilder = new NullBuilder();
+            StyleTransformer styleTransformer = new StyleTransformer();
+            ScriptTransformer scriptTransformer = new ScriptTransformer();
+            NullOrderer nullOrderer = new NullOrderer();
 
             BundleResolver.Current = new CustomBundleResolver();
 
-            var cssBundle = new StyleBundle("~/bundles/css");
+            StyleBundle cssBundle = new StyleBundle("~/bundles/css");
             cssBundle.Include(
                 "~/Content/css/bootstrap/bootstrap.min.css",
                 "~/Content/css/Prism.css",

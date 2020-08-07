@@ -28,7 +28,7 @@ namespace JCarrollOnlineV2
 
             ApplicationUserManager manager = null;
 
-            var userStore = new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2DbContext>());
+            UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2DbContext>());
 
             manager = new ApplicationUserManager(userStore);
 
@@ -68,7 +68,7 @@ namespace JCarrollOnlineV2
             manager.EmailService = new MailService();
 
             manager.SmsService = new SmsService();
-            var dataProtectionProvider = options.DataProtectionProvider;
+            Microsoft.Owin.Security.DataProtection.IDataProtectionProvider dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
                 manager.UserTokenProvider =

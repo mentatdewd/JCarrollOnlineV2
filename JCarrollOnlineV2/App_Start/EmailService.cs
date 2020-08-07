@@ -37,14 +37,14 @@ namespace JCarrollOnlineV2
             msg.To.Add(new MailAddress(toString));
 
             //var plainTextContent = "and easy to do anywhere, even with C#";
-            using (var smtp = new SmtpClient())
+            using (SmtpClient smtp = new SmtpClient())
             {
                 smtp.Host = "smtp.gmail.com";
                 smtp.Port = 587;
                 smtp.EnableSsl = true;
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.UseDefaultCredentials = false;
-                var credential = new NetworkCredential
+                NetworkCredential credential = new NetworkCredential
                 {
                     UserName = "",  // replace with valid value
                     Password = ""  // replace with valid value

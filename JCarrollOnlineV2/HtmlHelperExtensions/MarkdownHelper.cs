@@ -14,7 +14,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
             // Wrap the code in <pre><code> as the default MarkdownDeep.NET implementation does, but add a class of
             // "prettyprint" which is what Google Code Prettify uses to identify code blocks.
             // http://google-code-prettify.googlecode.com/svn/trunk/README.html
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append("<pre class=\"prettyprint\"><code>");
             sb.Append(code);
             sb.Append("</code></pre>\n\n");

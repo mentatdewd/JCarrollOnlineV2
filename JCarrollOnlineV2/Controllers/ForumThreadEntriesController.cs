@@ -62,9 +62,9 @@ namespace JCarrollOnlineV2.Controllers
 
             // Create the view model
 
-            foreach (var forumThread in currentForum.ForumThreadEntries.Where(forumThreadEntry => forumThreadEntry.ParentId == null))
+            foreach (ThreadEntry forumThread in currentForum.ForumThreadEntries.Where(forumThreadEntry => forumThreadEntry.ParentId == null))
             {
-                var threadEntryIndexItemViewModel = new ThreadEntryIndexItemViewModel();
+                ThreadEntryIndexItemViewModel threadEntryIndexItemViewModel = new ThreadEntryIndexItemViewModel();
 
                 threadEntryIndexItemViewModel.InjectFrom(forumThread);
                 threadEntryIndexItemViewModel.Forum.InjectFrom(currentForum);
@@ -87,12 +87,12 @@ namespace JCarrollOnlineV2.Controllers
                 return RedirectToAction("index", routeValues: new {  forumId });
             }
 
-            var detailItemInjector = new IEnumerableExtensions.InjectorDelegate<ThreadEntry, ThreadEntryDetailsItemViewModel>(DetailItemInjector);
+            IEnumerableExtensions.InjectorDelegate<ThreadEntry, ThreadEntryDetailsItemViewModel> detailItemInjector = new IEnumerableExtensions.InjectorDelegate<ThreadEntry, ThreadEntryDetailsItemViewModel>(DetailItemInjector);
 
             // Create the details view model
             ThreadEntryDetailsViewModel threadEntryDetailsViewModel = new ThreadEntryDetailsViewModel();
 
-            var forumThreadEntries = _data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Author)
+            IQueryable<ThreadEntry> forumThreadEntries = _data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Author)
                 .Include(forumThreadEntry => forumThreadEntry.Forum)
                 .Where(forumThreadEntry => forumThreadEntry.Forum.Id == forumId);
 
@@ -242,7 +242,7 @@ namespace JCarrollOnlineV2.Controllers
 
             ThreadEntriesEditViewModel threadEntriesViewModel = new ThreadEntriesEditViewModel();
 
-            var forumThread = await _data.ForumThreadEntry.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
+            ThreadEntry forumThread = await _data.ForumThreadEntry.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
 
             if (forumThread == null)
             {
@@ -293,7 +293,7 @@ namespace JCarrollOnlineV2.Controllers
 
             ThreadEntriesEditViewModel threadEntriesViewModel = new ThreadEntriesEditViewModel();
 
-            var forumThread = await _data.ForumThreadEntry.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
+            ThreadEntry forumThread = await _data.ForumThreadEntry.Include("Forum").SingleOrDefaultAsync(m => m.Id == id);
 
             if (forumThread == null)
             {

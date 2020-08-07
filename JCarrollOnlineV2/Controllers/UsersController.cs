@@ -38,9 +38,9 @@ namespace JCarrollOnlineV2.Controllers
                 PageTitle = "Users"
             };
 
-            var users = await _data.ApplicationUser.Include("Following").Include("Followers").ToListAsync();
+            System.Collections.Generic.List<ApplicationUser> users = await _data.ApplicationUser.Include("Following").Include("Followers").ToListAsync();
 
-            foreach (var user in users)
+            foreach (ApplicationUser user in users)
             {
                 UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
@@ -82,7 +82,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 userDetailViewModel.UserStatsViewModel.User.InjectFrom(user);
 
-                foreach (var following in user.Following)
+                foreach (ApplicationUser following in user.Following)
                 {
                     UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
@@ -94,7 +94,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 userDetailViewModel.UserStatsViewModel.UserFollowers = new UserFollowersViewModel();
 
-                foreach (var follower in user.Followers)
+                foreach (ApplicationUser follower in user.Followers)
                 {
                     UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
@@ -122,7 +122,7 @@ namespace JCarrollOnlineV2.Controllers
             userDetailViewModel.UserInfoViewModel.User.InjectFrom(user);
             userDetailViewModel.UserStatsViewModel.User.InjectFrom(user);
 
-            foreach (var following in user.Following)
+            foreach (ApplicationUser following in user.Following)
             {
                 UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
                 userItemViewModel.User.InjectFrom(following);
@@ -130,7 +130,7 @@ namespace JCarrollOnlineV2.Controllers
                 userDetailViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
             }
 
-            foreach (var follower in user.Followers)
+            foreach (ApplicationUser follower in user.Followers)
             {
                 UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
                 userItemViewModel.InjectFrom(follower);
@@ -156,7 +156,7 @@ namespace JCarrollOnlineV2.Controllers
             userDetailViewModel.UserInfoViewModel.User.InjectFrom(user);
             userDetailViewModel.UserStatsViewModel.User.InjectFrom(user);
 
-            foreach (var following in user.Following)
+            foreach (ApplicationUser following in user.Following)
             {
                 UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
@@ -165,7 +165,7 @@ namespace JCarrollOnlineV2.Controllers
                 userDetailViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
             }
 
-            foreach (var follower in user.Followers)
+            foreach (ApplicationUser follower in user.Followers)
             {
                 UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
@@ -186,7 +186,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                var followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
+                ApplicationUser followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
 
                 currentUser.Following.Add(followingUser);
                 await _data.SaveChangesAsync();
@@ -205,7 +205,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 string currentUserId = User.Identity.GetUserId();
                 ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                var followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
+                ApplicationUser followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
 
                 currentUser.Following.Remove(followingUser);
                 await _data.SaveChangesAsync();

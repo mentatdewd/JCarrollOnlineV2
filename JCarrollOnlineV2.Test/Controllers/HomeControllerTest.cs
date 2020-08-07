@@ -16,7 +16,7 @@ namespace JCarrollOnlineV2.Tests.Controllers
             HomeController controller = new HomeController();
 
             // Act
-            var result = await controller.Index(null) as ViewResult;
+            ViewResult result = await controller.Index(null) as ViewResult;
             HomeViewModel vm = (HomeViewModel)result.Model;
 
             // Assert

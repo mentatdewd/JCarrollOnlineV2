@@ -29,11 +29,11 @@ namespace JCarrollOnlineV2.Controllers
                 ForaIndexItems = new List<ForaIndexItemViewModel>()
             };
 
-            var fora = await _data.Forum.ToListAsync();
+            List<Forum> fora = await _data.Forum.ToListAsync();
 
-            foreach(var forum in fora)
+            foreach(Forum forum in fora)
             {
-                var foraIndexItemViewModel = new ForaIndexItemViewModel();
+                ForaIndexItemViewModel foraIndexItemViewModel = new ForaIndexItemViewModel();
 
                 foraIndexItemViewModel.InjectFrom(forum);
                 foraIndexItemViewModel.ThreadCount = await ControllerHelpers.GetThreadCountAsync(forum, _data);

@@ -46,12 +46,12 @@ namespace JCarrollOnlineV2.Controllers
             homeViewModel.UserStatsViewModel.UsersFollowing = new UserFollowingViewModel();
 
             logger.Info("Checking for blog entries");
-            var blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
+            System.Collections.Generic.List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
 
             homeViewModel.LatestForumThreadsViewModel = new LatestForumThreadsViewModel();
-            var threads = await _data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Forum).OrderByDescending(threadEntry => threadEntry.UpdatedAt).Take(5).ToListAsync();
+            System.Collections.Generic.List<ThreadEntry> threads = await _data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Forum).OrderByDescending(threadEntry => threadEntry.UpdatedAt).Take(5).ToListAsync();
 
-            foreach(var thread in threads)
+            foreach(ThreadEntry thread in threads)
             {
                 LatestForumThreadItemViewModel latestForumThreadItemViewModel = new LatestForumThreadItemViewModel();
 
@@ -65,7 +65,7 @@ namespace JCarrollOnlineV2.Controllers
 
             logger.Info("Processing blog entries");
 
-            foreach (var item in blogItems)
+            foreach (BlogItem item in blogItems)
             {
                 BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
@@ -73,7 +73,7 @@ namespace JCarrollOnlineV2.Controllers
                 blogFeedItemViewModel.Comments.BlogItemId = item.Id;
                 blogFeedItemViewModel.Author.InjectFrom(item.Author);
 
-                foreach(var comment in item.BlogItemComments.ToList())
+                foreach(BlogItemComment comment in item.BlogItemComments.ToList())
                 {
                     BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel(item.Id);
 
@@ -109,7 +109,7 @@ namespace JCarrollOnlineV2.Controllers
                     userItemViewModel.InjectFrom(item);
                     homeViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
 
-                    foreach (var microPost in item.MicroPosts)
+                    foreach (MicroPost microPost in item.MicroPosts)
                     {
                         MicroPostFeedItemViewModel microPostFeedItemViewModel = new MicroPostFeedItemViewModel();
 
@@ -122,7 +122,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 logger.Info("Processing followers");
 
-                foreach (var item in user.Followers)
+                foreach (ApplicationUser item in user.Followers)
                 {
                     UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
 
@@ -133,7 +133,7 @@ namespace JCarrollOnlineV2.Controllers
 
                 logger.Info("Processing microPosts");
 
-                foreach (var micropost in user.MicroPosts)
+                foreach (MicroPost micropost in user.MicroPosts)
                 {
                     MicroPostFeedItemViewModel microPostFeedItemViewModel = new MicroPostFeedItemViewModel();
 
@@ -143,7 +143,7 @@ namespace JCarrollOnlineV2.Controllers
                     homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.Add(microPostFeedItemViewModel);
                 }
 
-                var micropostPageNumber = microPostPage ?? 1;
+                int micropostPageNumber = microPostPage ?? 1;
 
                 homeViewModel.MicroPostFeedViewModel.OnePageOfMicroPosts = homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
 

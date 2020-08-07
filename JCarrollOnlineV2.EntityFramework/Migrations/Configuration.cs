@@ -27,22 +27,22 @@ namespace JCarrollOnlineV2.EntityFramework.Migrations
             AddAdminRoleAndUser(context);
         }
 
-        const string adminRole = "Administrator";
-        const string adminName = "administrator";
+        const string _adminRole = "Administrator";
+        const string _adminName = "administrator";
 
         private bool AddAdminRoleAndUser(JCarrollOnlineV2DbContext context)
         {
-            using(var userStore = new UserStore<ApplicationUser>(context))
-            using (var userManager = new UserManager<ApplicationUser>(userStore))
-            using (var roleStore = new RoleStore<IdentityRole>(context))
-            using (var roleManager = new RoleManager<IdentityRole>(roleStore))
+            using(UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context))
+            using (UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(userStore))
+            using (RoleStore<IdentityRole> roleStore = new RoleStore<IdentityRole>(context))
+            using (RoleManager<IdentityRole> roleManager = new RoleManager<IdentityRole>(roleStore))
             {
 
-                if (!context.ApplicationUser.Any(u => u.UserName == adminName))
+                if (!context.ApplicationUser.Any(u => u.UserName == _adminName))
                 {
-                    var adminUser = new ApplicationUser
+                    ApplicationUser adminUser = new ApplicationUser
                     {
-                        UserName = adminName,
+                        UserName = _adminName,
                         Email = "mentatdewd@comcast.net",
                         EmailConfirmed = true
                     };
@@ -51,13 +51,13 @@ namespace JCarrollOnlineV2.EntityFramework.Migrations
 
                     userManager.Create(adminUser, password);
 
-                    if (!roleManager.RoleExists(adminRole))
+                    if (!roleManager.RoleExists(_adminRole))
                     {
-                        IdentityRole adminIdentityRole = new IdentityRole(adminRole);
+                        IdentityRole adminIdentityRole = new IdentityRole(_adminRole);
                         roleManager.Create(adminIdentityRole);
                     }
 
-                    userManager.AddToRole(adminUser.Id, adminRole);
+                    userManager.AddToRole(adminUser.Id, _adminRole);
                 }
             }
 
