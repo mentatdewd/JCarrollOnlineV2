@@ -12,7 +12,7 @@
     "rimraf": "2.6.1"
   },
   "dependencies": {
-    "angular": "1.6.8",
+    "angular": "1.8.0",
     "graceful-fs": "^4.1.11"
   }
 }
