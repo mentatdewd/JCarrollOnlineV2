@@ -9,34 +9,34 @@
 <h2>YellowStoneSlideShow</h2>
 
 
-<div id="carousel-example-generic" class="carousel carousel-fade lazy" data-ride="carousel"  data-interval="10000">
+<div id="carousel-example-generic" class="carousel slide">
     <div class="carousel-inner" role="listbox">
-        <div class="carousel-item active">
-            <img class="d-block img-fluid" src=@Model.ImageFiles.FirstOrDefault().Path alt=@Model.ImageFiles.FirstOrDefault().AltString />
-            <div class="carousel-caption d-none d-md-block">
+        <div class="item active">
+            <img src=@Model.ImageFiles.FirstOrDefault().Path alt=@Model.ImageFiles.FirstOrDefault().AltString />
+            <div class="carousel-caption">
                 <h3>Arrival in Yellowstone City</h3>
                 <p>The day of our arrival Ally went shopping</p>
-            </div>       
+            </div>
         </div>
         @foreach (var image in Model.ImageFiles.Skip(1))
         {
-            @Html.Raw("<div class='carousel-item'>")
-                @Html.Raw("<img class='d-block img-fluid' data-src='")
-                @image.Path
-                @Html.Raw("' alt='")
-                @image.AltString
-                @Html.Raw("' />");
+            @Html.Raw("<div class='item'>")
+            @Html.Raw("<img src='")
+            @image.Path
+            @Html.Raw("' alt='")
+            @image.AltString
+            @Html.Raw("' />");
             @Html.Raw("</div>")
         }
     </div>
 
-    <a class="carousel-control-prev" href="#carousel-example-generic" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
         <span class="sr-only">Previous</span>
     </a>
 
-    <a class="carousel-control-next" href="#carousel-example-generic" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
     </a>
 </div>

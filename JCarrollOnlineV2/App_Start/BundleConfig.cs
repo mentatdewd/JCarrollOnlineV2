@@ -43,34 +43,34 @@ namespace JCarrollOnlineV2
             bundles.Add(cssBundle);
 
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-            "~/Scripts/jquery-3.2.1.js"));
+            "~/Content/scripts/jquery/jquery-3.5.1.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval")
-                .Include("~/Scripts/jquery.validate.js")
-                .Include("~/Scripts/jquery.validate.unobtrusive.js"));
+                .Include("~/Content/scripts/jquery/jquery.validate.js")
+                .Include("~/Content/scripts/jquery/jquery.validate.unobtrusive.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                     "~/Scripts/modernizr-*"));
+                     "~/Content/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
-                      "~/Scripts/respond.js"));
+                      "~/Content/scripts/bootstrap/bootstrap.js",
+                      "~/Content/scripts/bootstrap/respond.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jcarrollonlinev2").Include(
-                      "~/Scripts/jcarrollonlinev2.js"));
+                      "~/Content/scripts/jcarrollonlinev2.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/markdowndeep")
-                .Include("~/Scripts/MarkdownDeep.js")
-                .Include("~/Scripts/MarkdownDeepEditor.js")
-                .Include("~/Scripts/MarkdownDeepEditorUI.js")
-                .Include("~/Scripts/MarkdownDeepLib.js"));
+                .Include("~/Content/scripts/markdowndeep/MarkdownDeep.js")
+                .Include("~/Content/scripts/markdowndeep/MarkdownDeepEditor.js")
+                .Include("~/Content/scripts/markdowndeep/MarkdownDeepEditorUI.js")
+                .Include("~/Content/scripts/markdowndeep/MarkdownDeepLib.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/livestamp")
-                .Include("~/Scripts/moment.js")
-                .Include("~/Scripts/livestamp.js"));
+                .Include("~/Content/scripts/moment.js")
+                .Include("~/Content/scripts/livestamp.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/prism")
-                .Include("~/Scripts/prism.js"));
+                .Include("~/Content/scripts/prism.js"));
 
             //var jqueryBundle = new ScriptBundle("~/bundles/jquery");
             //jqueryBundle.Include("~/Scripts/jquery/jquery.min.js");

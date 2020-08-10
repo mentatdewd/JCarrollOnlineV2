@@ -29,7 +29,44 @@
     </style>
 </head>
 <body>
-    <nav class="navbar fixed top navbar-toggleable-md navbar-inverse bg-inverse">
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/markdownDeep")
+    @Scripts.Render("~/bundles/livestamp")
+    @Scripts.Render("~/bundles/jcarrollonlinev2")
+
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+        // Set min-height property based on the tallest carousel item.
+        (function () {
+            var $inner = $('.carousel-inner'),
+                $items = $('.carousel-item');
+
+            var maxHeight = Math.max.apply(null,
+                $items.map(function () {
+                    return $(this).outerHeight();
+                })
+            );
+
+            $inner
+                .add($items)
+                .css('min-height', maxHeight);
+        })();
+        $(function () {
+            return $(".carousel.lazy").on("slide.bs.carousel", function (ev) {
+                var lazy;
+                lazy = $(ev.relatedTarget).find("img[data-src]");
+                lazy.attr("src", lazy.data('src'));
+                lazy.removeAttr("data-src");
+            });
+        });
+        InitializeBlogComments();
+    </script>    <nav class="navbar fixed top navbar-toggleable-md navbar-inverse bg-inverse">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -59,44 +96,5 @@
             @Html.Partial("_FooterPartial")
         </div>
     </div>
-
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/markdownDeep")
-    @Scripts.Render("~/bundles/livestamp")
-    @Scripts.Render("~/bundles/jcarrollonlinev2")
-
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
-    
-    @RenderSection("scripts", required: false)
-
-    <script type="text/javascript">
-        // Set min-height property based on the tallest carousel item.
-        (function () {
-            var $inner = $('.carousel-inner'),
-                $items = $('.carousel-item');
-
-            var maxHeight = Math.max.apply(null,
-                $items.map(function () {
-                    return $(this).outerHeight();
-                })
-            );
-
-            $inner
-                .add($items)
-                .css('min-height', maxHeight);
-        })();
-        $(function () {
-            return $(".carousel.lazy").on("slide.bs.carousel", function (ev) {
-                var lazy;
-                lazy = $(ev.relatedTarget).find("img[data-src]");
-                lazy.attr("src", lazy.data('src'));
-                lazy.removeAttr("data-src");
-            });
-        });
-        InitializeBlogComments();
-    </script>
 </body>
 </html>
