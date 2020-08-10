@@ -20,7 +20,7 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class HomeController : Controller
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         private JCarrollOnlineV2DbContext _data { get; set; }
 
@@ -31,21 +31,21 @@ namespace JCarrollOnlineV2.Controllers
 
         public async Task<ActionResult> Index(int? microPostPage)
         {
-            logger.Info("In Home/Index");
+            _logger.Info("In Home/Index");
             HomeViewModel homeViewModel = new HomeViewModel
             {
                 Message = "JCarrollOnlineV2 Home - Index",
                 MicroPostCreateViewModel = new MicroPostCreateViewModel(),
                 MicroPostFeedViewModel = new MicroPostFeedViewModel(),
                 UserStatsViewModel = new UserStatsViewModel(),
-                UserInfoViewModel = new UserItemViewModel(logger),
+                UserInfoViewModel = new UserItemViewModel(_logger),
                 BlogFeed = new BlogFeedViewModel()
             };
 
             homeViewModel.UserStatsViewModel.UserFollowers = new UserFollowersViewModel();
             homeViewModel.UserStatsViewModel.UsersFollowing = new UserFollowingViewModel();
 
-            logger.Info("Checking for blog entries");
+            _logger.Info("Checking for blog entries");
             System.Collections.Generic.List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
 
             homeViewModel.LatestForumThreadsViewModel = new LatestForumThreadsViewModel();
@@ -63,7 +63,7 @@ namespace JCarrollOnlineV2.Controllers
                 homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(latestForumThreadItemViewModel);
             }
 
-            logger.Info("Processing blog entries");
+            _logger.Info("Processing blog entries");
 
             foreach (BlogItem item in blogItems)
             {
@@ -86,7 +86,7 @@ namespace JCarrollOnlineV2.Controllers
                 homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(blogFeedItemViewModel);
             }
 
-            logger.Info("Processing rss");
+            _logger.Info("Processing rss");
 
             Task<RssFeedViewModel> rss = ControllerHelpers.UpdateRssAsync();
 
@@ -100,11 +100,11 @@ namespace JCarrollOnlineV2.Controllers
                 homeViewModel.UserInfoViewModel.MicroPostsAuthored = user.MicroPosts.Count();
                 homeViewModel.UserStatsViewModel.User.InjectFrom(user);
 
-                logger.Info("Processing followings");
+                _logger.Info("Processing followings");
 
                 foreach (ApplicationUser item in user.Following)
                 {
-                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                     userItemViewModel.InjectFrom(item);
                     homeViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
@@ -120,18 +120,18 @@ namespace JCarrollOnlineV2.Controllers
                     }
                 }
 
-                logger.Info("Processing followers");
+                _logger.Info("Processing followers");
 
                 foreach (ApplicationUser item in user.Followers)
                 {
-                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                     userItemViewModel.InjectFrom(item);
                     userItemViewModel.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
                     homeViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
                 }
 
-                logger.Info("Processing microPosts");
+                _logger.Info("Processing microPosts");
 
                 foreach (MicroPost micropost in user.MicroPosts)
                 {
@@ -147,12 +147,12 @@ namespace JCarrollOnlineV2.Controllers
 
                 homeViewModel.MicroPostFeedViewModel.OnePageOfMicroPosts = homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
 
-                logger.Info("awaiting rss");
+                _logger.Info("awaiting rss");
                 homeViewModel.RssFeedViewModel = await rss;
             }
 
             homeViewModel.PageContainer = "Home";
-            logger.Info("Navigating to homepage");
+            _logger.Info("Navigating to homepage");
 
             return View(homeViewModel);
         }

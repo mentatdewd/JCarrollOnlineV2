@@ -24,7 +24,7 @@ namespace JCarrollOnlineV2.EntityFramework.Migrations
             //context.Database.ExecuteSqlCommand("DBCC CHECKIDENT (ForumThreadEntries, RESEED, 0)");
 
             //context.Database.ExecuteSqlCommand(@"TRUNCATE TABLE dbo.NLog");
-            AddAdminRoleAndUser(context);
+            //AddAdminRoleAndUser(context);
         }
 
         const string _adminRole = "Administrator";
