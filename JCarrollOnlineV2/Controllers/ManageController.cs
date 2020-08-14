@@ -40,6 +40,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Manage/Index
+        [HttpGet]
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
@@ -55,10 +56,10 @@ namespace JCarrollOnlineV2.Controllers
             ManageIndexViewModel model = new ManageIndexViewModel
             {
                 HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId).ConfigureAwait(false),
+                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId).ConfigureAwait(false),
+                Logins = await UserManager.GetLoginsAsync(userId).ConfigureAwait(false),
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId).ConfigureAwait(false)
             };
             return View(model);
         }
@@ -72,13 +73,13 @@ namespace JCarrollOnlineV2.Controllers
         public async Task<ActionResult> RemoveLogin(string loginProvider, string providerKey)
         {
             ManageMessageId? message;
-            IdentityResult result = await UserManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
+            IdentityResult result = await UserManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey)).ConfigureAwait(false);
             if (result.Succeeded)
             {
-                Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
                 if (user != null)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
                 }
                 message = ManageMessageId.RemoveLoginSuccess;
             }
@@ -91,6 +92,7 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Manage/AddPhoneNumber
+        [HttpGet]
         public ActionResult AddPhoneNumber()
         {
             return View();
@@ -107,17 +109,20 @@ namespace JCarrollOnlineV2.Controllers
                 return View(model);
             }
             // Generate the token and send it
-            string code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), model.Number);
-            if (UserManager.SmsService != null)
+            if (model != null)
             {
-                IdentityMessage message = new IdentityMessage
+                string code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), model.Number).ConfigureAwait(false);
+                if (UserManager.SmsService != null)
                 {
-                    Destination = model.Number,
-                    Body = "Your security code is: " + code
-                };
-                await UserManager.SmsService.SendAsync(message);
+                    IdentityMessage message = new IdentityMessage
+                    {
+                        Destination = model.Number,
+                        Body = "Your security code is: " + code
+                    };
+                    await UserManager.SmsService.SendAsync(message).ConfigureAwait(false);
+                }
             }
-            return RedirectToAction("VerifyPhoneNumber", new { PhoneNumber = model.Number });
+            return RedirectToAction("VerifyPhoneNumber", new { PhoneNumber = model?.Number });
         }
 
         //
@@ -126,11 +131,11 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EnableTwoFactorAuthentication()
         {
-            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), true);
-            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), true).ConfigureAwait(false);
+            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
             if (user != null)
             {
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
             }
             return RedirectToAction("Index", "Manage");
         }
@@ -141,22 +146,25 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DisableTwoFactorAuthentication()
         {
-            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), false);
-            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), false).ConfigureAwait(false);
+            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
             if (user != null)
             {
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
             }
             return RedirectToAction("Index", "Manage");
         }
 
         //
         // GET: /Manage/VerifyPhoneNumber
+        [HttpGet]
         public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
         {
-            string code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), phoneNumber);
             // Send an SMS through the SMS provider to verify the phone number
-            return phoneNumber == null ? View("Error") : View(new ManageVerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
+            return await Task.Run<ActionResult>(() =>
+            {
+                return phoneNumber == null ? View("Error") : View(new ManageVerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
+            }).ConfigureAwait(false);
         }
 
         //
@@ -169,15 +177,18 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View(model);
             }
-            IdentityResult result = await UserManager.ChangePhoneNumberAsync(User.Identity.GetUserId(), model.PhoneNumber, model.Code);
-            if (result.Succeeded)
+            if (model != null)
             {
-                Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-                if (user != null)
+                IdentityResult result = await UserManager.ChangePhoneNumberAsync(User.Identity.GetUserId(), model.PhoneNumber, model.Code).ConfigureAwait(false);
+                if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
+                    if (user != null)
+                    {
+                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
+                    }
+                    return RedirectToAction("Index", new { Message = ManageMessageId.AddPhoneSuccess });
                 }
-                return RedirectToAction("Index", new { Message = ManageMessageId.AddPhoneSuccess });
             }
             // If we got this far, something failed, redisplay form
             ModelState.AddModelError("", "Failed to verify phone");
@@ -190,21 +201,22 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RemovePhoneNumber()
         {
-            IdentityResult result = await UserManager.SetPhoneNumberAsync(User.Identity.GetUserId(), null);
+            IdentityResult result = await UserManager.SetPhoneNumberAsync(User.Identity.GetUserId(), null).ConfigureAwait(false);
             if (!result.Succeeded)
             {
                 return RedirectToAction("Index", new { Message = ManageMessageId.Error });
             }
-            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
             if (user != null)
             {
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
             }
             return RedirectToAction("Index", new { Message = ManageMessageId.RemovePhoneSuccess });
         }
 
         //
         // GET: /Manage/ChangePassword
+        [HttpGet]
         public ActionResult ChangePassword()
         {
             ManageChangePasswordViewModel manageChangePasswordViewModel = new ManageChangePasswordViewModel
@@ -226,22 +238,26 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View(model);
             }
-            IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-            if (result.Succeeded)
+            if (model != null)
             {
-                Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-                if (user != null)
+                IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword).ConfigureAwait(false);
+                if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
+                    if (user != null)
+                    {
+                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
+                    }
+                    return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
                 }
-                return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
+                AddErrors(result);
             }
-            AddErrors(result);
             return View(model);
         }
 
         //
         // GET: /Manage/SetPassword
+        [HttpGet]
         public ActionResult SetPassword()
         {
             ManageSetPasswordViewModel manageSetPasswordViewModel = new ManageSetPasswordViewModel
@@ -259,15 +275,15 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SetPassword(ManageSetPasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && model != null)
             {
-                IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
+                IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword).ConfigureAwait(false);
                 if (result.Succeeded)
                 {
-                    Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                    Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
                     if (user != null)
                     {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
                     }
                     return RedirectToAction("Index", new { Message = ManageMessageId.SetPasswordSuccess });
                 }
@@ -280,18 +296,19 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Manage/ManageLogins
+        [HttpGet]
         public async Task<ActionResult> ManageLogins(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
                 message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
-            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            Entities.ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId()).ConfigureAwait(false);
             if (user == null)
             {
                 return View("Error");
             }
-            System.Collections.Generic.IList<UserLoginInfo> userLogins = await UserManager.GetLoginsAsync(User.Identity.GetUserId());
+            System.Collections.Generic.IList<UserLoginInfo> userLogins = await UserManager.GetLoginsAsync(User.Identity.GetUserId()).ConfigureAwait(false);
             System.Collections.Generic.List<AuthenticationDescription> otherLogins = AuthenticationManager.GetExternalAuthenticationTypes().Where(auth => userLogins.All(ul => auth.AuthenticationType != ul.LoginProvider)).ToList();
             ViewBag.ShowRemoveButton = user.PasswordHash != null || userLogins.Count > 1;
             return View(new ManageLoginsViewModel
@@ -314,15 +331,16 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Manage/LinkLoginCallback
+        [HttpGet]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         public async Task<ActionResult> LinkLoginCallback()
         {
-            ExternalLoginInfo loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(_xsrfKey, User.Identity.GetUserId());
+            ExternalLoginInfo loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(_xsrfKey, User.Identity.GetUserId()).ConfigureAwait(false);
             if (loginInfo == null)
             {
                 return RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
             }
-            IdentityResult result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
+            IdentityResult result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login).ConfigureAwait(false);
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
         }
 
@@ -354,21 +372,13 @@ namespace JCarrollOnlineV2.Controllers
         private bool HasPassword()
         {
             Entities.ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
-            if (user != null)
-            {
-                return user.PasswordHash != null;
-            }
-            return false;
+            return user != null && user.PasswordHash != null;
         }
 
         private bool HasPhoneNumber()
         {
             Entities.ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
-            if (user != null)
-            {
-                return user.PhoneNumber != null;
-            }
-            return false;
+            return user != null && user.PhoneNumber != null;
         }
 
         public enum ManageMessageId

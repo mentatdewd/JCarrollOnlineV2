@@ -8,7 +8,7 @@ using BundleTransformer.Core.Transformers;
 
 namespace JCarrollOnlineV2
 {
-    public class BundleConfig
+    public static class BundleConfig
     {
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
@@ -22,7 +22,6 @@ namespace JCarrollOnlineV2
 
             NullBuilder nullBuilder = new NullBuilder();
             StyleTransformer styleTransformer = new StyleTransformer();
-            ScriptTransformer scriptTransformer = new ScriptTransformer();
             NullOrderer nullOrderer = new NullOrderer();
 
             BundleResolver.Current = new CustomBundleResolver();

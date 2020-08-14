@@ -12,57 +12,58 @@
         var cmtList = event.target.getAttribute("data-BlogItemId");
         $("#" + cmtList).hide(400);
     });
-    $(".ShowCommentsDialogButton").click(function (event) {
+    $(document).on('click', '.ShowCommentsDialogButton', function () {
         var data = event.target.id;
         var blogItemId = event.target.getAttribute("data-BlogItemId");
-        ShowMyDialog(blogItemId);
+        $('.modal-body').load();
         $(this).find("[type=submit]").hide();
     });
 }
 
-function ShowMyDialog(item) {
-    var targetForm = "#commentForm" + item;
 
-    $("#commentForm" + item).dialog({
-        width: 450,
-        open: function (event, ui) {
-            $(this).find("[type=submit]").hide();
-        },
+//function ShowMyDialog(item) {
+//    var targetForm = "#commentForm" + item;
+//    console.log("Looking up " + $(targetForm).id);
+//    $(targetForm).dialog({
+//        width: 450,
+//        open: function (event, ui) {
+//            $(this).find("[type=submit]").hide();
+//        },
 
-        buttons:
-        [
-            {
-                text: "Add a Comment",
-                click: function () {
-                    var mydata = $("#commentForm" + item).serialize();
+//        buttons:
+//        [
+//            {
+//                text: "Add a Comment",
+//                click: function () {
+//                    var mydata = $("#commentForm" + item).serialize();
 
-                    if ($("#commentForm" + item).valid()) {
-                        console.log("serialized commentForm: ", mydata);
-                        $.ajax(
-                            {
-                                url: "../Blog/CreateComment",
-                                type: "POST",
-                                data: mydata,
-                                success: function (data) {
-                                    if (data.success) {
-                                        $(item).load(item)
-                                    }
-                                }
-                            }
-                        );
-                        $(this).dialog("close");
-                    }
-                }
-            },
-            {
-                text: "Close",
-                click: function () {
-                    $(this).dialog("close");
-                }
-            }
-        ]
-    });
-}
+//                    if ($("#commentForm" + item).valid()) {
+//                        console.log("serialized commentForm: ", mydata);
+//                        $.ajax(
+//                            {
+//                                url: "../Blog/CreateComment",
+//                                type: "POST",
+//                                data: mydata,
+//                                success: function (data) {
+//                                    if (data.success) {
+//                                        $(item).load(item)
+//                                    }
+//                                }
+//                            }
+//                        );
+//                        $(this).dialog("close");
+//                    }
+//                }
+//            },
+//            {
+//                text: "Close",
+//                click: function () {
+//                    $(this).dialog("close");
+//                }
+//            }
+//        ]
+//    });
+//}
 
 $(function () {
     //or to give the parser some context, supply it with a selector

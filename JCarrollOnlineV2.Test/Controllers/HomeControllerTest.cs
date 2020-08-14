@@ -13,14 +13,16 @@ namespace JCarrollOnlineV2.Tests.Controllers
         public async Task Index()
         {
             // Arrange
-            HomeController controller = new HomeController();
+            using (HomeController controller = new HomeController())
+            {
 
-            // Act
-            ViewResult result = await controller.Index(null) as ViewResult;
-            HomeViewModel vm = (HomeViewModel)result.Model;
+                // Act
+                ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
+                HomeViewModel vm = (HomeViewModel)result.Model;
 
-            // Assert
-            Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.Message);
+                // Assert
+                Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.Message);
+            }
         }
 
         //[TestMethod]
@@ -39,27 +41,29 @@ namespace JCarrollOnlineV2.Tests.Controllers
         public void About()
         {
             // Arrange
-            HomeController controller = new HomeController();
+            using (HomeController controller = new HomeController())
+            {
+                // Act
+                ViewResult result = controller.About() as ViewResult;
+                AboutViewModel vm = (AboutViewModel)result.Model;
 
-            // Act
-            ViewResult result = controller.About() as ViewResult;
-            AboutViewModel vm = (AboutViewModel)result.Model;
-
-            // Assert
-            Assert.AreEqual("About JCarrollOnlineV2", vm.Message);
+                // Assert
+                Assert.AreEqual("About JCarrollOnlineV2", vm.Message);
+            }
         }
 
         [TestMethod]
         public void Contact()
         {
             // Arrange
-            HomeController controller = new HomeController();
-
-            // Act
-            ViewResult result = controller.Contact() as ViewResult;
-            ContactViewModel vm = (ContactViewModel)result.Model;
-            // Assert
-            Assert.AreEqual("JCarrollOnlineV2 Contact", vm.Message);
+            using (HomeController controller = new HomeController())
+            {
+                // Act
+                ViewResult result = controller.Contact() as ViewResult;
+                ContactViewModel vm = (ContactViewModel)result.Model;
+                // Assert
+                Assert.AreEqual("JCarrollOnlineV2 Contact", vm.Message);
+            }
         }
     }
 }

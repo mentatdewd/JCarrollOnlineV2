@@ -24,11 +24,7 @@ namespace JCarrollOnlineV2.ViewModels.Blog
         [Display(Name = "Content")]
         [DataType(DataType.MultilineText)]
         [AllowHtml]
-        public string Content
-        {
-            get;
-            set;
-        }
+        public string Content { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

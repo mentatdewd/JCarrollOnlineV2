@@ -10,18 +10,21 @@ namespace JCarrollOnlineV2.Controllers
     public class SandboxController : Controller
     {
         // GET: Sandbox
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
-            SandboxViewModel sandboxViewModel = new SandboxViewModel();
-
-            sandboxViewModel.PageTitle = "Sandbox";
+            SandboxViewModel sandboxViewModel = new SandboxViewModel
+            {
+                PageTitle = "Sandbox"
+            };
 
             return await Task.Run<ActionResult>(() =>
             {
                 return View(sandboxViewModel);
-            });
+            }).ConfigureAwait(false);
         }
 
+        [HttpGet]
         public async Task<ActionResult> YellowStoneSlideShow()
         {
             YellowstoneViewModel yellowstoneViewModel = new YellowstoneViewModel();
@@ -34,7 +37,7 @@ namespace JCarrollOnlineV2.Controllers
 
             foreach(string imageFile in imageFiles)
             {
-                yellowstoneViewModel.AddImageFile(new ImageFileMetaData()
+                yellowstoneViewModel.AddImageFile(new ImageFileMetadata()
                 {
                     Path = baseUri + Path.GetFileName(imageFile),
                     Caption = "",
@@ -46,91 +49,90 @@ namespace JCarrollOnlineV2.Controllers
             return await Task.Run<ActionResult>(() =>
             {
                 return View(yellowstoneViewModel);
-            });
+            }).ConfigureAwait(false);
         }
 
         // GET: Sandbox/Details/5
-        public async Task<ActionResult> Details(int id)
+        [HttpGet]
+        public async Task<ActionResult> Details()
         {
             return await Task.Run<ActionResult>(() =>
             {
                 return View();
-            });
+            }).ConfigureAwait(false);
         }
 
         // GET: Sandbox/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Sandbox/Create
-        [HttpPost]
-        public async Task<ActionResult> Create(FormCollection collection)
-        {
-            return await Task.Run<ActionResult>(() =>
-            {
-                try
-                {
-                    // TODO: Add insert logic here
-                    return RedirectToAction("Index");
-                }
-                catch
-                {
-                    return View();
-                }
-            });
-        }
-
-        // GET: Sandbox/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Sandbox/Edit/5
-        [HttpPost]
-        public async Task<ActionResult> Edit(int id, FormCollection collection)
-        {
-            return await Task.Run<ActionResult>(() =>
-            {
-                try
-                {
-                    // TODO: Add update logic here
-                    return RedirectToAction("Index");
-                }
-                catch
-                {
-                    return View();
-                }
-            });
-        }
-
-        // GET: Sandbox/Delete/5
-        public async Task<ActionResult> Delete(int id)
+        [HttpGet]
+        public async Task<ActionResult> Create()
         {
             return await Task.Run<ActionResult>(() =>
             {
                 return View();
-            });
+            }).ConfigureAwait(false);
         }
 
-        // POST: Sandbox/Delete/5
-        [HttpPost]
-        public async Task<ActionResult> Delete(int id, FormCollection collection)
+        // POST: Sandbox/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Create()
+        //{
+        //    return await Task.Run<ActionResult>(() =>
+        //    {
+        //        // TODO: Add insert logic here
+        //        return RedirectToAction("Index");
+        //    }).ConfigureAwait(false);
+        //}
+
+        // GET: Sandbox/Edit/5
+        [HttpGet]
+        public async Task<ActionResult> Edit()
         {
             return await Task.Run<ActionResult>(() =>
             {
-                try
-                {
-                    // TODO: Add delete logic here
-                    return RedirectToAction("Index");
-                }
-                catch
-                {
-                    return View();
-                }
-            });
+                return View();
+            }).ConfigureAwait(false);
         }
+
+        //// POST: Sandbox/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Edit()
+        //{
+        //    return await Task.Run<ActionResult>(() =>
+        //    {
+        //        // TODO: Add update logic here
+        //        return RedirectToAction("Index");
+        //    }).ConfigureAwait(false);
+        //}
+
+        // GET: Sandbox/Delete/5
+        [HttpGet]
+        public async Task<ActionResult> Delete()
+        {
+            return await Task.Run<ActionResult>(() =>
+            {
+                return View();
+            }).ConfigureAwait(false);
+        }
+
+        // POST: Sandbox/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Delete()
+        //{
+        //    return await Task.Run<ActionResult>(() =>
+        //    {
+        //        try
+        //        {
+        //            // TODO: Add delete logic here
+        //            return RedirectToAction("Index");
+        //        }
+        //        catch
+        //        {
+        //            return View();
+        //        }
+        //    }).ConfigureAwait(false);
+        //}
     }
 }

@@ -3,6 +3,6 @@
 
 <li style="border-bottom: 1px solid #eaeaea; margin-bottom: 4px; margin-top: 10px">
     <span>
-        @Html.ActionLink(@Model.ForumTitle + ";  " + Model.ThreadTitle, "Details", "ForumThreadEntries", new { forumId = Model.ForumId, id = Model.ThreadId }, null);
+        @Html.ActionLink(@Model.ForumTitle + ":  " + Model.ThreadTitle, "Details", "ForumThreadEntries", new { forumId = Model.ForumId, id = Model.ThreadId }, null)
     </span>
 </li>

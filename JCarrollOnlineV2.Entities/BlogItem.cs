@@ -23,6 +23,8 @@ namespace JCarrollOnlineV2.Entities
 
         [Required]
         public virtual ApplicationUser Author { get; set; }
-        public virtual Collection<BlogItemComment> BlogItemComments { get; private set; }
+#pragma warning disable CA2227 // Collection properties should be read only injector needs access to this
+        public virtual Collection<BlogItemComment> BlogItemComments { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

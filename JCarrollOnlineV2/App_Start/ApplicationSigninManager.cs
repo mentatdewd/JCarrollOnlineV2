@@ -19,22 +19,17 @@ namespace JCarrollOnlineV2
 
         public override Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
         {
-            if (user == null)
-            {
-                throw new System.ArgumentNullException(nameof(user));
-            }
-
-            return user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
+            return user == null
+                ? throw new System.ArgumentNullException(nameof(user))
+                : user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
         }
 
         public static ApplicationSignInManager Create(IdentityFactoryOptions<ApplicationSignInManager> options, IOwinContext context)
         {
-            if (context == null)
-            {
-                throw new System.ArgumentNullException(nameof(context));
-            }
-
-            return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
+            _ = options;
+            return context == null
+                ? throw new System.ArgumentNullException(nameof(context))
+                : new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
     }
 }

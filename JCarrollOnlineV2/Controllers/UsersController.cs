@@ -3,6 +3,7 @@ using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security.Provider;
 using NLog;
 using Omu.ValueInjecter;
 using System.Data.Entity;
@@ -15,9 +16,9 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize]
     public class UsersController : Controller
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private JCarrollOnlineV2DbContext _data { get; set; }
+        private JCarrollOnlineV2DbContext Data { get; set; }
 
         public UsersController()
             : this(null)
@@ -27,10 +28,11 @@ namespace JCarrollOnlineV2.Controllers
 
         public UsersController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2DbContext();
+            Data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: Users
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
             UsersIndexViewModel usersIndexViewModel = new UsersIndexViewModel
@@ -38,14 +40,14 @@ namespace JCarrollOnlineV2.Controllers
                 PageTitle = "Users"
             };
 
-            System.Collections.Generic.List<ApplicationUser> users = await _data.ApplicationUser.Include("Following").Include("Followers").ToListAsync();
+            System.Collections.Generic.List<ApplicationUser> users = await Data.ApplicationUser.Include("Following").Include("Followers").ToListAsync().ConfigureAwait(false);
 
             foreach (ApplicationUser user in users)
             {
-                UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                 userItemViewModel.User.InjectFrom(user);
-                userItemViewModel.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == user.Id).Select(u => u.MicroPosts).CountAsync();
+                userItemViewModel.MicroPostsAuthored = await Data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == user.Id).Select(u => u.MicroPosts).CountAsync().ConfigureAwait(false);
                 usersIndexViewModel.Users.Add(userItemViewModel);
             }
 
@@ -53,6 +55,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Users/Details/5
+        [HttpGet]
         public async Task<ActionResult> Details(string userId)
         {
             UserDetailViewModel userDetailViewModel = new UserDetailViewModel();
@@ -64,8 +67,8 @@ namespace JCarrollOnlineV2.Controllers
                 userId = currentUserId;
             }
 
-            ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
-            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").FirstOrDefaultAsync(m => m.Id == userId);
+            ApplicationUser currentUser = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
+            ApplicationUser user = await Data.ApplicationUser.Include("Following").Include("Followers").FirstOrDefaultAsync(m => m.Id == userId).ConfigureAwait(false);
 
             if (user != null)
             {
@@ -84,11 +87,11 @@ namespace JCarrollOnlineV2.Controllers
 
                 foreach (ApplicationUser following in user.Following)
                 {
-                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                     userItemViewModel.User.InjectFrom(following);
                     userItemViewModel.UserId = following.Id;
-                    userItemViewModel.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == following.Id).CountAsync();
+                    userItemViewModel.MicroPostsAuthored = await Data.MicroPost.Where(u => u.Author.Id == following.Id).CountAsync().ConfigureAwait(false);
                     userDetailViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
                 }
 
@@ -96,26 +99,27 @@ namespace JCarrollOnlineV2.Controllers
 
                 foreach (ApplicationUser follower in user.Followers)
                 {
-                    UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                     userItemViewModel.User.InjectFrom(follower);
                     userItemViewModel.UserId = follower.Id;
-                    userItemViewModel.MicroPostsAuthored = await _data.MicroPost.Where(u => u.Author.Id == follower.Id).CountAsync();
+                    userItemViewModel.MicroPostsAuthored = await Data.MicroPost.Where(u => u.Author.Id == follower.Id).CountAsync().ConfigureAwait(false);
                     userDetailViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
                 }
             }
             return View(userDetailViewModel);
         }
 
+        [HttpGet]
         public async Task<ActionResult> Following(string userId)
         {
             UserDetailViewModel userDetailViewModel = new UserDetailViewModel
             {
                 PageTitle = "Following",
-                UserInfoViewModel = new UserItemViewModel(logger)
+                UserInfoViewModel = new UserItemViewModel(_logger)
             };
 
-            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
+            ApplicationUser user = await Data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId).ConfigureAwait(false);
 
             userDetailViewModel.UserStatsViewModel = new UserStatsViewModel();
             userDetailViewModel.User.InjectFrom(user);
@@ -124,32 +128,33 @@ namespace JCarrollOnlineV2.Controllers
 
             foreach (ApplicationUser following in user.Following)
             {
-                UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
                 userItemViewModel.User.InjectFrom(following);
-                userItemViewModel.MicroPostsAuthored = following.MicroPosts.Count();
+                userItemViewModel.MicroPostsAuthored = following.MicroPosts.Count;
                 userDetailViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
             }
 
             foreach (ApplicationUser follower in user.Followers)
             {
-                UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
                 userItemViewModel.InjectFrom(follower);
-                userItemViewModel.MicroPostsAuthored = follower.MicroPosts.Count();
+                userItemViewModel.MicroPostsAuthored = follower.MicroPosts.Count;
                 userDetailViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
             }
 
             return View("Show_Follow", userDetailViewModel);
         }
 
+        [HttpGet]
         public async Task<ActionResult> Followed(string userId)
         {
             UserDetailViewModel userDetailViewModel = new UserDetailViewModel
             {
                 PageTitle = "Followers",
-                UserInfoViewModel = new UserItemViewModel(logger)
+                UserInfoViewModel = new UserItemViewModel(_logger)
             };
 
-            ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId);
+            ApplicationUser user = await Data.ApplicationUser.Include("Following").Include("Followers").SingleAsync(m => m.Id == userId).ConfigureAwait(false);
 
             userDetailViewModel.UserStatsViewModel = new UserStatsViewModel();
             userDetailViewModel.User.InjectFrom(user);
@@ -158,19 +163,19 @@ namespace JCarrollOnlineV2.Controllers
 
             foreach (ApplicationUser following in user.Following)
             {
-                UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                 userItemViewModel.User.InjectFrom(following);
-                userItemViewModel.MicroPostsAuthored = following.MicroPosts.Count();
+                userItemViewModel.MicroPostsAuthored = following.MicroPosts.Count;
                 userDetailViewModel.UserStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
             }
 
             foreach (ApplicationUser follower in user.Followers)
             {
-                UserItemViewModel userItemViewModel = new UserItemViewModel(logger);
+                UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                 userItemViewModel.User.InjectFrom(follower);
-                userItemViewModel.MicroPostsAuthored = follower.MicroPosts.Count();
+                userItemViewModel.MicroPostsAuthored = follower.MicroPosts.Count;
                 userDetailViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
             }
 
@@ -185,14 +190,14 @@ namespace JCarrollOnlineV2.Controllers
             if (ModelState.IsValid)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                ApplicationUser followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
+                ApplicationUser currentUser = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
+                ApplicationUser followingUser = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId).ConfigureAwait(false);
 
                 currentUser.Following.Add(followingUser);
-                await _data.SaveChangesAsync();
+                await Data.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            return RedirectToAction("Details", new { userid = followUser.UserId });
+            return RedirectToAction("Details", new { userid = followUser?.UserId });
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Unfollow")]
@@ -204,14 +209,14 @@ namespace JCarrollOnlineV2.Controllers
             if (ModelState.IsValid)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
-                ApplicationUser followingUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId);
+                ApplicationUser currentUser = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
+                ApplicationUser followingUser = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == followUser.UserId).ConfigureAwait(false);
 
                 currentUser.Following.Remove(followingUser);
-                await _data.SaveChangesAsync();
+                await Data.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            return RedirectToAction("Details", new { userid = followUser.UserId });
+            return RedirectToAction("Details", new { userid = followUser?.UserId });
         }
 
         [HttpPost]
@@ -220,90 +225,83 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == userItemViewModel.UserId);
+                ApplicationUser user = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == userItemViewModel.UserId).ConfigureAwait(false);
 
-                user.MicroPostEmailNotifications = userItemViewModel.MicroPostEmailNotifications;
-                //user.MicroPostSMSNotifications = auVM.MicroPostSMSNotifications;
-                await _data.SaveChangesAsync();
+                if (userItemViewModel != null)
+                {
+                    user.MicroPostEmailNotifications = userItemViewModel.MicroPostEmailNotifications;
+                    //user.MicroPostSMSNotifications = auVM.MicroPostSMSNotifications;
+                    await Data.SaveChangesAsync().ConfigureAwait(false);
+                }
             }
 
-            return RedirectToAction("Details", new { userid = userItemViewModel.UserId });
+            return RedirectToAction("Details", new { userid = userItemViewModel?.UserId });
         }
 
         // GET: Users/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Users/Create
-        [HttpPost]
-        public async Task<ActionResult> Create(FormCollection collection)
-        {
-            return await Task.Run<ActionResult>(() =>
-            {
-                try
-                {
-                    // TODO: Add insert logic here
-                    return RedirectToAction("Index");
-                }
-                catch
-                {
-                    return View();
-                }
-            });
-        }
-
-        // GET: Users/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Users/Edit/5
-        [HttpPost]
-        public async Task<ActionResult> Edit(int id, FormCollection collection)
-        {
-            return await Task.Run<ActionResult>(() =>
-            {
-                try
-                {
-                    // TODO: Add update logic here
-                    return RedirectToAction("Index");
-                }
-                catch
-                {
-                    return View();
-                }
-            });
-        }
-
-        // GET: Users/Delete/5
-        public async Task<ActionResult> Delete(string userId)
+        [HttpGet]
+        public async Task<ActionResult> Create()
         {
             return await Task.Run<ActionResult>(() =>
             {
                 return View();
-            });
+            }).ConfigureAwait(false);
+
         }
 
-        // POST: Users/Delete/5
-        [HttpPost]
-        public async Task<ActionResult> Delete(int id, FormCollection collection)
+        //// POST: Users/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Create()
+        //{
+        //    return await Task.Run<ActionResult>(() =>
+        //    {
+        //        return RedirectToAction("Index");
+        //    }).ConfigureAwait(false);
+        //}
+
+        // GET: Users/Edit/5
+        [HttpGet]
+        public async Task<ActionResult> Edit()
         {
             return await Task.Run<ActionResult>(() =>
             {
-                try
-                {
-                    // TODO: Add delete logic here
-                    return RedirectToAction("Index");
-                }
-                catch
-                {
-                    return View();
-                }
-            });
+                return View();
+            }).ConfigureAwait(false);
         }
+
+        // POST: Users/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Edit(int id, FormCollection collection)
+        //{
+        //    return await Task.Run<ActionResult>(() =>
+        //    {
+        //        return RedirectToAction("Index");
+        //    }).ConfigureAwait(false);
+        //}
+
+        // GET: Users/Delete/5
+        [HttpGet]
+        public async Task<ActionResult> Delete()
+        {
+            return await Task.Run<ActionResult>(() =>
+            {
+                return View();
+            }).ConfigureAwait(false);
+        }
+
+        // POST: Users/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Delete()
+        //{
+        //    return await Task.Run<ActionResult>(() =>
+        //    {
+        //        // TODO: Add delete logic here
+        //        return RedirectToAction("Index");
+        //    }).ConfigureAwait(false);
+        //}
 
         protected override void Dispose(bool disposing)
         {

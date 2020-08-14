@@ -1,16 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
-using RestSharp;
-using RestSharp.Authenticators;
-using SendGrid;
-using SendGrid.Helpers.Mail;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Mail;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2
@@ -22,30 +11,32 @@ namespace JCarrollOnlineV2
             return SendAsync("Excited User <administrator@mail.JCarrollOnline.com>", message.Destination, message.Subject, message.Body);
         }
 
-        public async Task SendAsync(string fromString, string toString, string subjectString, string message)
+        public static async Task SendAsync(string fromString, string toString, string subjectString, string message)
         {
-            MailMessage msg = new MailMessage();
-            msg.Subject = subjectString;
-            msg.From = new MailAddress(fromString);
-            msg.Body = message;
-            msg.To.Add(new MailAddress(toString));
+            //using (MailMessage msg = new MailMessage())
+            //{
+            //    msg.Subject = subjectString;
+            //    msg.From = new MailAddress(fromString);
+            //    msg.Body = message;
+            //    msg.To.Add(new MailAddress(toString));
 
-            //var plainTextContent = "and easy to do anywhere, even with C#";
-            using (SmtpClient smtp = new SmtpClient())
-            {
-                smtp.Host = "mail.jcarrollonline.com";
-                smtp.Port = 25;
-                smtp.EnableSsl = false;
-                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtp.UseDefaultCredentials = true;
-                //NetworkCredential credential = new NetworkCredential
-                //{
-                //    UserName = "",  // replace with valid value
-                //    Password = ""  // replace with valid value
-                //};
-                //smtp.Credentials = credential;
-                await smtp.SendMailAsync(msg);
-            }
+            //    //var plainTextContent = "and easy to do anywhere, even with C#";
+            //    using (SmtpClient smtp = new SmtpClient())
+            //    {
+            //        smtp.Host = "mail.jcarrollonline.com";
+            //        smtp.Port = 25;
+            //        smtp.EnableSsl = false;
+            //        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            //        smtp.UseDefaultCredentials = true;
+            //        //NetworkCredential credential = new NetworkCredential
+            //        //{
+            //        //    UserName = "",  // replace with valid value
+            //        //    Password = ""  // replace with valid value
+            //        //};
+            //        //smtp.Credentials = credential;
+            //        await smtp.SendMailAsync(msg).ConfigureAwait(false);
+            //    }
+            //}
         }
     }
 }

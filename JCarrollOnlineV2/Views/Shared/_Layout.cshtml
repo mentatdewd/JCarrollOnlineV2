@@ -42,29 +42,6 @@
     @RenderSection("scripts", required: false)
 
     <script type="text/javascript">
-        // Set min-height property based on the tallest carousel item.
-        (function () {
-            var $inner = $('.carousel-inner'),
-                $items = $('.carousel-item');
-
-            var maxHeight = Math.max.apply(null,
-                $items.map(function () {
-                    return $(this).outerHeight();
-                })
-            );
-
-            $inner
-                .add($items)
-                .css('min-height', maxHeight);
-        })();
-        $(function () {
-            return $(".carousel.lazy").on("slide.bs.carousel", function (ev) {
-                var lazy;
-                lazy = $(ev.relatedTarget).find("img[data-src]");
-                lazy.attr("src", lazy.data('src'));
-                lazy.removeAttr("data-src");
-            });
-        });
         InitializeBlogComments();
     </script>    <nav class="navbar fixed top navbar-toggleable-md navbar-inverse bg-inverse">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">

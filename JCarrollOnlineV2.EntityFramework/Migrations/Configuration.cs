@@ -30,7 +30,9 @@ namespace JCarrollOnlineV2.EntityFramework.Migrations
         const string _adminRole = "Administrator";
         const string _adminName = "administrator";
 
-        private bool AddAdminRoleAndUser(JCarrollOnlineV2DbContext context)
+#pragma warning disable IDE0051 // Remove unused private members
+        private static bool AddAdminRoleAndUser(JCarrollOnlineV2DbContext context)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             using(UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context))
             using (UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(userStore))

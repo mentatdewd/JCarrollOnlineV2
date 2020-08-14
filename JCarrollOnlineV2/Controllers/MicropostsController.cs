@@ -28,7 +28,7 @@ namespace JCarrollOnlineV2.Controllers
             private set => _userManager = value;
         }
 
-        private JCarrollOnlineV2DbContext _data { get; set; }
+        private JCarrollOnlineV2DbContext Data { get; set; }
 
         public MicroPostsController()
             : this(null)
@@ -38,16 +38,18 @@ namespace JCarrollOnlineV2.Controllers
 
         public MicroPostsController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2DbContext();
+            Data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: MicroPosts
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
-            return View(await _data.MicroPost.ToListAsync());
+            return View(await Data.MicroPost.ToListAsync().ConfigureAwait(false));
         }
 
         // GET: MicroPosts/Details/5
+        [HttpGet]
         public async Task<ActionResult> Details(int? id)
         {
             if (id == null)
@@ -55,17 +57,13 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            MicroPost microPost = await _data.MicroPost.FindAsync(id);
+            MicroPost microPost = await Data.MicroPost.FindAsync(id).ConfigureAwait(false);
 
-            if (microPost == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(microPost);
+            return microPost == null ? HttpNotFound() : (ActionResult)View(microPost);
         }
 
         // GET: MicroPosts/Create
+        [HttpGet]
         public ActionResult Create()
         {
             return View();
@@ -87,13 +85,13 @@ namespace JCarrollOnlineV2.Controllers
                 microPost.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.ApplicationUser.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId);
+                ApplicationUser currentUser = await Data.ApplicationUser.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
 
                 microPost.Author = currentUser;
-                _data.MicroPost.Add(microPost);
-                await _data.SaveChangesAsync();
+                Data.MicroPost.Add(microPost);
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
-                await SendMicroPostNotification(microPost, currentUser);
+                await SendMicroPostNotification(microPost, currentUser).ConfigureAwait(false);
 
                 return RedirectToAction("Index", "Home");
             }
@@ -109,7 +107,7 @@ namespace JCarrollOnlineV2.Controllers
                 {
                     MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, user);
                     
-                    await SendEmail(microPostNotificationEmailViewModel);
+                    await SendEmail(microPostNotificationEmailViewModel).ConfigureAwait(false);
                 }
             }
 
@@ -117,17 +115,18 @@ namespace JCarrollOnlineV2.Controllers
             {
                 MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, currentUser);
 
-                await SendEmail(microPostNotificationEmailViewModel);
+                await SendEmail(microPostNotificationEmailViewModel).ConfigureAwait(false);
             }
         }
 
-        private MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
+        private static MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
         {
-            MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel();
-
-            microPostNotificationEmailViewModel.TargetUser = user;
-            microPostNotificationEmailViewModel.MicroPostAuthor = currentUser;
-            microPostNotificationEmailViewModel.MicroPostContent = micropost.Content;
+            MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel
+            {
+                TargetUser = user,
+                MicroPostAuthor = currentUser,
+                MicroPostContent = micropost.Content
+            };
 
             return microPostNotificationEmailViewModel;
         }
@@ -137,26 +136,30 @@ namespace JCarrollOnlineV2.Controllers
 
             string templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
             string templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicroPostNotificationPage.cshtml");
-            IRazorEngineService templateService = RazorEngineService.Create();
-
-            microPostNotificationEmailViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "microPostTemplatekey", null, microPostNotificationEmailViewModel);
-
-            await SendEmailAsync(microPostNotificationEmailViewModel);
+            using (IRazorEngineService templateService = RazorEngineService.Create())
+            {
+                microPostNotificationEmailViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "microPostTemplatekey", null, microPostNotificationEmailViewModel);
+                await SendEmailAsync(microPostNotificationEmailViewModel).ConfigureAwait(false);
+            }
         }
 
         public async Task SendEmailAsync(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
         {
-            IdentityMessage email = new IdentityMessage()
+            if (microPostNotificationEmailViewModel != null)
             {
-                Body = microPostNotificationEmailViewModel.Content,
-                Destination = microPostNotificationEmailViewModel.TargetUser.UserName + " " + microPostNotificationEmailViewModel.TargetUser.Email,
-                Subject = microPostNotificationEmailViewModel.MicroPostAuthor.UserName + " has added a new micropost"
-            };
-            
-            await  UserManager.EmailService.SendAsync(email);
+                IdentityMessage email = new IdentityMessage()
+                {
+                    Body = microPostNotificationEmailViewModel.Content,
+                    Destination = microPostNotificationEmailViewModel.TargetUser.UserName + " " + microPostNotificationEmailViewModel.TargetUser.Email,
+                    Subject = microPostNotificationEmailViewModel.MicroPostAuthor.UserName + " has added a new micropost"
+                };
+
+                await UserManager.EmailService.SendAsync(email).ConfigureAwait(false);
+            }
         }
 
         // GET: MicroPosts/Edit/5
+        [HttpGet]
         public async Task<ActionResult> Edit(int? microPostId)
         {
             if (microPostId == null)
@@ -164,14 +167,9 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            MicroPost micropost = await _data.MicroPost.FindAsync(microPostId);
+            MicroPost micropost = await Data.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
 
-            if (micropost == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(micropost);
+            return micropost == null ? HttpNotFound() : (ActionResult)View(micropost);
         }
 
         // POST: MicroPosts/Edit/5
@@ -183,8 +181,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                _data.Entry(microPost).State = EntityState.Modified;
-                await _data.SaveChangesAsync();
+                Data.Entry(microPost).State = EntityState.Modified;
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -193,6 +191,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: MicroPosts/Delete/5
+        [HttpGet]
         public async Task<ActionResult> Delete(int? microPostId)
         {
             if (microPostId == null)
@@ -200,14 +199,9 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            MicroPost micropost = await _data.MicroPost.FindAsync(microPostId);
+            MicroPost micropost = await Data.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
 
-            if (micropost == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(micropost);
+            return micropost == null ? HttpNotFound() : (ActionResult)View(micropost);
         }
 
         // POST: MicroPosts/Delete/5
@@ -215,10 +209,10 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int microPostId)
         {
-            MicroPost micropost = await _data.MicroPost.FindAsync(microPostId);
+            MicroPost micropost = await Data.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
 
-            _data.MicroPost.Remove(micropost);
-            await _data.SaveChangesAsync();
+            Data.MicroPost.Remove(micropost);
+            await Data.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index");
         }

@@ -369,3 +369,6 @@ h1 {
     .carousel-fade .carousel-item.active {
         opacity: 1;
     }
+#forumThreads {
+    list-style: none;
+}

@@ -14,7 +14,9 @@ namespace JCarrollOnlineV2
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc")]
     public class MvcApplication : System.Web.HttpApplication
     {
+#pragma warning disable CA1822 // Mark members as static If this is declared static, IIS complains that there is no default document
         protected void Application_Start()
+#pragma warning restore CA1822 // Mark members as static
         {
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);

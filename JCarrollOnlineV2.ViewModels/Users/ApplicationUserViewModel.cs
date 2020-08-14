@@ -16,6 +16,6 @@ namespace JCarrollOnlineV2.ViewModels.Users
         public bool MicroPostEmailNotifications { get; set; }
 
         [Display(Name="Enable microPost SMS notifications")]
-        public bool MicroPostSmsNotifications { get; set; }
+        public bool MicroPostSMSNotifications { get; set; }
     }
 }

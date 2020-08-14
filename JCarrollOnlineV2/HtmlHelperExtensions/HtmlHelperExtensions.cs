@@ -69,7 +69,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
             return string.Format(CultureInfo.InvariantCulture, "<a href='{0}'>{1}</a>", uri, label);
         }
 
-        private static Regex rxExtractLanguage = new Regex("({{(.+)}}[\r\n])", RegexOptions.Compiled);
+        private static Regex _rxExtractLanguage = new Regex("({{(.+)}}[\r\n])", RegexOptions.Compiled);
 
         public static MvcHtmlString Markdown(this HtmlHelper helper, string input)
         {
@@ -78,7 +78,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
                 throw new ArgumentNullException(nameof(input));
             }
             // Try to extract the language from the first line
-            Match match = rxExtractLanguage.Match(input);
+            Match match = _rxExtractLanguage.Match(input);
             string language = null;
 
             if (match.Success)
@@ -189,6 +189,8 @@ namespace JCarrollOnlineV2.HtmlHelpers
         /// <param name="includeJavaScript">If true, output will automatically into the JavaScript to turn the ul into the treeview</param>    
         public static string TreeView<T>(this HtmlHelper html, string treeId, string treeItemId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript, string emptyContent)
         {
+            _ = includeJavaScript;
+
             if (rootItems == null)
             {
                 throw new ArgumentNullException(nameof(rootItems));
@@ -198,15 +200,18 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
             sb.AppendFormat(CultureInfo.InvariantCulture, "<ul id='{0}'>\r\n", treeId);
 
-            if (rootItems.Count() == 0)
+            if (!rootItems.Any())
             {
                 sb.AppendFormat(CultureInfo.InvariantCulture, "<li id='{0}'>{1}</li>", treeItemId, emptyContent);
             }
 
             foreach (T item in rootItems)
             {
-                RenderLi(sb, item, itemContent, treeItemId);
-                AppendChildren(sb, item, childrenProperty, itemContent, treeId, treeItemId);
+                if (itemContent != null && childrenProperty != null)
+                {
+                    RenderLi(sb, item, itemContent, treeItemId);
+                    AppendChildren(sb, item, childrenProperty, itemContent, treeId, treeItemId);
+                }
             }
 
             sb.AppendLine("</ul>");
@@ -229,7 +234,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
             IEnumerable<T> children = childrenProperty(root);
             if (children != null)
             {
-                if (children.Count() == 0)
+                if (!children.Any())
                 {
                     sb.AppendLine("</li>");
                     return;
@@ -292,6 +297,10 @@ namespace JCarrollOnlineV2.HtmlHelpers
         /// <param name="includeJavaScript">If true, output will automatically into the JavaScript to turn the ul into the treeview</param>    
         public static string HierarchicalListView1<T>(this HtmlHelper html, string treeId, IEnumerable<T> rootItems, Func<T, IEnumerable<T>> childrenProperty, Func<T, string> itemContent, bool includeJavaScript, string emptyContent)
         {
+            _ = treeId;
+            _ = includeJavaScript;
+            _ = emptyContent;
+
             if (rootItems == null)
             {
                 throw new ArgumentNullException(nameof(rootItems));
@@ -301,8 +310,11 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
             foreach (T item in rootItems)
             {
-                RenderTr(sb, item, itemContent);
-                AppendListChildren(sb, item, childrenProperty, itemContent);
+                if (itemContent != null && childrenProperty != null)
+                {
+                    RenderTr(sb, item, itemContent);
+                    AppendListChildren(sb, item, childrenProperty, itemContent);
+                }
             }
 
             sb.AppendLine("</tr>");
@@ -325,7 +337,7 @@ namespace JCarrollOnlineV2.HtmlHelpers
             IEnumerable<T> children = childrenProperty(root);
             if (children != null)
             {
-                if (children.Count() == 0)
+                if (!children.Any())
                 {
                     sb.AppendLine("</tr>");
                     return;

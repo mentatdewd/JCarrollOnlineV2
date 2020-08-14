@@ -1,6 +1,4 @@
 ﻿using MarkdownDeep;
-using System;
-using System.Globalization;
 using System.Text;
 
 namespace JCarrollOnlineV2.HtmlHelpers
@@ -11,6 +9,8 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
         public static string FormatCodeBlock(Markdown md, string code)
         {
+            _ = md;
+
             // Wrap the code in <pre><code> as the default MarkdownDeep.NET implementation does, but add a class of
             // "prettyprint" which is what Google Code Prettify uses to identify code blocks.
             // http://google-code-prettify.googlecode.com/svn/trunk/README.html

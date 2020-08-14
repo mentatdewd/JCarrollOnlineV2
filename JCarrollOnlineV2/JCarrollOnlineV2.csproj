@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.3.3.0\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.3.3.0\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props')" />
+  <Import Project="..\packages\Microsoft.NetFramework.Analyzers.3.3.0\build\Microsoft.NetFramework.Analyzers.props" Condition="Exists('..\packages\Microsoft.NetFramework.Analyzers.3.3.0\build\Microsoft.NetFramework.Analyzers.props')" />
+  <Import Project="..\packages\Microsoft.NetCore.Analyzers.3.3.0\build\Microsoft.NetCore.Analyzers.props" Condition="Exists('..\packages\Microsoft.NetCore.Analyzers.3.3.0\build\Microsoft.NetCore.Analyzers.props')" />
+  <Import Project="..\packages\Microsoft.CodeQuality.Analyzers.3.3.0\build\Microsoft.CodeQuality.Analyzers.props" Condition="Exists('..\packages\Microsoft.CodeQuality.Analyzers.3.3.0\build\Microsoft.CodeQuality.Analyzers.props')" />
+  <Import Project="..\packages\Microsoft.CodeAnalysis.VersionCheckAnalyzer.3.3.0\build\Microsoft.CodeAnalysis.VersionCheckAnalyzer.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.VersionCheckAnalyzer.3.3.0\build\Microsoft.CodeAnalysis.VersionCheckAnalyzer.props')" />
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -36,7 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -329,6 +334,8 @@
     <Content Include="Content\css\bootsstrap\bootstrap-reboot.min.css.map" />
     <Content Include="Content\css\bootsstrap\bootstrap.css.map" />
     <Content Include="Content\css\bootsstrap\bootstrap.min.css.map" />
+    <Content Include="Content\scripts\jquery\jquery-3.5.1.min.map" />
+    <Content Include="Content\scripts\jquery\jquery-3.5.1.slim.min.map" />
     <None Include="DataContexts\JCarrollOnlineV2Db.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Global.asax.cs">
@@ -536,7 +543,33 @@
     <Content Include="Content\images\yellowstone\DSCF0224.jpg" />
     <Content Include="Content\images\yellowstone\DSCF0225.jpg" />
     <Content Include="Content\scripts\jcarrollonlinev2.js" />
+    <None Include="Content\scripts\jquery\jquery-3.5.1.intellisense.js" />
+    <Content Include="Content\scripts\jquery\jquery-3.5.1.js" />
+    <Content Include="Content\scripts\jquery\jquery-3.5.1.min.js" />
+    <Content Include="Content\scripts\jquery\jquery-3.5.1.slim.js" />
+    <Content Include="Content\scripts\jquery\jquery-3.5.1.slim.min.js" />
+    <Content Include="Content\scripts\jquery\jquery.unobtrusive-ajax.js" />
+    <Content Include="Content\scripts\jquery\jquery.unobtrusive-ajax.min.js" />
+    <None Include="Content\scripts\jquery\jquery.validate-vsdoc.js" />
+    <Content Include="Content\scripts\jquery\jquery.validate.js" />
+    <Content Include="Content\scripts\jquery\jquery.validate.min.js" />
+    <Content Include="Content\scripts\jquery\jquery.validate.unobtrusive.js" />
+    <Content Include="Content\scripts\jquery\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\scripts\livestamp.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeep.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeep.min.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeepEditor.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeepEditor.min.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeepEditorUI.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeepEditorUI.min.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeepLib.js" />
+    <Content Include="Content\scripts\markdowndeep\MarkdownDeepLib.min.js" />
+    <Content Include="Content\scripts\markdowndeep\mdd_ajax_loader.gif" />
+    <Content Include="Content\scripts\markdowndeep\mdd_gripper.png" />
+    <Content Include="Content\scripts\markdowndeep\mdd_help.htm" />
+    <Content Include="Content\scripts\markdowndeep\mdd_modal_background.png" />
+    <Content Include="Content\scripts\markdowndeep\mdd_styles.css" />
+    <Content Include="Content\scripts\markdowndeep\mdd_toolbar.png" />
     <Content Include="Content\scripts\modernizr-2.8.3.js" />
     <Content Include="Content\scripts\moment.js" />
     <Content Include="Content\scripts\bootstrap\bootstrap.bundle.js" />
@@ -547,18 +580,11 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="EmailTemplates\Web.config" />
+    <Content Include="Mvc.sitemap" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Scripts\MarkdownDeep License.txt" />
-    <Content Include="Scripts\MarkdownDeep Quick Reference.txt" />
-    <Content Include="Scripts\MarkdownDeepLib.min.js" />
-    <Content Include="Scripts\mdd_ajax_loader.gif" />
-    <Content Include="Scripts\mdd_gripper.png" />
-    <Content Include="Scripts\mdd_help.htm" />
-    <Content Include="Scripts\mdd_modal_background.png" />
-    <Content Include="Scripts\mdd_styles.css" />
-    <Content Include="Scripts\mdd_toolbar.png" />
     <Content Include="Views\ForumThreadEntries\AdminEdit.cshtml" />
     <Content Include="Views\Sandbox\YellowStoneSlideShow.cshtml" />
   </ItemGroup>
@@ -612,10 +638,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="EmailTemplates\MicropostNotificationPage.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Web.config">
-      <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\toastr.scss" />
@@ -743,8 +765,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\scripts\jquery\" />
-    <Folder Include="Content\scripts\markdowndeep\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -773,6 +793,17 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.VersionCheckAnalyzer.3.3.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.VersionCheckAnalyzer.resources.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.VersionCheckAnalyzer.3.3.0\analyzers\dotnet\Microsoft.CodeAnalysis.VersionCheckAnalyzer.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeQuality.Analyzers.3.3.0\analyzers\dotnet\cs\Humanizer.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeQuality.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.CodeQuality.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeQuality.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.CodeQuality.CSharp.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.NetCore.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.NetCore.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.NetCore.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.NetCore.CSharp.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -819,6 +850,11 @@
     <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
     <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.VersionCheckAnalyzer.3.3.0\build\Microsoft.CodeAnalysis.VersionCheckAnalyzer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.VersionCheckAnalyzer.3.3.0\build\Microsoft.CodeAnalysis.VersionCheckAnalyzer.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeQuality.Analyzers.3.3.0\build\Microsoft.CodeQuality.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeQuality.Analyzers.3.3.0\build\Microsoft.CodeQuality.Analyzers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.NetCore.Analyzers.3.3.0\build\Microsoft.NetCore.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.NetCore.Analyzers.3.3.0\build\Microsoft.NetCore.Analyzers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.NetFramework.Analyzers.3.3.0\build\Microsoft.NetFramework.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.NetFramework.Analyzers.3.3.0\build\Microsoft.NetFramework.Analyzers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.3.3.0\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.3.3.0\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props'))" />
   </Target>
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

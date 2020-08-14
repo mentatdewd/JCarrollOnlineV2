@@ -11,7 +11,7 @@ namespace JCarrollOnlineV2
 {
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
-        private bool _disposed = false;
+        private bool _disposed;
 
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
             : base(store)
@@ -25,11 +25,11 @@ namespace JCarrollOnlineV2
                 throw new ArgumentNullException(nameof(options));
             }
 
-            ApplicationUserManager manager = null;
-
+#pragma warning disable CA2000 // Dispose objects before losing scope If this is closed when leaving then the logged in user is lost
             UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2DbContext>());
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
-            manager = new ApplicationUserManager(userStore);
+            ApplicationUserManager manager = new ApplicationUserManager(userStore);
 
             // Configure validation logic for usernames
             manager.UserValidator = new UserValidator<ApplicationUser>(manager)

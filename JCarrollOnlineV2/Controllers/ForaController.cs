@@ -14,14 +14,15 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class ForaController : Controller
     {
-        private JCarrollOnlineV2DbContext _data { get; set; }
+        private JCarrollOnlineV2DbContext Data { get; set; }
 
         public ForaController()
         {
-            _data = new JCarrollOnlineV2DbContext();
+            Data = new JCarrollOnlineV2DbContext();
         }
 
         // GET: Fora
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
             ForaIndexViewModel foraIndexViewModel = new ForaIndexViewModel
@@ -29,18 +30,18 @@ namespace JCarrollOnlineV2.Controllers
                 ForaIndexItems = new List<ForaIndexItemViewModel>()
             };
 
-            List<Forum> fora = await _data.Forum.ToListAsync();
+            List<Forum> fora = await Data.Forum.ToListAsync().ConfigureAwait(false);
 
             foreach(Forum forum in fora)
             {
                 ForaIndexItemViewModel foraIndexItemViewModel = new ForaIndexItemViewModel();
 
                 foraIndexItemViewModel.InjectFrom(forum);
-                foraIndexItemViewModel.ThreadCount = await ControllerHelpers.GetThreadCountAsync(forum, _data);
+                foraIndexItemViewModel.ThreadCount = await ControllerHelpers.GetThreadCountAsync(forum, Data).ConfigureAwait(false);
 
                 if (foraIndexItemViewModel.ThreadCount > 0)
                 {
-                    foraIndexItemViewModel.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(forum, _data);
+                    foraIndexItemViewModel.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(forum, Data).ConfigureAwait(false);
                 }
 
                 foraIndexViewModel.ForaIndexItems.Add(foraIndexItemViewModel);
@@ -50,6 +51,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: Fora/Details/5
+        [HttpGet]
         public async Task<ActionResult> Details(int? id)
         {
             if (id == null)
@@ -57,18 +59,14 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Forum forum = await _data.Forum.FindAsync(id);
+            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
 
-            if (forum == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(forum);
+            return forum == null ? HttpNotFound() : (ActionResult)View(forum);
         }
 
         // GET: Fora/Create
         [Authorize(Roles ="Administrator")]
+        [HttpGet]
         public ActionResult Create()
         {
             ForaCreateViewModel foraCreateViewModel = new ForaCreateViewModel();
@@ -91,8 +89,8 @@ namespace JCarrollOnlineV2.Controllers
                 forum.InjectFrom(forumViewModel);
                 forum.CreatedAt = DateTime.Now;
                 forum.UpdatedAt = DateTime.Now;
-                _data.Forum.Add(forum);
-                await _data.SaveChangesAsync();
+                Data.Forum.Add(forum);
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -102,6 +100,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // GET: Fora/Edit/5
         [Authorize]
+        [HttpGet]
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
@@ -109,17 +108,12 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Forum forum = await _data.Forum.FindAsync(id);
+            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
             ForumEditViewModel forumEditViewModel = new ForumEditViewModel();
 
             forumEditViewModel.InjectFrom(forum);
 
-            if (forum == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(forumEditViewModel);
+            return forum == null ? HttpNotFound() : (ActionResult)View(forumEditViewModel);
         }
 
         // POST: Fora/Edit/5
@@ -132,8 +126,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                _data.Entry(forum).State = EntityState.Modified;
-                await _data.SaveChangesAsync();
+                Data.Entry(forum).State = EntityState.Modified;
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -143,6 +137,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // GET: Fora/Delete/5
         [Authorize]
+        [HttpGet]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,17 +145,12 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Forum forum = await _data.Forum.FindAsync(id);
+            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
             ForumDeleteViewModel forumDeleteViewModel = new ForumDeleteViewModel();
 
             forumDeleteViewModel.InjectFrom(forum);
 
-            if (forum == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(forumDeleteViewModel);
+            return forum == null ? HttpNotFound() : (ActionResult)View(forumDeleteViewModel);
         }
 
         // POST: Fora/Delete/5
@@ -169,10 +159,10 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Forum forum = await _data.Forum.FindAsync(id);
+            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
 
-            _data.Forum.Remove(forum);
-            await _data.SaveChangesAsync();
+            Data.Forum.Remove(forum);
+            await Data.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index");
         }

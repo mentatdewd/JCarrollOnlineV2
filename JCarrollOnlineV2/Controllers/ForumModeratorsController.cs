@@ -11,7 +11,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles="Administrator")]
     public class ForumModeratorsController : Controller
     {
-        private JCarrollOnlineV2DbContext _data { get; set; }
+        private JCarrollOnlineV2DbContext Data { get; set; }
 
         public ForumModeratorsController() : this(null)
         {
@@ -20,16 +20,18 @@ namespace JCarrollOnlineV2.Controllers
 
         public ForumModeratorsController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2DbContext();
+            Data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: ForumModerators
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
-            return View(await _data.ForumModerator.ToListAsync());
+            return View(await Data.ForumModerator.ToListAsync().ConfigureAwait(false));
         }
 
         // GET: ForumModerators/Details/5
+        [HttpGet]
         public async Task<ActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,17 +39,13 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+            ForumModerator forumModerator = await Data.ForumModerator.FindAsync(id).ConfigureAwait(false);
 
-            if (forumModerator == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(forumModerator);
+            return forumModerator == null ? HttpNotFound() : (ActionResult)View(forumModerator);
         }
 
         // GET: ForumModerators/Create
+        [HttpGet]
         public ActionResult Create()
         {
             return View();
@@ -62,8 +60,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                _data.ForumModerator.Add(forumModerator);
-                await _data.SaveChangesAsync();
+                Data.ForumModerator.Add(forumModerator);
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -72,6 +70,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: ForumModerators/Edit/5
+        [HttpGet]
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,14 +78,9 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+            ForumModerator forumModerator = await Data.ForumModerator.FindAsync(id).ConfigureAwait(false);
 
-            if (forumModerator == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(forumModerator);
+            return forumModerator == null ? HttpNotFound() : (ActionResult)View(forumModerator);
         }
 
         // POST: ForumModerators/Edit/5
@@ -98,8 +92,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                _data.Entry(forumModerator).State = EntityState.Modified;
-                await _data.SaveChangesAsync();
+                Data.Entry(forumModerator).State = EntityState.Modified;
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -108,6 +102,7 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: ForumModerators/Delete/5
+        [HttpGet]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -115,14 +110,9 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+            ForumModerator forumModerator = await Data.ForumModerator.FindAsync(id).ConfigureAwait(false);
 
-            if (forumModerator == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(forumModerator);
+            return forumModerator == null ? HttpNotFound() : (ActionResult)View(forumModerator);
         }
 
         // POST: ForumModerators/Delete/5
@@ -130,10 +120,10 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            ForumModerator forumModerator = await _data.ForumModerator.FindAsync(id);
+            ForumModerator forumModerator = await Data.ForumModerator.FindAsync(id).ConfigureAwait(false);
 
-            _data.ForumModerator.Remove(forumModerator);
-            await _data.SaveChangesAsync();
+            Data.ForumModerator.Remove(forumModerator);
+            await Data.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index");
         }

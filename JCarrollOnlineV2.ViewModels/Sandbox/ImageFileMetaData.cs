@@ -1,6 +1,6 @@
 ﻿namespace JCarrollOnlineV2.ViewModels.Sandbox
 {
-    public class ImageFileMetaData
+    public class ImageFileMetadata
     {
         public string Path { get; set; }
         public string Caption { get; set; }

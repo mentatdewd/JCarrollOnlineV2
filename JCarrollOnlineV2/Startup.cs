@@ -5,12 +5,12 @@ using Owin;
 [assembly: OwinStartupAttribute(typeof(JCarrollOnlineV2.Startup))]
 namespace JCarrollOnlineV2
 {
-    public partial class Startup
+    public static partial class Startup
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        public void Configuration(IAppBuilder app)
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        public static void Configuration(IAppBuilder app)
         {
-            logger.Info("Starting application");
+            _logger.Info("Starting application");
             ConfigureAuthentication(app);
         }
     }

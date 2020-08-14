@@ -9,13 +9,13 @@ namespace JCarrollOnlineV2.EntityFramework.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        private JCarrollOnlineV2DbContext _dbContext;
+        private readonly JCarrollOnlineV2DbContext _dbContext;
 
         internal Repository(JCarrollOnlineV2DbContext dbContext) { _dbContext = dbContext; }
 
         internal DbSet<TEntity> Set => _dbContext.Set<TEntity>();
 
-        public Repository(TEntity entity, DbContext context) { }
+        public Repository() { }
 
         public void Add(TEntity entity)
         {
@@ -32,9 +32,9 @@ namespace JCarrollOnlineV2.EntityFramework.Repositories
             return FindByIdAsync(id);
         }
 
-        public Task<TEntity> FindByIdAsync(CancellationToken cancellationToken, object id)
+        public Task<TEntity> FindByIdAsync(object id, CancellationToken cancellationToken)
         {
-            return FindByIdAsync(cancellationToken, id);
+            return FindByIdAsync(id);
         }
 
         public List<TEntity> GetAll()
@@ -62,7 +62,7 @@ namespace JCarrollOnlineV2.EntityFramework.Repositories
             return Set.Skip(skip).Take(take).ToListAsync();
         }
 
-        public Task<List<TEntity>> PageAllAsync(CancellationToken cancellationToken, int skip, int take)
+        public Task<List<TEntity>> PageAllAsync(int skip, int take, CancellationToken cancellationToken)
         {
             return Set.Skip(skip).Take(take).ToListAsync(cancellationToken);
         }
@@ -99,5 +99,15 @@ namespace JCarrollOnlineV2.EntityFramework.Repositories
 
             entry.State = EntityState.Modified;
         }
+
+        //public Task<List<TEntity>> PageAllAsync(int skip, int take, CancellationToken cancellationToken)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        //public Task<TEntity> FindByIdAsync(object id, CancellationToken cancellationToken)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
     }
 }

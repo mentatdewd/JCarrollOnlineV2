@@ -16,7 +16,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles = "Administrator")]
     public class BlogController : Controller
     {
-        private JCarrollOnlineV2DbContext _data { get; set; }
+        private JCarrollOnlineV2DbContext Data { get; set; }
 
         public BlogController()
             : this(null)
@@ -26,17 +26,18 @@ namespace JCarrollOnlineV2.Controllers
 
         public BlogController(JCarrollOnlineV2DbContext dataContext)
         {
-            _data = dataContext ?? new JCarrollOnlineV2DbContext();
+            Data = dataContext ?? new JCarrollOnlineV2DbContext();
         }
 
         // GET: BlogItemId
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
             BlogIndexViewModel blogIndexViewModel = new BlogIndexViewModel();
 
             string currentUserId = User.Identity.GetUserId();
-            ApplicationUser user = await _data.ApplicationUser.FindAsync(currentUserId);
-            List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").ToListAsync();
+            ApplicationUser user = await Data.ApplicationUser.FindAsync(currentUserId).ConfigureAwait(false);
+            List<BlogItem> blogItems = await Data.BlogItem.Include("BlogItemComments").ToListAsync().ConfigureAwait(false);
 
             foreach(BlogItem blogItem in blogItems.OrderByDescending(m => m.UpdatedAt))
             {
@@ -61,7 +62,8 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: BlogItemId/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public ActionResult Details()
         {
             return View();
         }
@@ -77,14 +79,17 @@ namespace JCarrollOnlineV2.Controllers
                 blogItemComment.InjectFrom(blogCommentItemViewModel);
                 blogItemComment.CreatedAt = DateTime.Now;
 
-                blogItemComment.BlogItem = _data.BlogItem.Find(blogCommentItemViewModel.Id);
-
-                _data.BlogItemComment.Add(blogItemComment);
-                _data.SaveChanges();
+                if (blogCommentItemViewModel != null)
+                {
+                    blogItemComment.BlogItem = Data.BlogItem.Find(blogCommentItemViewModel.Id);
+                }
+                Data.BlogItemComment.Add(blogItemComment);
+                Data.SaveChanges();
             }
         }
 
         // GET: BlogItemId/Create
+        [HttpGet]
         public ActionResult Create()
         {
             BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
@@ -97,7 +102,9 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         [ValidateInput(false)]
         [Authorize(Roles = "Administrator")]
+#pragma warning disable CA5363 // Do Not Disable Request Validation
         public async Task<ActionResult> Create([Bind(Include = "Title,Content")]  BlogFeedItemViewModel blogFeedItemViewModel)
+#pragma warning restore CA5363 // Do Not Disable Request Validation
         {
             if (ModelState.IsValid)
             {
@@ -109,12 +116,12 @@ namespace JCarrollOnlineV2.Controllers
                 blogItem.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await _data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId);
+                ApplicationUser currentUser = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
 
                 blogItem.Author = currentUser;
 
-                _data.BlogItem.Add(blogItem);
-                await _data.SaveChangesAsync();
+                Data.BlogItem.Add(blogItem);
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
                 return new RedirectResult(Url.Action("Index"));
             }
@@ -123,11 +130,12 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: BlogItemId/Edit/5
+        [HttpGet]
         public async Task<ActionResult> Edit(int blogItemId)
         {
             BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
-            BlogItem blogItem = await _data.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId);
+            BlogItem blogItem = await Data.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId).ConfigureAwait(false);
 
             if (blogItem == null)
             {
@@ -143,6 +151,7 @@ namespace JCarrollOnlineV2.Controllers
 
         // POST: BlogItemId/Edit/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,AuthorId,Title,Content,CreatedAt")] BlogFeedItemViewModel blogItemVM)
         {
             if (ModelState.IsValid)
@@ -150,11 +159,14 @@ namespace JCarrollOnlineV2.Controllers
                 BlogItem blogItem = new BlogItem();
 
                 blogItem.InjectFrom(blogItemVM);
-                blogItem.Author = await _data.ApplicationUser.FindAsync(blogItemVM.AuthorId);
+                if (blogItemVM != null)
+                {
+                    blogItem.Author = await Data.ApplicationUser.FindAsync(blogItemVM.AuthorId).ConfigureAwait(false);
+                }
                 blogItem.UpdatedAt = DateTime.Now;
 
-                _data.Entry(blogItem).State = EntityState.Modified;
-                await _data.SaveChangesAsync();
+                Data.Entry(blogItem).State = EntityState.Modified;
+                await Data.SaveChangesAsync().ConfigureAwait(false);
 
                 return Redirect(Url.RouteUrl(new { controller = "Blog", action = "Index"}));
             }
@@ -163,25 +175,19 @@ namespace JCarrollOnlineV2.Controllers
         }
 
         // GET: BlogItemId/Delete/5
-        public ActionResult Delete(int id)
+        [HttpGet]
+        public ActionResult Delete()
         {
             return View();
         }
 
-        // POST: BlogItemId/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// POST: BlogItemId/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Delete()
+        //{
+        //    // TODO: Add delete logic here
+        //    return RedirectToAction("Index");
+        //}
     }
 }

@@ -4,13 +4,13 @@ namespace JCarrollOnlineV2.ViewModels.Sandbox
 {
     public class YellowstoneViewModel : ViewModelBase
     {
-        private List<ImageFileMetaData> _imageFiles = new List<ImageFileMetaData>();
+        private readonly List<ImageFileMetadata> _imageFiles = new List<ImageFileMetadata>();
 
-        public IEnumerable<ImageFileMetaData> ImageFiles => _imageFiles;
+        public IEnumerable<ImageFileMetadata> ImageFiles => _imageFiles;
 
-        public void AddImageFile(ImageFileMetaData imageFileMetaData)
+        public void AddImageFile(ImageFileMetadata imageFileMetadata)
         {
-            _imageFiles.Add(imageFileMetaData);
+            _imageFiles.Add(imageFileMetadata);
         }
     }
 }

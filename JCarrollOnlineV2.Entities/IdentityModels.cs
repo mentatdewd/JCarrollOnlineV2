@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,8 +12,12 @@ namespace JCarrollOnlineV2.Entities
     {
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
-            ClaimsIdentity userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+            ClaimsIdentity userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie).ConfigureAwait(false);
             // Add custom user claims here
             return userIdentity;
         }
@@ -23,7 +28,7 @@ namespace JCarrollOnlineV2.Entities
         public bool MicroPostSmsNotifications { get; set; }
 
         // Navigation Property
-        public virtual ICollection<ThreadEntry> ForumThreadEntries { get; set; }
+        public virtual ICollection<ThreadEntry> ForumThreadEntries { get; private set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public virtual ICollection<MicroPost> MicroPosts { get; private set; }

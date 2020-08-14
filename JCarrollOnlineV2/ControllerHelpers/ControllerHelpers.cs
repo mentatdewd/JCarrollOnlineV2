@@ -17,36 +17,53 @@ namespace JCarrollOnlineV2
 {
     public static class ControllerHelpers
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         public static async Task<int> GetThreadPostCountAsync(int thread, IJCarrollOnlineV2Context data)
         {
-            return await data.ForumThreadEntry.Where(i => i.RootId == thread).AsQueryable().CountAsync();
+            return data == null
+                ? throw new ArgumentNullException(nameof(data))
+                : await data.ForumThreadEntry.Where(i => i.RootId == thread).AsQueryable().CountAsync().ConfigureAwait(false);
         }
 
         public static async Task<int> GetThreadCountAsync(Forum forum, JCarrollOnlineV2DbContext data)
         {
-            return await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync();
+            return data == null
+                ? throw new ArgumentNullException(nameof(data))
+                : await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id && i.ParentId == null).CountAsync().ConfigureAwait(false);
         }
 
         public static async Task<DateTime> GetLastReplyAsync(int? rootId, IJCarrollOnlineV2Context data)
         {
             if (rootId != null)
             {
-                ThreadEntry fte = await data.ForumThreadEntry.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync();
+                if (data == null)
+                {
+                    throw new ArgumentNullException(nameof(data));
+                }
+
+                ThreadEntry fte = await data.ForumThreadEntry.Where(m => m.RootId == rootId).OrderByDescending(m => m.UpdatedAt).FirstOrDefaultAsync().ConfigureAwait(false);
                 return fte.UpdatedAt;
             }
-            else return DateTime.Now;
+            else
+            {
+                return DateTime.Now;
+            }
         }
 
         public static async Task<LastThreadViewModel> GetLatestThreadDataAsync(Forum forum, JCarrollOnlineV2DbContext data)
         {
             LastThreadViewModel lastThreadViewModel = new LastThreadViewModel();
 
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
             ThreadEntry forumThreadEntry = await data.ForumThreadEntry.Where(i => i.Forum.Id == forum.Id)
                 .Include(i => i.Author)
                 .OrderByDescending(i => i.UpdatedAt)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync().ConfigureAwait(false);
 
             if (forumThreadEntry != null)
             {
@@ -62,7 +79,7 @@ namespace JCarrollOnlineV2
                 {
                     while (rootNotFound)
                     {
-                        forumThreadEntry = await data.ForumThreadEntry.FindAsync(forumThreadEntry.ParentId);
+                        forumThreadEntry = await data.ForumThreadEntry.FindAsync(forumThreadEntry.ParentId).ConfigureAwait(false);
                         if (forumThreadEntry != null)
                         {
                             if (forumThreadEntry.ParentId == null)
@@ -83,10 +100,11 @@ namespace JCarrollOnlineV2
 
         public static async Task<RssFeedViewModel> UpdateRssAsync()
         {
-            logger.Info("Obtaining rss data");
-            TNX.RssReader.RssFeed rssFeed = await TNX.RssReader.RssHelper.ReadFeedAsync("http://m.mariners.mlb.com/partnerxml/gen/news/rss/sea.xml");
+            _logger.Info("Obtaining rss data");
+            Uri mlbUri = new Uri("https://www.mlb.com/mariners/feeds/news/rss.xml");
+            TNX.RssReader.RssFeed rssFeed = await TNX.RssReader.RssHelper.ReadFeedAsync(mlbUri).ConfigureAwait(false);
 
-            logger.Info("Processing rss data");
+            _logger.Info("Processing rss data");
             RssFeedViewModel rssFeedViewModel = new RssFeedViewModel
             {
                 RssFeedItems = new List<RssFeedItemViewModel>()
@@ -105,7 +123,7 @@ namespace JCarrollOnlineV2
                 }
             }
 
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "Processed {0} rss records", rssFeedViewModel.RssFeedItems.Count));
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Processed {0} rss records", rssFeedViewModel.RssFeedItems.Count));
 
             return rssFeedViewModel;
         }

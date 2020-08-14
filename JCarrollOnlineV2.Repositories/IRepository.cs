@@ -12,11 +12,11 @@ namespace JCarrollOnlineV2.Repositories
 
         List<TEntity> PageAll(int skip, int take);
         Task<List<TEntity>> PageAllAsync(int skip, int take);
-        Task<List<TEntity>> PageAllAsync(CancellationToken cancellationToken, int skip, int take);
+        Task<List<TEntity>> PageAllAsync(int skip, int take, CancellationToken cancellationToken);
 
         TEntity FindById(object id);
         Task<TEntity> FindByIdAsync(object id);
-        Task<TEntity> FindByIdAsync(CancellationToken cancellationToken, object id);
+        Task<TEntity> FindByIdAsync(object id, CancellationToken cancellationToken);
 
         void Add(TEntity entity);
         void Update(TEntity entity);

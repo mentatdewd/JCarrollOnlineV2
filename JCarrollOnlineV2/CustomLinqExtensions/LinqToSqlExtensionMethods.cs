@@ -57,13 +57,14 @@ namespace JCarrollOnlineV2.Extensions
 
             IEnumerable<TEntity> childs = allItems.Where(predicate).ToList();
 
-            if (childs.Count() > 0)
+            if (childs.Any())
             {
                 depth++;
 
                 if ((depth <= maxDepth) || (maxDepth == 0))
                 {
                     foreach (TEntity item in childs)
+                    {
                         yield return
                           new HierarchyNode<TEntity>()
                           {
@@ -73,6 +74,7 @@ namespace JCarrollOnlineV2.Extensions
                               Depth = depth,
                               Parent = parentItem
                           };
+                    }
                 }
             }
         }

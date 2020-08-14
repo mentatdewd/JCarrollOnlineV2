@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using NLog;
 using Omu.ValueInjecter;
 using PagedList;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
@@ -20,15 +21,16 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class HomeController : Controller
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private JCarrollOnlineV2DbContext _data { get; set; }
+        private JCarrollOnlineV2DbContext Data { get; set; }
 
         public HomeController()
         {
-            _data = new JCarrollOnlineV2DbContext();
+            Data = new JCarrollOnlineV2DbContext();
         }
 
+        [HttpGet]
         public async Task<ActionResult> Index(int? microPostPage)
         {
             _logger.Info("In Home/Index");
@@ -46,19 +48,20 @@ namespace JCarrollOnlineV2.Controllers
             homeViewModel.UserStatsViewModel.UsersFollowing = new UserFollowingViewModel();
 
             _logger.Info("Checking for blog entries");
-            System.Collections.Generic.List<BlogItem> blogItems = await _data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync();
+            List<BlogItem> blogItems = await Data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync().ConfigureAwait(false);
 
             homeViewModel.LatestForumThreadsViewModel = new LatestForumThreadsViewModel();
-            System.Collections.Generic.List<ThreadEntry> threads = await _data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Forum).OrderByDescending(threadEntry => threadEntry.UpdatedAt).Take(5).ToListAsync();
+            List<ThreadEntry> threads = await Data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Forum).OrderByDescending(threadEntry => threadEntry.UpdatedAt).Take(5).ToListAsync().ConfigureAwait(false);
 
             foreach(ThreadEntry thread in threads)
             {
-                LatestForumThreadItemViewModel latestForumThreadItemViewModel = new LatestForumThreadItemViewModel();
-
-                latestForumThreadItemViewModel.ThreadTitle = thread.Title;
-                latestForumThreadItemViewModel.ForumTitle = thread.Forum.Title;
-                latestForumThreadItemViewModel.ForumId = thread.Forum.Id;
-                latestForumThreadItemViewModel.ThreadId = thread.Id;
+                LatestForumThreadItemViewModel latestForumThreadItemViewModel = new LatestForumThreadItemViewModel
+                {
+                    ThreadTitle = thread.Title,
+                    ForumTitle = thread.Forum.Title,
+                    ForumId = thread.Forum.Id,
+                    ThreadId = thread.Id
+                };
 
                 homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(latestForumThreadItemViewModel);
             }
@@ -93,11 +96,11 @@ namespace JCarrollOnlineV2.Controllers
             if (User != null && User.Identity.IsAuthenticated == true)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser user = await _data.ApplicationUser.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId);
+                ApplicationUser user = await Data.ApplicationUser.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId).ConfigureAwait(false);
 
                 homeViewModel.UserInfoViewModel.User.InjectFrom(user);
                 homeViewModel.UserInfoViewModel.UserId = user.Id;
-                homeViewModel.UserInfoViewModel.MicroPostsAuthored = user.MicroPosts.Count();
+                homeViewModel.UserInfoViewModel.MicroPostsAuthored = user.MicroPosts.Count;
                 homeViewModel.UserStatsViewModel.User.InjectFrom(user);
 
                 _logger.Info("Processing followings");
@@ -127,7 +130,7 @@ namespace JCarrollOnlineV2.Controllers
                     UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                     userItemViewModel.InjectFrom(item);
-                    userItemViewModel.MicroPostsAuthored = await _data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync();
+                    userItemViewModel.MicroPostsAuthored = await Data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync().ConfigureAwait(false);
                     homeViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
                 }
 
@@ -148,7 +151,7 @@ namespace JCarrollOnlineV2.Controllers
                 homeViewModel.MicroPostFeedViewModel.OnePageOfMicroPosts = homeViewModel.MicroPostFeedViewModel.MicroPostFeedItems.OrderByDescending(m => m.CreatedAt).ToPagedList(micropostPageNumber, 4);
 
                 _logger.Info("awaiting rss");
-                homeViewModel.RssFeedViewModel = await rss;
+                homeViewModel.RssFeedViewModel = await rss.ConfigureAwait(false);
             }
 
             homeViewModel.PageContainer = "Home";
@@ -157,6 +160,7 @@ namespace JCarrollOnlineV2.Controllers
             return View(homeViewModel);
         }
 
+        [HttpGet]
         public ActionResult About()
         {
             AboutViewModel aboutViewModel = new AboutViewModel
@@ -168,6 +172,7 @@ namespace JCarrollOnlineV2.Controllers
             return View(aboutViewModel);
         }
 
+        [HttpGet]
         public ActionResult Contact()
         {
             ContactViewModel contactViewModel = new ContactViewModel
@@ -179,6 +184,7 @@ namespace JCarrollOnlineV2.Controllers
             return View(contactViewModel);
         }
 
+        [HttpGet]
         public async Task<ActionResult> Welcome()
         {
             HomeViewModel homeViewModel = new HomeViewModel
@@ -189,15 +195,8 @@ namespace JCarrollOnlineV2.Controllers
 
             return await Task.Run<ActionResult>(() =>
             {
-                if (Request.IsAuthenticated)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    return View("Welcome", "_LayoutWelcome", homeViewModel);
-                }
-            });
+                return Request.IsAuthenticated ? RedirectToAction("Index", "Home") : (ActionResult)View("Welcome", "_LayoutWelcome", homeViewModel);
+            }).ConfigureAwait(false);
         }
     }
 }
