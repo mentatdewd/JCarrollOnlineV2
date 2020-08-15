@@ -73,9 +73,11 @@ namespace JCarrollOnlineV2.HtmlHelpers
 
         public static MvcHtmlString Markdown(this HtmlHelper helper, string input)
         {
+            // TODO: fix this, for some reason input is null and it shouldn't throw
             if (input == null)
             {
-                throw new ArgumentNullException(nameof(input));
+                return new MvcHtmlString("");
+                //throw new ArgumentNullException(nameof(input));
             }
             // Try to extract the language from the first line
             Match match = _rxExtractLanguage.Match(input);

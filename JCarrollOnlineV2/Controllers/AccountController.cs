@@ -288,7 +288,7 @@ namespace JCarrollOnlineV2.Controllers
             IdentityMessage email = new IdentityMessage()
             {
                 Body = userWelcomeViewModel?.Content,
-                Destination = userWelcomeViewModel.TargetUser.UserName + " " + userWelcomeViewModel.TargetUser.Email,
+                Destination = userWelcomeViewModel.TargetUser.Email,
                 Subject = "Welcome to JCarrollOnline"
             };
 

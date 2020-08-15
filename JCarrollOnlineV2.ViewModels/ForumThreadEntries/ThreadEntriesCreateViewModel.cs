@@ -11,6 +11,7 @@ namespace JCarrollOnlineV2.ViewModels.ForumThreadEntries
         public int ForumId { get; set; }
 
         [Display(Name = "Title")]
+        [Required]
         public string Title { get; set; }
 
         [Display(Name = "Content")]

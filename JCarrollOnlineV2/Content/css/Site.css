@@ -345,15 +345,18 @@ h1 {
 .ui-dialog > .ui-widget-header {
   background: orange;
 }
-.item img {
+.carousel-item img {
     width: 100%;
     min-height: 100%;
+    object-fit: contain;
 }
 
 .carousel-inner img {
     width: 100%;
     margin: auto;
     min-height: 100vh;
+    max-width: none;
+    object-fit: contain;
 }
 
 .carousel-fade .carousel-item {
@@ -363,12 +366,13 @@ h1 {
     left: 0;
     right: 0;
     opacity: 0;
-    transition: opacity 500ms ease;
+    transition: opacity 1000ms ease;
 }
 
-    .carousel-fade .carousel-item.active {
-        opacity: 1;
-    }
+.carousel-fade .carousel-item.active {
+    opacity: 1;
+}
+
 #forumThreads {
     list-style: none;
 }

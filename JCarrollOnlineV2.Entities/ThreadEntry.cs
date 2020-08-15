@@ -9,6 +9,7 @@ namespace JCarrollOnlineV2.Entities
         public int Id { get; set; }
 
         [StringLength(255)]
+        [Required]
         public string Title { get; set; }
 
         [DataType(DataType.MultilineText)]
