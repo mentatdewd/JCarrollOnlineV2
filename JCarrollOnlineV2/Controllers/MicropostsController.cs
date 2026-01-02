@@ -7,6 +7,7 @@ using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Omu.ValueInjecter;
+using RazorEngine;
 using RazorEngine.Templating;
 using System;
 using System.Data.Entity;
@@ -133,14 +134,14 @@ namespace JCarrollOnlineV2.Controllers
 
         private async Task SendEmail(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
         {
-
             string templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
             string templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicroPostNotificationPage.cshtml");
-            using (IRazorEngineService templateService = RazorEngineService.Create())
-            {
-                microPostNotificationEmailViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "microPostTemplatekey", null, microPostNotificationEmailViewModel);
-                await SendEmailAsync(microPostNotificationEmailViewModel).ConfigureAwait(false);
-            }
+
+            string template = System.IO.File.ReadAllText(templateFilePath);
+
+            microPostNotificationEmailViewModel.Content = Engine.Razor.RunCompile(template, "microPostTemplatekey", null, microPostNotificationEmailViewModel);
+
+            await SendEmailAsync(microPostNotificationEmailViewModel).ConfigureAwait(false);
         }
 
         public async Task SendEmailAsync(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)

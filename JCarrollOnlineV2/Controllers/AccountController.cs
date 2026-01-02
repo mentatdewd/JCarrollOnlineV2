@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using NLog;
 using Omu.ValueInjecter;
+using RazorEngine;
 using RazorEngine.Templating;
 using System;
 using System.Globalization;
@@ -270,17 +271,14 @@ namespace JCarrollOnlineV2.Controllers
 
         private async Task SendEmail(UserWelcomeViewModel userWelcomeViewModel)
         {
-
             string templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
             string templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
 
-            using (IRazorEngineService templateService = RazorEngineService.Create())
-            {
+            string template = System.IO.File.ReadAllText(templateFilePath);
 
-                userWelcomeViewModel.Content = templateService.RunCompile(System.IO.File.ReadAllText(templateFilePath), "userWelcomeTemplatekey", null, userWelcomeViewModel);
+            userWelcomeViewModel.Content = Engine.Razor.RunCompile(template, "userWelcomeTemplatekey", null, userWelcomeViewModel);
 
-                await SendEmailAsync(userWelcomeViewModel).ConfigureAwait(false);
-            }
+            await SendEmailAsync(userWelcomeViewModel).ConfigureAwait(false);
         }
 
         public async Task SendEmailAsync(UserWelcomeViewModel userWelcomeViewModel)

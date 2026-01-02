@@ -2,6 +2,7 @@
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Net;
 using System.Threading;
 using System.Web;
 using System.Web.Http;
@@ -18,6 +19,8 @@ namespace JCarrollOnlineV2
         protected void Application_Start()
 #pragma warning restore CA1822 // Mark members as static
         {
+            // Enable TLS 1.2 and TLS 1.3 for HTTPS requests
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

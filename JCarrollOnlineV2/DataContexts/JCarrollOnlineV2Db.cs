@@ -1,32 +1,28 @@
 ﻿using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.Migrations;
+using JCarrollOnlineV2.EntityFramework.Migrations;
 using Microsoft.AspNet.Identity.EntityFramework;
-using NLog;
 using System;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
-using System.Globalization;
-using System.Web.Management;
 
-namespace JCarrollOnlineV2.DataContexts
+namespace JCarrollOnlineV2.EntityFramework
 {
-    public class JCarrollOnlineV2Connection : DbContext, IJCarrollOnlineV2Context
+    public class JCarrollOnlineV2DbContext : DbContext
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        //private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public JCarrollOnlineV2Connection()
-            : base("JCarrollOnlineV2Connection")
+        public JCarrollOnlineV2DbContext()
+            : base("JCarrollOnlineV2ProductionConnection")  // Changed from JCarrollOnlineV2Connection
         {
             //Database.Log = Console.WriteLine;
             //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
             //Database.Log = s => { logger.Info(s); };
         }
 
-        public static JCarrollOnlineV2Connection Create()
+
+        public static JCarrollOnlineV2DbContext Create()
         {
-            var context = new JCarrollOnlineV2Connection();
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "Creating new db context, call stack: {0}", new System.Diagnostics.StackTrace()));
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "Using connection string: {0}", context.Database.Connection.ConnectionString));
+            JCarrollOnlineV2DbContext context = new JCarrollOnlineV2DbContext();
             return context;
         }
 
@@ -37,7 +33,7 @@ namespace JCarrollOnlineV2.DataContexts
                 throw new ArgumentNullException(nameof(modelBuilder));
             }
 
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2Connection, Configuration>());
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2DbContext, Configuration>());
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
