@@ -16,7 +16,7 @@ namespace JCarrollOnlineV2.EntityFramework.Migrations
 
         protected override void Seed(JCarrollOnlineV2DbContext context)
         {
-            //AddAdminRoleAndUser(context);
+            AddAdminRoleAndUser(context);
         }
 
         const string _adminRole = "Administrator";
@@ -39,7 +39,7 @@ namespace JCarrollOnlineV2.EntityFramework.Migrations
                         EmailConfirmed = true
                     };
 
-                    string password = "";
+                    string password = "Admin@2024";
 
                     userManager.Create(adminUser, password);
 

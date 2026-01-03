@@ -1,14 +1,11 @@
-﻿using JCarrollOnlineV2.DataContexts;
-using JCarrollOnlineV2.EmailViewModels;
+﻿using JCarrollOnlineV2.EmailViewModels;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
+using JCarrollOnlineV2.Helpers;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
-using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Omu.ValueInjecter;
-using RazorEngine;
-using RazorEngine.Templating;
 using System;
 using System.Data.Entity;
 using System.Net;
@@ -134,12 +131,26 @@ namespace JCarrollOnlineV2.Controllers
 
         private async Task SendEmail(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
         {
-            string templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-            string templateFilePath = System.IO.Path.Combine(templateFolderPath, "MicroPostNotificationPage.cshtml");
+            // Convert to anonymous object for Handlebars
+            var templateData = new
+            {
+                TargetUser = new
+                {
+                    microPostNotificationEmailViewModel.TargetUser.UserName,
+                    microPostNotificationEmailViewModel.TargetUser.Email
+                },
+                MicroPostAuthor = new
+                {
+                    microPostNotificationEmailViewModel.MicroPostAuthor.UserName
+                },
+                MicroPostContent = microPostNotificationEmailViewModel.MicroPostContent
+            };
 
-            string template = System.IO.File.ReadAllText(templateFilePath);
-
-            microPostNotificationEmailViewModel.Content = Engine.Razor.RunCompile(template, "microPostTemplatekey", null, microPostNotificationEmailViewModel);
+            // Use Handlebars instead of RazorEngine
+            microPostNotificationEmailViewModel.Content = HandlebarsEmailHelper.RenderTemplate(
+                "MicropostNotificationPage", 
+                templateData
+            );
 
             await SendEmailAsync(microPostNotificationEmailViewModel).ConfigureAwait(false);
         }

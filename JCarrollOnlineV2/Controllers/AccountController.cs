@@ -1,5 +1,6 @@
 ﻿using JCarrollOnlineV2.EmailViewModels;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.Helpers;
 using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Account;
 using JCarrollOnlineV2.ViewModels.Users;
@@ -8,8 +9,6 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using NLog;
 using Omu.ValueInjecter;
-using RazorEngine;
-using RazorEngine.Templating;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -251,9 +250,9 @@ namespace JCarrollOnlineV2.Controllers
             return View(registrationNotificationViewModel);
         }
 
-        private async Task SendWelcomeEmail(ApplicationUser user, Uri callbackUrl)
+        private async Task SendWelcomeEmail(ApplicationUser user, Uri callbackUri)
         {
-            UserWelcomeViewModel userWelcomeViewModel = GenerateViewModel(user, callbackUrl);
+            UserWelcomeViewModel userWelcomeViewModel = GenerateViewModel(user, callbackUri);
 
             await SendEmail(userWelcomeViewModel).ConfigureAwait(false);
         }
@@ -271,12 +270,22 @@ namespace JCarrollOnlineV2.Controllers
 
         private async Task SendEmail(UserWelcomeViewModel userWelcomeViewModel)
         {
-            string templateFolderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
-            string templateFilePath = System.IO.Path.Combine(templateFolderPath, "UserWelcomePage.cshtml");
+            // Convert the view model to an anonymous object for Handlebars
+            var templateData = new
+            {
+                TargetUser = new
+                {
+                    userWelcomeViewModel.TargetUser.UserName,
+                    userWelcomeViewModel.TargetUser.Email
+                },
+                CallbackUrl = userWelcomeViewModel.CallbackUrl?.ToString()
+            };
 
-            string template = System.IO.File.ReadAllText(templateFilePath);
-
-            userWelcomeViewModel.Content = Engine.Razor.RunCompile(template, "userWelcomeTemplatekey", null, userWelcomeViewModel);
+            // Use Handlebars instead of RazorEngine
+            userWelcomeViewModel.Content = HandlebarsEmailHelper.RenderTemplate(
+                "UserWelcomePage", 
+                templateData
+            );
 
             await SendEmailAsync(userWelcomeViewModel).ConfigureAwait(false);
         }
