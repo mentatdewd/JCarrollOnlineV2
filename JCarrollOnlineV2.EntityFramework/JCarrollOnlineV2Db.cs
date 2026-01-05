@@ -12,7 +12,11 @@ namespace JCarrollOnlineV2.EntityFramework
         //private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public JCarrollOnlineV2DbContext()
-            : base("JCarrollOnlineV2ProductionConnection")
+#if DEBUG
+        : base("JCarrollOnlineV2Connection")
+#else
+        : base("JCarrollOnlineV2ProductionConnection")
+#endif      
         {
             //Database.Log = Console.WriteLine;
             //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");

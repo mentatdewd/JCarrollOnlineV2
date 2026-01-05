@@ -1,4 +1,4 @@
-name: Deploy to HostGator
+﻿name: Deploy to HostGator
 
 on:
   push:
@@ -6,114 +6,53 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: windows-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.3
+      uses: microsoft/setup-msbuild@v1
     
     - name: Setup NuGet
-      uses: nuget/setup-nuget@v1
+      uses: NuGet/setup-nuget@v1
     
     - name: Restore NuGet packages
       run: nuget restore JCarrollOnlineV2.sln
     
+    - name: Replace secrets in Web.config
+      shell: pwsh
+      run: |
+        $webConfigPath = "JCarrollOnlineV2\Web.config"
+        $content = Get-Content $webConfigPath -Raw
+        
+        # Replace machine keys
+        $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.MACHINEKEY_VALIDATION }}'
+        $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.MACHINEKEY_DECRYPTION }}'
+        
+        # Replace connection strings
+        $content = $content -replace '__DEV_CONNECTION_STRING__', '${{ secrets.DEV_CONNECTION_STRING }}'
+        $content = $content -replace '__PROD_CONNECTION_STRING__', '${{ secrets.PROD_CONNECTION_STRING }}'
+        
+        # Replace SMTP password
+        $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.SMTP_PASSWORD }}"'
+        
+        Set-Content $webConfigPath $content -NoNewline
+        Write-Host "✓ Web.config secrets replaced successfully" -ForegroundColor Green
+    
     - name: Build solution
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Release" /p:DeployOnBuild=true /p:PublishProfile=FolderProfile /p:OutputPath=./publish
-    
-    - name: Create publish directory if not exists
-      run: |
-        if (!(Test-Path "./publish")) {
-          New-Item -Path "./publish" -ItemType Directory -Force
-        }
-      shell: pwsh
-    
-    - name: Copy build output to publish directory
-      run: |
-        Copy-Item -Path ".\JCarrollOnlineV2\bin\Release\*" -Destination "./publish" -Recurse -Force
-      shell: pwsh
-
-    - name: Create connectionStrings.config
-      run: |
-        $configContent = @"
-        <?xml version="1.0" encoding="utf-8"?>
-        <connectionStrings>
-          <add name="JCarrollOnlineV2Connection"
-               connectionString="${{ secrets.DB_CONNECTION_STRING_LOCAL }}"
-               providerName="System.Data.SqlClient" />
-          <add name="JCarrollOnlineV2ProductionConnection"
-               connectionString="${{ secrets.DB_CONNECTION_STRING }}"
-               providerName="System.Data.SqlClient" />
-        </connectionStrings>
-        "@
-        
-        $configPath = "./publish/connectionStrings.config"
-        $configContent | Out-File -FilePath $configPath -Encoding UTF8 -Force
-        Write-Host "Created connectionStrings.config"
-      shell: pwsh
-    
-    - name: Create mailSettings.config
-      run: |
-        $mailConfig = @"
-        <?xml version="1.0" encoding="utf-8"?>
-        <mailSettings>
-          <smtp>
-            <network host="mail.jcarrollonline.com" userName="admin@jcarrollonline.com" port="587" password="${{ secrets.SMTP_PASSWORD }}" />
-          </smtp>
-        </mailSettings>
-        "@
-        
-        $mailConfigPath = "./publish/mailSettings.config"
-        $mailConfig | Out-File -FilePath $mailConfigPath -Encoding UTF8 -Force
-        Write-Host "Created mailSettings.config"
-      shell: pwsh
-    
-    - name: Update Web.config for production
-      run: |
-        $webConfigPath = "./publish/Web.config"
-        
-        if (Test-Path $webConfigPath) {
-          [xml]$webConfig = Get-Content $webConfigPath
-          
-          # Set debug to false
-          $compilation = $webConfig.SelectSingleNode("//compilation")
-          if ($compilation) {
-            $compilation.SetAttribute("debug", "false")
-          }
-          
-          # Set custom errors to On
-          $customErrors = $webConfig.SelectSingleNode("//customErrors")
-          if ($customErrors) {
-            $customErrors.SetAttribute("mode", "On")
-          }
-          
-          # Disable Glimpse
-          $glimpse = $webConfig.SelectSingleNode("//glimpse")
-          if ($glimpse) {
-            $glimpse.SetAttribute("defaultRuntimePolicy", "Off")
-          }
-          
-          $webConfig.Save($webConfigPath)
-          Write-Host "Updated Web.config for production"
-        }
-      shell: pwsh
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:DeployOnBuild=true
     
     - name: Deploy to HostGator via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: ${{ secrets.HOSTGATOR_FTP_HOST }}
-        username: ${{ secrets.HOSTGATOR_FTP_USER }}
-        password: ${{ secrets.HOSTGATOR_FTP_PASSWORD }}
-        local-dir: ./publish/
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./JCarrollOnlineV2/bin/Release/Publish/
         server-dir: /public_html/
-        dangerous-clean-slate: false
         exclude: |
           **/.git*
           **/.git*/**
-          **/obj/**
-          **/packages/**
-          **/*.pdb
+          secrets.xml

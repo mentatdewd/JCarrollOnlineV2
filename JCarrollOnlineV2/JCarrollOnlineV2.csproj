@@ -497,6 +497,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="ControllerHelpers\ControllerHelpers.cs" />
     <Compile Include="Controllers\BlogController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ForaController.cs" />
     <Compile Include="Controllers\ForumModeratorsController.cs" />
     <Compile Include="Controllers\ForumThreadEntriesController.cs" />
@@ -507,6 +508,8 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomLinqExtensions\EnumerableExtensions.cs" />
     <Compile Include="CustomLinqExtensions\LinqToSqlExtensionMethods.cs" />
+    <Compile Include="Filters\CustomHandleErrorAttribute.cs" />
+    <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Content Include="Content\css\images\mdd_ajax_loader.gif" />
     <Content Include="Content\css\images\mdd_gripper.png" />
     <Content Include="Content\css\images\mdd_modal_background.png" />

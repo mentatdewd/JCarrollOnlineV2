@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using JCarrollOnlineV2.Filters;
+using System.Web.Mvc;
 
 namespace JCarrollOnlineV2
 {
@@ -11,7 +12,7 @@ namespace JCarrollOnlineV2
                 throw new System.ArgumentNullException(nameof(filters));
             }
 
-            filters.Add(new HandleErrorAttribute());
+            filters.Add(new CustomHandleErrorAttribute());
         }
     }
 }

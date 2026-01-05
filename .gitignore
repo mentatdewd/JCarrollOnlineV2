@@ -10,6 +10,14 @@ connectionStrings.config
 *.sln.docstates
 donotcheckintogit.txt
 
+# User secrets
+secrets.xml
+**/secrets.json
+
+# Sensitive configs
+connectionStrings.config
+*.config.user
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

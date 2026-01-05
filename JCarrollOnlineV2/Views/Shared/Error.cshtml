@@ -1,9 +1,18 @@
-﻿@model System.Web.Mvc.HandleErrorInfo
-
-@{
-    //Model.PageTitle = "Error";
-}
+﻿@model JCarrollOnlineV2.ViewModels.ErrorViewModel
 
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
 
+@if (Model.HandleErrorInfo != null)
+{
+    <div>
+        <h3>Exception Details:</h3>
+        <p><strong>Controller:</strong> @Model.HandleErrorInfo.ControllerName</p>
+        <p><strong>Action:</strong> @Model.HandleErrorInfo.ActionName</p>
+        @if (Model.HandleErrorInfo.Exception != null)
+        {
+            <p><strong>Exception Type:</strong> @Model.HandleErrorInfo.Exception.GetType().Name</p>
+            <p><strong>Message:</strong> @Model.HandleErrorInfo.Exception.Message</p>
+        }
+    </div>
+}

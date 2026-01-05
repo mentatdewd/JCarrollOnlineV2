@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JCarrollOnlineV2Db.cs" />
+    <Compile Include="JCarrollOnlineV2DbContext.cs" />
     <Compile Include="Migrations\202601051613037_AddChatMessages.cs" />
     <Compile Include="Migrations\202601051613037_AddChatMessages.Designer.cs">
       <DependentUpon>202601051613037_AddChatMessages.cs</DependentUpon>
