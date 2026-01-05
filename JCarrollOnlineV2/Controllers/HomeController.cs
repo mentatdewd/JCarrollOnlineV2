@@ -3,10 +3,12 @@ using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Blog;
+using JCarrollOnlineV2.ViewModels.Chat;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using JCarrollOnlineV2.ViewModels.Rss;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security;
 using NLog;
 using Omu.ValueInjecter;
 using PagedList;
@@ -15,6 +17,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace JCarrollOnlineV2.Controllers
@@ -28,6 +31,14 @@ namespace JCarrollOnlineV2.Controllers
         public HomeController()
         {
             Data = new JCarrollOnlineV2DbContext();
+        }
+
+        private IAuthenticationManager AuthenticationManager
+        {
+            get
+            {
+                return HttpContext.GetOwinContext().Authentication;
+            }
         }
 
         [HttpGet]
@@ -96,7 +107,23 @@ namespace JCarrollOnlineV2.Controllers
             if (User != null && User.Identity.IsAuthenticated == true)
             {
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser user = await Data.ApplicationUser.Include("Following").Include("Followers").Include("MicroPosts").SingleAsync(u => u.Id == currentUserId).ConfigureAwait(false);
+                
+                // Use SingleOrDefaultAsync instead of SingleAsync to avoid exception
+                ApplicationUser user = await Data.ApplicationUser
+                    .Include("Following")
+                    .Include("Followers")
+                    .Include("MicroPosts")
+                    .SingleOrDefaultAsync(u => u.Id == currentUserId)
+                    .ConfigureAwait(false);
+
+                // Check if user exists in database
+                if (user == null)
+                {
+                    // User is authenticated but doesn't exist in database
+                    // Log them out and redirect to registration
+                    AuthenticationManager.SignOut();
+                    return RedirectToAction("Register", "Account");
+                }
 
                 homeViewModel.UserInfoViewModel.User.InjectFrom(user);
                 homeViewModel.UserInfoViewModel.UserId = user.Id;
@@ -152,6 +179,26 @@ namespace JCarrollOnlineV2.Controllers
 
                 _logger.Info("awaiting rss");
                 homeViewModel.RssFeedViewModel = await rss.ConfigureAwait(false);
+            }
+
+            homeViewModel.ChatViewModel = new ChatViewModel();
+
+            // Load recent chat messages (last 50)
+            var recentMessages = await Data.ChatMessages
+                .Include(c => c.Author)
+                .OrderByDescending(c => c.CreatedAt)
+                .Take(50)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            foreach (var msg in recentMessages.OrderBy(m => m.CreatedAt))
+            {
+                homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
+                {
+                    UserName = msg.Author.UserName,
+                    Message = msg.Message,
+                    TimeAgo = msg.CreatedAt.ToUniversalTime().ToString("o")
+                });
             }
 
             homeViewModel.PageContainer = "Home";

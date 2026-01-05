@@ -116,6 +116,12 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.4\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.3\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.3\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Hosting.Server.Abstractions, Version=2.3.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNetCore.Hosting.Server.Abstractions.2.3.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.Server.Abstractions.dll</HintPath>
     </Reference>
@@ -612,6 +618,7 @@
     <Compile Include="Helpers\HandlebarsEmailHelper.cs" />
     <Compile Include="HtmlHelperExtensions\HtmlHelperExtensions.cs" />
     <Compile Include="HtmlHelperExtensions\MarkdownHelper.cs" />
+    <Compile Include="Hubs\ChatHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SiteMapProviders\ForaIndexDynamicNodeProvider.cs" />
     <Compile Include="SiteMapProviders\ForumThreadEntriesDetailsDynamicNodeProvider.cs" />
@@ -894,6 +901,7 @@
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\chat.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />
     <Content Include="Scripts\jquery-3.7.1.slim.js" />
@@ -902,6 +910,8 @@
     <Content Include="Scripts\jquery-ui-1.14.1.js" />
     <Content Include="Scripts\jquery-ui-1.14.1.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.3.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.3.min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
@@ -928,6 +938,7 @@
     <Content Include="Views\Sandbox\YellowStoneSlideShow.cshtml" />
     <Content Include="Scripts\jquery-3.7.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.1.min.map" />
+    <Content Include="Views\Shared\_ChatPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\images\DeceptionPassBridgeInFogHeader.jpg">

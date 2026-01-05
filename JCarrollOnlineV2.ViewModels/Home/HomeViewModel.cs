@@ -1,4 +1,5 @@
 ﻿using JCarrollOnlineV2.ViewModels.Blog;
+using JCarrollOnlineV2.ViewModels.Chat;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using JCarrollOnlineV2.ViewModels.Rss;
 using JCarrollOnlineV2.ViewModels.Users;
@@ -16,7 +17,7 @@ namespace JCarrollOnlineV2.ViewModels
         public int MicroPosts { get; set; }
         public BlogFeedViewModel BlogFeed { get; set; }
         public LatestForumThreadsViewModel LatestForumThreadsViewModel { get; set; }
-
+        public ChatViewModel ChatViewModel { get; set; }
         public int? MicroPostPage { get; set; }
  //       public List<MicroPostFeedItemViewModel> OnePageOfMicroPosts { get; private set; }
         public int? PageNumber { get; set; }
