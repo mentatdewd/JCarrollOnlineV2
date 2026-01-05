@@ -1,0 +1,94 @@
+﻿name: Deploy to HostGator
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+    
+    - name: Restore NuGet packages
+      run: nuget restore JCarrollOnlineV2.sln
+    
+    - name: Build solution (Release with publish)
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=Release /p:WebPublishMethod=FileSystem /p:publishUrl="bin\Release\Publish" /p:DeleteExistingFiles=true /t:Build /t:WebPublish
+    
+    - name: Replace secrets in published Web.config
+      shell: pwsh
+      run: |
+        $webConfigPath = "JCarrollOnlineV2\bin\Release\Publish\Web.config"
+        
+        if (-not (Test-Path $webConfigPath)) {
+          # Fallback to Package\PackageTmp location if Publish doesn't exist
+          $webConfigPath = "JCarrollOnlineV2\obj\Release\Package\PackageTmp\Web.config"
+        }
+        
+        if (Test-Path $webConfigPath) {
+          Write-Host "Found Web.config at: $webConfigPath" -ForegroundColor Cyan
+          $content = Get-Content $webConfigPath -Raw
+          
+          # Replace machine keys (if they exist as placeholders)
+          if ($content -match '__MACHINEKEY_VALIDATION__') {
+            $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.MACHINEKEY_VALIDATION }}'
+            Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
+          }
+          
+          if ($content -match '__MACHINEKEY_DECRYPTION__') {
+            $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.MACHINEKEY_DECRYPTION }}'
+            Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
+          }
+          
+          # Replace connection strings
+          $content = $content -replace '__DEV_CONNECTION_STRING__', '${{ secrets.DEV_CONNECTION_STRING }}'
+          $content = $content -replace '__PROD_CONNECTION_STRING__', '${{ secrets.PROD_CONNECTION_STRING }}'
+          Write-Host "✓ Replaced connection strings" -ForegroundColor Green
+          
+          # Replace SMTP password
+          $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.SMTP_PASSWORD }}"'
+          Write-Host "✓ Replaced SMTP password" -ForegroundColor Green
+          
+          Set-Content $webConfigPath $content -NoNewline
+          Write-Host "✓ Web.config secrets replaced successfully" -ForegroundColor Green
+        } else {
+          Write-Error "Web.config not found at expected locations"
+          Get-ChildItem -Path "JCarrollOnlineV2" -Filter "Web.config" -Recurse | Select-Object FullName
+          exit 1
+        }
+    
+    - name: Verify published files
+      shell: pwsh
+      run: |
+        $publishDir = "JCarrollOnlineV2\bin\Release\Publish"
+        if (-not (Test-Path $publishDir)) {
+          $publishDir = "JCarrollOnlineV2\obj\Release\Package\PackageTmp"
+        }
+        
+        Write-Host "Published files location: $publishDir" -ForegroundColor Cyan
+        Get-ChildItem -Path $publishDir -Recurse | Select-Object FullName | Format-Table -AutoSize
+    
+    - name: Deploy to HostGator via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: mentatdewd
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./JCarrollOnlineV2/bin/Release/Publish/
+        server-dir: /public_html/
+        dangerous-clean-slate: false
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/secrets.xml
+          **/*.pdb
+          **/packages.config
