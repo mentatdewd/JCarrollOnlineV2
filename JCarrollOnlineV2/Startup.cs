@@ -12,6 +12,7 @@ namespace JCarrollOnlineV2
         {
             _logger.Info("Starting application");
             ConfigureAuthentication(app);
+            app.MapSignalR();
         }
     }
 }

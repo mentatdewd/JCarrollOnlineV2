@@ -71,6 +71,9 @@ namespace JCarrollOnlineV2
             bundles.Add(new ScriptBundle("~/bundles/prism")
                 .Include("~/Content/scripts/prism.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/signalr")
+                .Include("~/Scripts/jquery.signalR-{version}.js"));
+
             //var jqueryBundle = new ScriptBundle("~/bundles/jquery");
             //jqueryBundle.Include("~/Scripts/jquery/jquery.min.js");
             //jqueryBundle.Include("~/Scripts/bootstrap/bootstrap.min.js");

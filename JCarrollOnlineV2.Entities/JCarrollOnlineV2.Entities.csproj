@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="BlogItem.cs" />
     <Compile Include="BlogItemComment.cs" />
+    <Compile Include="ChatMessage.cs" />
     <Compile Include="Forum.cs" />
     <Compile Include="ForumModerator.cs" />
     <Compile Include="ThreadEntry.cs" />
