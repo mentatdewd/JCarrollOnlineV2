@@ -34,9 +34,9 @@ jobs:
     
     - name: Copy build output to publish directory
       run: |
-        Copy-Item -Path "JCarrollOnlineV2\bin\Release\*" -Destination "./publish" -Recurse -Force
+        Copy-Item -Path ".\JCarrollOnlineV2\bin\Release\*" -Destination "./publish" -Recurse -Force
       shell: pwsh
-    
+
     - name: Create connectionStrings.config
       run: |
         $configContent = @"
