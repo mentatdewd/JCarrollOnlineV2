@@ -241,28 +241,38 @@ namespace JCarrollOnlineV2.Controllers
 
                 if (result.Succeeded)
                 {
-                    //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    try
+                    {
+                        // Generate email confirmation token
+                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id).ConfigureAwait(false);
 
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id).ConfigureAwait(false);
-                    Uri callbackUri = new Uri(Url.Action("ConfirmEmail", "Account", routeValues: new { userId = user.Id,  code }, protocol: Request.Url.Scheme));
+                        // URL encode the code to handle special characters
+                        string encodedCode = System.Web.HttpUtility.UrlEncode(code);
 
-//#if DEBUG
-//                    var cleanUrl = callbackUri;
-//#else
-                    //var cleanUrl = new Uri(callbackUri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
-                    //#endif
+                        // Generate callback URI with encoded code
+                        Uri callbackUri = new Uri(Url.Action("ConfirmEmail", "Account",
+                            routeValues: new { userId = user.Id, code = encodedCode },
+                            protocol: Request.Url.Scheme));
 
-                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code });
-                    await SendWelcomeEmail(user, callbackUri).ConfigureAwait(false);
-                    ApplicationUserViewModel appplicationUserViewModel = new ApplicationUserViewModel();
+                        _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                            "Sending welcome email to {0} for userId: {1}", user.Email, user.Id));
 
-                    appplicationUserViewModel.InjectFrom(user);
+                        await SendWelcomeEmail(user, callbackUri).ConfigureAwait(false);
 
-                    //await SendWelcomeEmail(auVM, cleanUrl);
+                        ApplicationUserViewModel appplicationUserViewModel = new ApplicationUserViewModel();
+                        appplicationUserViewModel.InjectFrom(user);
 
-                    return RedirectToAction("RegistrationNotification", "Account");
+                        return RedirectToAction("RegistrationNotification", "Account");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                            "Failed to send welcome email during registration for user: {0}", user.Email));
+
+                        // Still redirect to notification page even if email fails
+                        // You might want to show a different message
+                        return RedirectToAction("RegistrationNotification", "Account");
+                    }
                 }
 
                 AddErrors(result);
@@ -271,7 +281,6 @@ namespace JCarrollOnlineV2.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-
 
         [AllowAnonymous]
         [HttpGet]
@@ -412,13 +421,44 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (userId == null || code == null)
             {
+                _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                    "ConfirmEmail called with null parameters. UserId: {0}, Code: {1}",
+                    userId ?? "null", code ?? "null"));
                 return View("Error");
             }
 
-            LoginConfirmationViewModel loginConfirmationViewModel = new LoginConfirmationViewModel();
-            IdentityResult result = await UserManager.ConfirmEmailAsync(userId, code).ConfigureAwait(false);
+            try
+            {
+                // URL decode the code if it's not already decoded (handles + signs and %20)
+                string decodedCode = System.Web.HttpUtility.UrlDecode(code);
 
-            return View(result.Succeeded ? "ConfirmEmail" : "Error", loginConfirmationViewModel);
+                _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                    "Attempting to confirm email for userId: {0}", userId));
+
+                IdentityResult result = await UserManager.ConfirmEmailAsync(userId, decodedCode).ConfigureAwait(false);
+
+                if (result.Succeeded)
+                {
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                        "Email confirmed successfully for userId: {0}", userId));
+
+                    LoginConfirmationViewModel loginConfirmationViewModel = new LoginConfirmationViewModel();
+                    return View("ConfirmEmail", loginConfirmationViewModel);
+                }
+                else
+                {
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Email confirmation failed for userId: {0}. Errors: {1}",
+                        userId, string.Join(", ", result.Errors)));
+                    return View("Error");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                    "Exception during email confirmation for userId: {0}", userId));
+                return View("Error");
+            }
         }
 
         //
