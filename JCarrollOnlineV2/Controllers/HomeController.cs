@@ -33,13 +33,7 @@ namespace JCarrollOnlineV2.Controllers
             Data = new JCarrollOnlineV2DbContext();
         }
 
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
+        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
 
         [HttpGet]
         public async Task<ActionResult> Index(int? microPostPage)
@@ -184,14 +178,14 @@ namespace JCarrollOnlineV2.Controllers
             homeViewModel.ChatViewModel = new ChatViewModel();
 
             // Load recent chat messages (last 50)
-            var recentMessages = await Data.ChatMessages
+            List<ChatMessage> recentMessages = await Data.ChatMessages
                 .Include(c => c.Author)
                 .OrderByDescending(c => c.CreatedAt)
                 .Take(50)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
-            foreach (var msg in recentMessages.OrderBy(m => m.CreatedAt))
+            foreach (ChatMessage msg in recentMessages.OrderBy(m => m.CreatedAt))
             {
                 homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
                 {

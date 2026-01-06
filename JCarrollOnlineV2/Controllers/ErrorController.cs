@@ -7,7 +7,7 @@ namespace JCarrollOnlineV2.Controllers
     {
         public ActionResult Index()
         {
-            var errorViewModel = new ErrorViewModel
+            ErrorViewModel errorViewModel = new ErrorViewModel
             {
                 PageTitle = "Error",
                 PageContainer = "container-fluid"
@@ -18,7 +18,7 @@ namespace JCarrollOnlineV2.Controllers
         public ActionResult NotFound()
         {
             Response.StatusCode = 404;
-            var errorViewModel = new ErrorViewModel
+            ErrorViewModel errorViewModel = new ErrorViewModel
             {
                 PageTitle = "Page Not Found",
                 PageContainer = "container-fluid"

@@ -17,10 +17,10 @@ namespace JCarrollOnlineV2.Filters
                 return;
             }
 
-            var controllerName = (string)filterContext.RouteData.Values["controller"];
-            var actionName = (string)filterContext.RouteData.Values["action"];
-            var handleErrorInfo = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
-            var model = new ErrorViewModel(handleErrorInfo);
+            string controllerName = (string)filterContext.RouteData.Values["controller"];
+            string actionName = (string)filterContext.RouteData.Values["action"];
+            HandleErrorInfo handleErrorInfo = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
+            ErrorViewModel model = new ErrorViewModel(handleErrorInfo);
 
             filterContext.Result = new ViewResult
             {
