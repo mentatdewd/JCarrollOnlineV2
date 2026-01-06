@@ -72,15 +72,42 @@ jobs:
       run: |
         Write-Host "Publishing web application..." -ForegroundColor Cyan
         
-        # Use aspnet_compiler for more reliable publishing
-        msbuild JCarrollOnlineV2/JCarrollOnlineV2.csproj `
-          /p:Configuration=Release `
-          /p:Platform="Any CPU" `
-          /p:OutputPath=bin `
-          /p:WebProjectOutputDir=..\publish-output `
-          /p:OutDir=bin\Release\ `
-          /t:_CopyWebApplication `
-          /v:minimal
+        # Copy web application files to publish-output
+        $sourceDir = "JCarrollOnlineV2"
+        $destDir = "publish-output"
+        
+        # Copy all necessary files
+        $itemsToCopy = @(
+          "*.asax",
+          "*.config",
+          "*.html",
+          "*.htm",
+          "*.css",
+          "*.js",
+          "*.aspx",
+          "*.ascx",
+          "*.asmx",
+          "*.ashx",
+          "*.master",
+          "bin",
+          "Content",
+          "fonts",
+          "Scripts",
+          "Views",
+          "App_Data",
+          "Models",
+          "Images",
+          "favicon.ico"
+        )
+        
+        foreach ($item in $itemsToCopy) {
+          $sourcePath = Join-Path $sourceDir $item
+          if (Test-Path $sourcePath) {
+            $destPath = Join-Path $destDir $item
+            Write-Host "  Copying: $item" -ForegroundColor Gray
+            Copy-Item -Path $sourcePath -Destination $destPath -Recurse -Force -ErrorAction SilentlyContinue
+          }
+        }
         
         Write-Host "✓ Publish completed" -ForegroundColor Green
     
@@ -128,17 +155,21 @@ jobs:
         # Track changes
         $changes = 0
         
-        # Replace machine keys
+        # Replace machine keys (commented out in source, so may not match)
         if ($content -match '__MACHINEKEY_VALIDATION__') {
           $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.MACHINEKEY_VALIDATION }}'
           Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
           $changes++
+        } else {
+          Write-Host "⚠ MACHINEKEY_VALIDATION placeholder not found (may be commented out)" -ForegroundColor Yellow
         }
         
         if ($content -match '__MACHINEKEY_DECRYPTION__') {
           $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.MACHINEKEY_DECRYPTION }}'
           Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
           $changes++
+        } else {
+          Write-Host "⚠ MACHINEKEY_DECRYPTION placeholder not found (may be commented out)" -ForegroundColor Yellow
         }
         
         # Replace connection strings
@@ -154,7 +185,7 @@ jobs:
           $changes++
         }
         
-        # Replace SMTP password (handle both old hardcoded and placeholder)
+        # Replace SMTP password
         if ($content -match 'password="jV41wt\^5"') {
           $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.SMTP_PASSWORD }}"'
           Write-Host "✓ Replaced hardcoded SMTP password" -ForegroundColor Green
@@ -181,9 +212,9 @@ jobs:
           Write-Host "Total files: $($files.Count)"
           
           # Show key directories
-          Write-Host "`nKey files and directories:" -ForegroundColor Yellow
-          Get-ChildItem -Path $publishPath -Recurse -Depth 2 | 
-            Select-Object FullName, Length, @{Name='Type';Expression={if($_.PSIsContainer){'DIR'}else{'FILE'}}} |
+          Write-Host "`nTop-level items:" -ForegroundColor Yellow
+          Get-ChildItem -Path $publishPath | 
+            Select-Object Name, @{Name='Type';Expression={if($_.PSIsContainer){'DIR'}else{'FILE'}}}, Length |
             Format-Table -AutoSize
         } else {
           Write-Warning "Publish path not found: $publishPath"
