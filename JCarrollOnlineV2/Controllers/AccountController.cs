@@ -663,7 +663,7 @@ namespace JCarrollOnlineV2.Controllers
             ResetPasswordViewModel resetPasswordViewModel = new ResetPasswordViewModel
             {
                 Code = code,
-                PageTitle = "Reset Password"
+                PageTitle = "Reset password"  // ← Set PageTitle here
             };
 
             return View(resetPasswordViewModel);
