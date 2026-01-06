@@ -34,53 +34,72 @@ jobs:
           Write-Warning "Packages folder not found"
         }
     
-    - name: Build and Publish
+    - name: Clean output folders
       shell: pwsh
       run: |
-        # Build with explicit publish output - NO publish profile required
-        msbuild JCarrollOnlineV2/JCarrollOnlineV2.csproj `
-          /p:Configuration=Release `
-          /p:Platform=AnyCPU `
-          /p:DeployOnBuild=true `
-          /p:WebPublishMethod=FileSystem `
-          /p:publishUrl="bin\Release\Publish" `
-          /p:DeleteExistingFiles=true `
-          /p:TransformWebConfigEnabled=true `
-          /p:AutoParameterizationWebConfigConnectionStrings=false `
-          /t:Clean `
-          /t:Build `
-          /t:WebPublish `
-          /v:normal
+        Write-Host "Cleaning output folders..." -ForegroundColor Cyan
         
-        Write-Host "Build completed" -ForegroundColor Green
-    
-    - name: Find published files
-      id: find-publish
-      shell: pwsh
-      run: |
-        # Search for published Web.config
-        $possiblePaths = @(
-          "JCarrollOnlineV2\bin\Release\Publish",
-          "JCarrollOnlineV2\obj\Release\Package\PackageTmp",
-          "publish-output",
-          "JCarrollOnlineV2\publish-output",
-          "JCarrollOnlineV2\bin\app.publish"
+        $foldersToClean = @(
+          "JCarrollOnlineV2\bin",
+          "JCarrollOnlineV2\obj",
+          "publish-output"
         )
         
-        $publishPath = $null
-        foreach ($path in $possiblePaths) {
-          if (Test-Path "$path\Web.config") {
-            $publishPath = $path
-            Write-Host "✓ Found published files at: $publishPath" -ForegroundColor Green
-            break
+        foreach ($folder in $foldersToClean) {
+          if (Test-Path $folder) {
+            Write-Host "  Removing: $folder" -ForegroundColor Yellow
+            Remove-Item -Path $folder -Recurse -Force -ErrorAction SilentlyContinue
           }
         }
         
-        if (-not $publishPath) {
-          Write-Error "Could not find published Web.config in any expected location"
-          Write-Host "Searching entire workspace..." -ForegroundColor Yellow
+        Write-Host "✓ Output folders cleaned" -ForegroundColor Green
+    
+    - name: Build solution
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
+    
+    - name: Create publish directory
+      shell: pwsh
+      run: |
+        $publishDir = "publish-output"
+        if (Test-Path $publishDir) {
+          Remove-Item -Path $publishDir -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
+        Write-Host "✓ Created publish directory: $publishDir" -ForegroundColor Green
+    
+    - name: Publish web application
+      shell: pwsh
+      run: |
+        Write-Host "Publishing web application..." -ForegroundColor Cyan
+        
+        # Use aspnet_compiler for more reliable publishing
+        msbuild JCarrollOnlineV2/JCarrollOnlineV2.csproj `
+          /p:Configuration=Release `
+          /p:Platform="Any CPU" `
+          /p:OutputPath=bin `
+          /p:WebProjectOutputDir=..\publish-output `
+          /p:OutDir=bin\Release\ `
+          /t:_CopyWebApplication `
+          /v:minimal
+        
+        Write-Host "✓ Publish completed" -ForegroundColor Green
+    
+    - name: Verify published files
+      id: find-publish
+      shell: pwsh
+      run: |
+        $publishPath = "publish-output"
+        
+        if (-not (Test-Path "$publishPath\Web.config")) {
+          Write-Error "Web.config not found in publish output"
+          Write-Host "Contents of publish directory:" -ForegroundColor Yellow
+          if (Test-Path $publishPath) {
+            Get-ChildItem -Path $publishPath -Recurse | Select-Object FullName
+          }
+          
+          Write-Host "`nSearching for Web.config..." -ForegroundColor Yellow
           Get-ChildItem -Path "." -Filter "Web.config" -Recurse | 
-            Where-Object { $_.FullName -notlike "*\obj\Debug\*" -and $_.FullName -notlike "*\.vs\*" } |
+            Where-Object { $_.FullName -notlike "*\.vs\*" } |
             ForEach-Object { Write-Host $_.FullName }
           exit 1
         }
@@ -90,7 +109,7 @@ jobs:
         echo "PUBLISH_PATH=$fullPath" >> $env:GITHUB_OUTPUT
         echo "PUBLISH_PATH_RELATIVE=$publishPath" >> $env:GITHUB_OUTPUT
         
-        Write-Host "Published path set to: $publishPath" -ForegroundColor Cyan
+        Write-Host "✓ Found published files at: $publishPath" -ForegroundColor Green
     
     - name: Replace secrets in Web.config
       shell: pwsh
@@ -158,9 +177,14 @@ jobs:
         $publishPath = "${{ steps.find-publish.outputs.PUBLISH_PATH }}"
         
         if (Test-Path $publishPath) {
-          $files = Get-ChildItem -Path $publishPath -Recurse
+          $files = Get-ChildItem -Path $publishPath -Recurse | Where-Object { -not $_.PSIsContainer }
           Write-Host "Total files: $($files.Count)"
-          $files | Select-Object FullName, Length | Format-Table -AutoSize
+          
+          # Show key directories
+          Write-Host "`nKey files and directories:" -ForegroundColor Yellow
+          Get-ChildItem -Path $publishPath -Recurse -Depth 2 | 
+            Select-Object FullName, Length, @{Name='Type';Expression={if($_.PSIsContainer){'DIR'}else{'FILE'}}} |
+            Format-Table -AutoSize
         } else {
           Write-Warning "Publish path not found: $publishPath"
         }
