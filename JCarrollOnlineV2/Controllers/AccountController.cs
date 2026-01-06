@@ -283,23 +283,49 @@ namespace JCarrollOnlineV2.Controllers
 
             // Use Handlebars instead of RazorEngine
             userWelcomeViewModel.Content = HandlebarsEmailHelper.RenderTemplate(
-                "UserWelcomePage", 
+                "UserWelcomePage",
                 templateData
             );
 
-            await SendEmailAsync(userWelcomeViewModel).ConfigureAwait(false);
+            await SendEmailViaHostGatorAsync(userWelcomeViewModel).ConfigureAwait(false);
         }
 
-        public async Task SendEmailAsync(UserWelcomeViewModel userWelcomeViewModel)
+        private async Task SendEmailViaHostGatorAsync(UserWelcomeViewModel userWelcomeViewModel)
         {
-            IdentityMessage email = new IdentityMessage()
-            {
-                Body = userWelcomeViewModel?.Content,
-                Destination = userWelcomeViewModel.TargetUser.Email,
-                Subject = "Welcome to JCarrollOnline"
-            };
+            // Read SMTP settings from web.config/appSettings
+            string smtpHost = System.Configuration.ConfigurationManager.AppSettings["SmtpHost"];
+            int smtpPort = int.Parse(System.Configuration.ConfigurationManager.AppSettings["SmtpPort"]);
+            string smtpUsername = System.Configuration.ConfigurationManager.AppSettings["SmtpUsername"];
+            string smtpPassword = System.Configuration.ConfigurationManager.AppSettings["SmtpPassword"];
+            string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SmtpFromEmail"];
+            bool enableSsl = bool.Parse(System.Configuration.ConfigurationManager.AppSettings["SmtpEnableSsl"]);
 
-            await UserManager.EmailService.SendAsync(email).ConfigureAwait(false);
+            using (System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage())
+            {
+                mailMessage.From = new System.Net.Mail.MailAddress(fromEmail, "JCarrollOnline");
+                mailMessage.To.Add(new System.Net.Mail.MailAddress(userWelcomeViewModel?.TargetUser.Email));
+                mailMessage.Subject = "Welcome to JCarrollOnline";
+                mailMessage.Body = userWelcomeViewModel.Content;
+                mailMessage.IsBodyHtml = true;
+
+                using (System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
+                {
+                    smtpClient.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
+                    smtpClient.EnableSsl = enableSsl;
+                    smtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
+
+                    try
+                    {
+                        await smtpClient.SendMailAsync(mailMessage).ConfigureAwait(false);
+                        _logger.Info(string.Format(CultureInfo.InvariantCulture, "Welcome email sent successfully to {0}", userWelcomeViewModel.TargetUser.Email));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, string.Format(CultureInfo.InvariantCulture, "Failed to send welcome email to {0}", userWelcomeViewModel.TargetUser.Email));
+                        throw;
+                    }
+                }
+            }
         }
 
         //

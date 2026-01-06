@@ -128,7 +128,7 @@ jobs:
         
         [xml]$xml = Get-Content $webConfigPath
         
-        # Remove configBuilders
+        # Remove configBuilders from connectionStrings
         $connStrings = $xml.configuration.connectionStrings
         if ($connStrings.HasAttribute("configBuilders")) {
           $connStrings.RemoveAttribute("configBuilders")
@@ -138,11 +138,27 @@ jobs:
         foreach ($add in $connStrings.add) {
           if ($add.connectionString -eq "__DEV_CONNECTION_STRING__") {
             $add.connectionString = $env:DEV_CONN
-            Write-Host "✓ Replaced DEV connection string" -ForegroundColor Green
+            Write-Host "✓ Replaced __DEV_CONNECTION_STRING__" -ForegroundColor Green
           }
           if ($add.connectionString -eq "__PROD_CONNECTION_STRING__") {
             $add.connectionString = $env:PROD_CONN
-            Write-Host "✓ Replaced PROD connection string" -ForegroundColor Green
+            Write-Host "✓ Replaced __PROD_CONNECTION_STRING__" -ForegroundColor Green
+          }
+        }
+        
+        # Remove configBuilders from appSettings and replace SMTP password
+        $appSettings = $xml.configuration.appSettings
+        if ($appSettings) {
+          if ($appSettings.HasAttribute("configBuilders")) {
+            $appSettings.RemoveAttribute("configBuilders")
+            Write-Host "✓ Removed configBuilders from appSettings" -ForegroundColor Green
+          }
+          
+          foreach ($add in $appSettings.add) {
+            if ($add.value -eq "__SMTP_PASSWORD__") {
+              $add.value = $env:SMTP_PWD
+              Write-Host "✓ Replaced __SMTP_PASSWORD__" -ForegroundColor Green
+            }
           }
         }
         
@@ -153,11 +169,11 @@ jobs:
           if ($machineKey) {
             if ($machineKey.validationKey -eq "__MACHINEKEY_VALIDATION__") {
               $machineKey.validationKey = $env:MACH_VAL
-              Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
+              Write-Host "✓ Replaced __MACHINEKEY_VALIDATION__" -ForegroundColor Green
             }
             if ($machineKey.decryptionKey -eq "__MACHINEKEY_DECRYPTION__") {
               $machineKey.decryptionKey = $env:MACH_DEC
-              Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
+              Write-Host "✓ Replaced __MACHINEKEY_DECRYPTION__" -ForegroundColor Green
             }
           }
           
@@ -169,13 +185,13 @@ jobs:
           }
         }
         
-        # Handle SMTP password
+        # Handle legacy system.net SMTP password (if still in use)
         $systemNet = $xml.configuration.'system.net'
-        if ($systemNet.mailSettings.smtp.network) {
+        if ($systemNet -and $systemNet.mailSettings -and $systemNet.mailSettings.smtp -and $systemNet.mailSettings.smtp.network) {
           $network = $systemNet.mailSettings.smtp.network
           if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
             $network.password = $env:SMTP_PWD
-            Write-Host "✓ Replaced SMTP password" -ForegroundColor Green
+            Write-Host "✓ Replaced legacy __SMTP_PASSWORD__" -ForegroundColor Green
           }
         }
         
@@ -191,9 +207,18 @@ jobs:
         
         # Verify no placeholders remain
         [xml]$verify = Get-Content $webConfigPath
+        $placeholderPattern = '__[A-Z_]+__'
+        
         foreach ($add in $verify.configuration.connectionStrings.add) {
-          if ($add.connectionString -match '__.*?__') {
-            Write-Error "Placeholder still exists in $($add.name)"
+          if ($add.connectionString -match $placeholderPattern) {
+            Write-Error "Placeholder still exists in connection string: $($add.name)"
+            exit 1
+          }
+        }
+        
+        foreach ($add in $verify.configuration.appSettings.add) {
+          if ($add.value -match $placeholderPattern) {
+            Write-Error "Placeholder still exists in appSettings: $($add.key) = $($add.value)"
             exit 1
           }
         }
