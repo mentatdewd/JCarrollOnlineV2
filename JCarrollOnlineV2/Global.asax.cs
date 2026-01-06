@@ -12,12 +12,9 @@ using System.Web.Routing;
 
 namespace JCarrollOnlineV2
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc")]
     public class MvcApplication : System.Web.HttpApplication
     {
-#pragma warning disable CA1822 // Mark members as static If this is declared static, IIS complains that there is no default document
         protected void Application_Start()
-#pragma warning restore CA1822 // Mark members as static
         {
             // Enable TLS 1.2 and TLS 1.3 for HTTPS requests
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
