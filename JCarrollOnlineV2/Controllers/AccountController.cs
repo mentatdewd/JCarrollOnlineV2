@@ -70,9 +70,14 @@ namespace JCarrollOnlineV2.Controllers
         [HttpPost, ActionName("DeleteUser")]
         [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteUserConfirmed(string userId)
+        public async Task<ActionResult> DeleteUserConfirmed(string id)  // ← Changed from userId to id
         {
-            ApplicationUser user = await UserManager.FindByIdAsync(userId).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(id))
+            {
+                return HttpNotFound();
+            }
+
+            ApplicationUser user = await UserManager.FindByIdAsync(id).ConfigureAwait(false);
 
             if (user == null)
             {
@@ -83,16 +88,24 @@ namespace JCarrollOnlineV2.Controllers
 
             if (result.Succeeded)
             {
+                _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                    "User {0} (ID: {1}) deleted successfully", user.UserName, id));
                 return RedirectToAction("Index", "Users");
             }
 
             // Handle deletion errors
+            _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                "Failed to delete user {0}: {1}", id, string.Join(", ", result.Errors)));
+
+            DeleteUserViewModel deleteUserViewModel = new DeleteUserViewModel();
+            deleteUserViewModel.InjectFrom(user);
+
             foreach (string error in result.Errors)
             {
                 ModelState.AddModelError("", error);
             }
 
-            return View("DeleteUser", new DeleteUserViewModel { /* populate from user */ });
+            return View("DeleteUser", deleteUserViewModel);
         }
 
         //
