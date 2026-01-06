@@ -101,15 +101,30 @@
         <div class="container body-content">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    @foreach (var node in Html.MvcSiteMap().SiteMapPath())
-                    {
-                        if (node == Html.MvcSiteMap().SiteMapPath().Last())
+                    @{
+                        var siteMap = Html.MvcSiteMap();
+                        var currentNode = siteMap.SiteMap.CurrentNode;
+                        var breadcrumbs = new List<MvcSiteMapProvider.ISiteMapNode>();
+
+                        // Build breadcrumb trail from current node to root
+                        var node = currentNode;
+                        while (node != null)
                         {
-                            <li class="breadcrumb-item active" aria-current="page">@node.Title</li>
+                            breadcrumbs.Insert(0, node);
+                            node = node.ParentNode;
                         }
-                        else
+
+                        for (int i = 0; i < breadcrumbs.Count; i++)
                         {
-                            <li class="breadcrumb-item"><a href="@node.Url">@node.Title</a></li>
+                            var crumb = breadcrumbs[i];
+                            if (i == breadcrumbs.Count - 1)
+                            {
+                                <li class="breadcrumb-item active" aria-current="page">@crumb.Title</li>
+                            }
+                            else
+                            {
+                                <li class="breadcrumb-item"><a href="@crumb.Url">@crumb.Title</a></li>
+                            }
                         }
                     }
                 </ol>
