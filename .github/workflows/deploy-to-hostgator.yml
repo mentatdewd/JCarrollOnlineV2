@@ -21,24 +21,38 @@ jobs:
     
     - name: Restore NuGet packages
       run: nuget restore JCarrollOnlineV2.sln
+      
+    - name: Verify NuGet restore
+      shell: pwsh
+      run: |
+        Write-Host "Verifying NuGet packages restored..." -ForegroundColor Cyan
+        $packagesPath = "packages"
+        if (Test-Path $packagesPath) {
+          $packageCount = (Get-ChildItem -Path $packagesPath -Directory).Count
+          Write-Host "✓ Found $packageCount NuGet packages" -ForegroundColor Green
+        } else {
+          Write-Warning "Packages folder not found"
+        }
     
     - name: Build and Publish
       shell: pwsh
       run: |
-        # Build with explicit publish output
+        # Build with explicit publish output - NO publish profile required
         msbuild JCarrollOnlineV2/JCarrollOnlineV2.csproj `
           /p:Configuration=Release `
           /p:Platform=AnyCPU `
           /p:DeployOnBuild=true `
-          /p:PublishProfile=Release `
           /p:WebPublishMethod=FileSystem `
-          /p:PublishUrl="../publish-output" `
-          /p:DeleteExistingFiles=false `
+          /p:publishUrl="bin\Release\Publish" `
+          /p:DeleteExistingFiles=true `
           /p:TransformWebConfigEnabled=true `
           /p:AutoParameterizationWebConfigConnectionStrings=false `
-          /t:Rebuild `
+          /t:Clean `
+          /t:Build `
           /t:WebPublish `
-          /v:detailed
+          /v:normal
+        
+        Write-Host "Build completed" -ForegroundColor Green
     
     - name: Find published files
       id: find-publish
@@ -46,10 +60,10 @@ jobs:
       run: |
         # Search for published Web.config
         $possiblePaths = @(
-          "publish-output",
-          "JCarrollOnlineV2\publish-output",
           "JCarrollOnlineV2\bin\Release\Publish",
           "JCarrollOnlineV2\obj\Release\Package\PackageTmp",
+          "publish-output",
+          "JCarrollOnlineV2\publish-output",
           "JCarrollOnlineV2\bin\app.publish"
         )
         
@@ -75,6 +89,8 @@ jobs:
         $fullPath = (Resolve-Path $publishPath).Path
         echo "PUBLISH_PATH=$fullPath" >> $env:GITHUB_OUTPUT
         echo "PUBLISH_PATH_RELATIVE=$publishPath" >> $env:GITHUB_OUTPUT
+        
+        Write-Host "Published path set to: $publishPath" -ForegroundColor Cyan
     
     - name: Replace secrets in Web.config
       shell: pwsh
@@ -82,6 +98,12 @@ jobs:
         $webConfigPath = Join-Path "${{ steps.find-publish.outputs.PUBLISH_PATH }}" "Web.config"
         
         Write-Host "Processing: $webConfigPath" -ForegroundColor Cyan
+        
+        if (-not (Test-Path $webConfigPath)) {
+          Write-Error "Web.config not found at: $webConfigPath"
+          exit 1
+        }
+        
         $content = Get-Content $webConfigPath -Raw
         
         # Track changes
@@ -133,9 +155,15 @@ jobs:
       shell: pwsh
       run: |
         Write-Host "`nPublished files structure:" -ForegroundColor Cyan
-        Get-ChildItem -Path "${{ steps.find-publish.outputs.PUBLISH_PATH }}" -Recurse |
-          Select-Object FullName, Length |
-          Format-Table -AutoSize
+        $publishPath = "${{ steps.find-publish.outputs.PUBLISH_PATH }}"
+        
+        if (Test-Path $publishPath) {
+          $files = Get-ChildItem -Path $publishPath -Recurse
+          Write-Host "Total files: $($files.Count)"
+          $files | Select-Object FullName, Length | Format-Table -AutoSize
+        } else {
+          Write-Warning "Publish path not found: $publishPath"
+        }
     
     - name: Deploy to HostGator via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -153,3 +181,5 @@ jobs:
           **/secrets.xml
           **/*.pdb
           **/packages.config
+          **/upgrade.log
+          **/.vs/**
