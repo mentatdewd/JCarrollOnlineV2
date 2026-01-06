@@ -54,6 +54,26 @@ jobs:
         
         Write-Host "✓ Output folders cleaned" -ForegroundColor Green
     
+    - name: Build and Publish
+      shell: pwsh
+      run: |
+        Write-Host "Cleaning output folders..." -ForegroundColor Cyan
+        
+        $foldersToClean = @(
+          "JCarrollOnlineV2\bin",
+          "JCarrollOnlineV2\obj",
+          "publish-output"
+        )
+        
+        foreach ($folder in $foldersToClean) {
+          if (Test-Path $folder) {
+            Write-Host "  Removing: $folder" -ForegroundColor Yellow
+            Remove-Item -Path $folder -Recurse -Force -ErrorAction SilentlyContinue
+          }
+        }
+        
+        Write-Host "✓ Output folders cleaned" -ForegroundColor Green
+    
     - name: Build solution
       run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
     
@@ -75,12 +95,16 @@ jobs:
         # Use aspnet_compiler for more reliable publishing
         msbuild JCarrollOnlineV2/JCarrollOnlineV2.csproj `
           /p:Configuration=Release `
-          /p:Platform="Any CPU" `
-          /p:OutputPath=bin `
-          /p:WebProjectOutputDir=..\publish-output `
-          /p:OutDir=bin\Release\ `
-          /t:_CopyWebApplication `
-          /v:minimal
+          /p:Platform=AnyCPU `
+          /p:DeployOnBuild=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:publishUrl="bin\Release\Publish" `
+          /p:DeleteExistingFiles=true `
+          /p:TransformWebConfigEnabled=true `
+          /p:AutoParameterizationWebConfigConnectionStrings=false `
+          /t:Build `
+          /t:WebPublish `
+          /v:normal
         
         Write-Host "✓ Publish completed" -ForegroundColor Green
     
