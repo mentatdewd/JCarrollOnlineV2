@@ -146,6 +146,12 @@ jobs:
     
     - name: Replace secrets in Web.config
       shell: pwsh
+      env:
+        DEV_CONN: ${{ secrets.__DEV_CONNECTION_STRING__ }}
+        PROD_CONN: ${{ secrets.__PROD_CONNECTION_STRING__ }}
+        MACH_VAL: ${{ secrets.__MACHINEKEY_VALIDATION__ }}
+        MACH_DEC: ${{ secrets.__MACHINEKEY_DECRYPTION__ }}
+        SMTP_PWD: ${{ secrets.__SMTP_PASSWORD__ }}
       run: |
         $webConfigPath = Join-Path "${{ steps.find-publish.outputs.PUBLISH_PATH }}" "Web.config"
         
@@ -156,10 +162,10 @@ jobs:
           exit 1
         }
         
-        # Load as XML first for proper manipulation
+        # Load as XML
         [xml]$xml = Get-Content $webConfigPath
         
-        Write-Host "`n========== BEFORE REPLACEMENTS ==========" -ForegroundColor Magenta
+        Write-Host "`n========== PROCESSING REPLACEMENTS ==========" -ForegroundColor Magenta
         
         # Remove configBuilders attribute
         $connStringsNode = $xml.configuration.connectionStrings
@@ -169,15 +175,16 @@ jobs:
             Write-Host "✓ Removed configBuilders attribute" -ForegroundColor Green
           }
           
-          # Replace connection strings using XML manipulation
+          # Replace connection strings - get values from environment variables
           foreach ($add in $connStringsNode.add) {
             if ($add.connectionString -eq "__DEV_CONNECTION_STRING__") {
-              $add.connectionString = '${{ secrets.__DEV_CONNECTION_STRING__ }}'
-              Write-Host "✓ Replaced DEV connection string" -ForegroundColor Green
+              # Set directly from environment variable (no encoding issues)
+              $add.connectionString = $env:DEV_CONN
+              Write-Host "✓ Replaced DEV connection string (length: $($env:DEV_CONN.Length))" -ForegroundColor Green
             }
             if ($add.connectionString -eq "__PROD_CONNECTION_STRING__") {
-              $add.connectionString = '${{ secrets.__PROD_CONNECTION_STRING__ }}'
-              Write-Host "✓ Replaced PROD connection string" -ForegroundColor Green
+              $add.connectionString = $env:PROD_CONN
+              Write-Host "✓ Replaced PROD connection string (length: $($env:PROD_CONN.Length))" -ForegroundColor Green
             }
           }
         } else {
@@ -191,11 +198,11 @@ jobs:
           $machineKey = $systemWeb.machineKey
           if ($machineKey) {
             if ($machineKey.validationKey -eq "__MACHINEKEY_VALIDATION__") {
-              $machineKey.validationKey = '${{ secrets.__MACHINEKEY_VALIDATION__ }}'
+              $machineKey.validationKey = $env:MACH_VAL
               Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
             }
             if ($machineKey.decryptionKey -eq "__MACHINEKEY_DECRYPTION__") {
-              $machineKey.decryptionKey = '${{ secrets.__MACHINEKEY_DECRYPTION__ }}'
+              $machineKey.decryptionKey = $env:MACH_DEC
               Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
             }
           }
@@ -216,15 +223,23 @@ jobs:
             $network = $smtp.network
             if ($network) {
               if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
-                $network.password = '${{ secrets.__SMTP_PASSWORD__ }}'
+                $network.password = $env:SMTP_PWD
                 Write-Host "✓ Replaced SMTP password" -ForegroundColor Green
               }
             }
           }
         }
         
-        # Save the modified XML
-        $xml.Save($webConfigPath)
+        # Save with proper XML settings to avoid encoding issues
+        $settings = New-Object System.Xml.XmlWriterSettings
+        $settings.Indent = $true
+        $settings.IndentChars = "  "
+        $settings.NewLineChars = "`r`n"
+        $settings.Encoding = [System.Text.Encoding]::UTF8
+        
+        $writer = [System.Xml.XmlWriter]::Create($webConfigPath, $settings)
+        $xml.Save($writer)
+        $writer.Close()
         
         Write-Host "`n========== VERIFICATION ==========" -ForegroundColor Magenta
         
@@ -238,10 +253,13 @@ jobs:
             $connStr = $add.connectionString
             
             if ($connStr -match '__.*?__') {
-              Write-Error "  ❌ Still contains placeholder: $connStr"
+              Write-Error "  ❌ Still contains placeholder!"
               exit 1
             } elseif ([string]::IsNullOrWhiteSpace($connStr)) {
               Write-Error "  ❌ Connection string is empty!"
+              exit 1
+            } elseif ($connStr -match '&quot;|&lt;|&gt;|&amp;') {
+              Write-Error "  ❌ Connection string contains HTML entities: $connStr"
               exit 1
             } else {
               Write-Host "  ✓ Valid (length: $($connStr.Length) chars)" -ForegroundColor Green
