@@ -72,42 +72,15 @@ jobs:
       run: |
         Write-Host "Publishing web application..." -ForegroundColor Cyan
         
-        # Copy web application files to publish-output
         $sourceDir = "JCarrollOnlineV2"
         $destDir = "publish-output"
         
-        # Copy all necessary files
-        $itemsToCopy = @(
-          "*.asax",
-          "*.config",
-          "*.html",
-          "*.htm",
-          "*.css",
-          "*.js",
-          "*.aspx",
-          "*.ascx",
-          "*.asmx",
-          "*.ashx",
-          "*.master",
-          "bin",
-          "Content",
-          "fonts",
-          "Scripts",
-          "Views",
-          "App_Data",
-          "Models",
-          "Images",
-          "favicon.ico"
-        )
+        # Use robocopy for reliable recursive copy
+        Write-Host "Copying all files from $sourceDir to $destDir..." -ForegroundColor Cyan
+        robocopy $sourceDir $destDir /E /XD obj .vs node_modules /XF *.csproj *.user *.sln /NFL /NDL /NJH /NJS /nc /ns /np
         
-        foreach ($item in $itemsToCopy) {
-          $sourcePath = Join-Path $sourceDir $item
-          if (Test-Path $sourcePath) {
-            $destPath = Join-Path $destDir $item
-            Write-Host "  Copying: $item" -ForegroundColor Gray
-            Copy-Item -Path $sourcePath -Destination $destPath -Recurse -Force -ErrorAction SilentlyContinue
-          }
-        }
+        # Robocopy returns exit codes 0-7 for success (1 = files copied successfully)
+        if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
         
         Write-Host "✓ Publish completed" -ForegroundColor Green
     
