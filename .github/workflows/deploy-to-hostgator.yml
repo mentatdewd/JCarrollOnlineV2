@@ -75,12 +75,36 @@ jobs:
         $sourceDir = "JCarrollOnlineV2"
         $destDir = "publish-output"
         
-        # Use robocopy for reliable recursive copy
-        Write-Host "Copying all files from $sourceDir to $destDir..." -ForegroundColor Cyan
-        robocopy $sourceDir $destDir /E /XD obj .vs node_modules /XF *.csproj *.user *.sln /NFL /NDL /NJH /NJS /nc /ns /np
+        # Copy content files (excluding build artifacts and project files)
+        Write-Host "Copying content files from $sourceDir to $destDir..." -ForegroundColor Cyan
+        robocopy $sourceDir $destDir /E /XD obj .vs node_modules bin /XF *.csproj *.user *.sln /NFL /NDL /NJH /NJS /nc /ns /np
         
         # Robocopy returns exit codes 0-7 for success (1 = files copied successfully)
         if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
+        
+        # Copy the compiled bin folder with all assemblies
+        Write-Host "Copying compiled binaries..." -ForegroundColor Cyan
+        $binSource = Join-Path $sourceDir "bin"
+        $binDest = Join-Path $destDir "bin"
+        
+        if (Test-Path $binSource) {
+          robocopy $binSource $binDest /E /NFL /NDL /NJH /NJS /nc /ns /np
+          if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
+          
+          # Verify critical DLLs
+          $criticalDlls = @("JCarrollOnlineV2.dll", "EntityFramework.dll", "System.Web.Mvc.dll")
+          foreach ($dll in $criticalDlls) {
+            $dllPath = Join-Path $binDest $dll
+            if (Test-Path $dllPath) {
+              Write-Host "  ✓ Found: $dll" -ForegroundColor Green
+            } else {
+              Write-Warning "  ⚠ Missing: $dll"
+            }
+          }
+        } else {
+          Write-Error "Bin folder not found at: $binSource"
+          exit 1
+        }
         
         Write-Host "✓ Publish completed" -ForegroundColor Green
     
@@ -92,15 +116,22 @@ jobs:
         
         if (-not (Test-Path "$publishPath\Web.config")) {
           Write-Error "Web.config not found in publish output"
-          Write-Host "Contents of publish directory:" -ForegroundColor Yellow
-          if (Test-Path $publishPath) {
-            Get-ChildItem -Path $publishPath -Recurse | Select-Object FullName
+          exit 1
+        }
+        
+        if (-not (Test-Path "$publishPath\Global.asax")) {
+          Write-Error "Global.asax not found in publish output"
+          exit 1
+        }
+        
+        if (-not (Test-Path "$publishPath\bin\JCarrollOnlineV2.dll")) {
+          Write-Error "JCarrollOnlineV2.dll not found in bin folder"
+          Write-Host "Contents of bin folder:" -ForegroundColor Yellow
+          if (Test-Path "$publishPath\bin") {
+            Get-ChildItem -Path "$publishPath\bin" | Select-Object Name, Length
+          } else {
+            Write-Error "Bin folder does not exist!"
           }
-          
-          Write-Host "`nSearching for Web.config..." -ForegroundColor Yellow
-          Get-ChildItem -Path "." -Filter "Web.config" -Recurse | 
-            Where-Object { $_.FullName -notlike "*\.vs\*" } |
-            ForEach-Object { Write-Host $_.FullName }
           exit 1
         }
         
@@ -189,6 +220,15 @@ jobs:
           Get-ChildItem -Path $publishPath | 
             Select-Object Name, @{Name='Type';Expression={if($_.PSIsContainer){'DIR'}else{'FILE'}}}, Length |
             Format-Table -AutoSize
+          
+          # Show bin folder contents
+          Write-Host "`nBin folder contents:" -ForegroundColor Yellow
+          $binPath = Join-Path $publishPath "bin"
+          if (Test-Path $binPath) {
+            Get-ChildItem -Path $binPath -Filter "*.dll" | 
+              Select-Object Name, Length |
+              Format-Table -AutoSize
+          }
         } else {
           Write-Warning "Publish path not found: $publishPath"
         }
