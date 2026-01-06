@@ -200,7 +200,7 @@ jobs:
         username: mentatdewd
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ${{ steps.find-publish.outputs.PUBLISH_PATH_RELATIVE }}/
-        server-dir: /public_html/
+        server-dir: /httpdocs/jcarrollonline/
         dangerous-clean-slate: false
         log-level: verbose
         exclude: |
