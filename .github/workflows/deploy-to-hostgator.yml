@@ -158,24 +158,23 @@ jobs:
         
         $content = Get-Content $webConfigPath -Raw
         
+        # First, show what we're working with
+        Write-Host "`n========== BEFORE REPLACEMENTS ==========" -ForegroundColor Magenta
+        Write-Host "Connection strings section BEFORE:" -ForegroundColor Yellow
+        if ($content -match '(?s)<connectionStrings[^>]*>.*?</connectionStrings>') {
+          Write-Host $matches[0]
+        } else {
+          Write-Warning "Could not find connectionStrings section!"
+        }
+        
         # Track changes
         $changes = 0
         
-        # Replace machine keys
-        if ($content -match '__MACHINEKEY_VALIDATION__') {
-          $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.MACHINEKEY_VALIDATION }}'
-          Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
+        # Remove configBuilders attribute FIRST (it interferes with connection strings)
+        if ($content -match 'configBuilders="Secrets"') {
+          $content = $content -replace '\s+configBuilders="Secrets"', ''
+          Write-Host "✓ Removed configBuilders attribute" -ForegroundColor Green
           $changes++
-        } else {
-          Write-Host "⚠ MACHINEKEY_VALIDATION placeholder not found" -ForegroundColor Yellow
-        }
-        
-        if ($content -match '__MACHINEKEY_DECRYPTION__') {
-          $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.MACHINEKEY_DECRYPTION }}'
-          Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
-          $changes++
-        } else {
-          Write-Host "⚠ MACHINEKEY_DECRYPTION placeholder not found" -ForegroundColor Yellow
         }
         
         # Replace connection strings
@@ -195,16 +194,31 @@ jobs:
           Write-Warning "PROD_CONNECTION_STRING placeholder not found"
         }
         
+        # Replace machine keys
+        if ($content -match '__MACHINEKEY_VALIDATION__') {
+          $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.MACHINEKEY_VALIDATION }}'
+          Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
+          $changes++
+        } else {
+          Write-Host "⚠ MACHINEKEY_VALIDATION placeholder not found" -ForegroundColor Yellow
+        }
+        
+        if ($content -match '__MACHINEKEY_DECRYPTION__') {
+          $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.MACHINEKEY_DECRYPTION }}'
+          Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
+          $changes++
+        } else {
+          Write-Host "⚠ MACHINEKEY_DECRYPTION placeholder not found" -ForegroundColor Yellow
+        }
+        
         # Replace SMTP password
         if ($content -match '__SMTP_PASSWORD__') {
           $content = $content -replace '__SMTP_PASSWORD__', '${{ secrets.SMTP_PASSWORD }}'
           Write-Host "✓ Replaced SMTP_PASSWORD placeholder" -ForegroundColor Green
           $changes++
-        } else {
-          Write-Warning "SMTP_PASSWORD placeholder not found"
         }
         
-        # Handle hardcoded password
+        # Handle hardcoded password (escape the special characters properly)
         if ($content -match 'password="jV41wt\^5"') {
           $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.SMTP_PASSWORD }}"'
           Write-Host "✓ Replaced hardcoded SMTP password" -ForegroundColor Green
@@ -218,33 +232,51 @@ jobs:
           $changes++
         }
         
-        # Remove configBuilders attribute from production (it's dev-only)
-        if ($content -match 'configBuilders="Secrets"') {
-          $content = $content -replace '\s*configBuilders="Secrets"', ''
-          Write-Host "✓ Removed configBuilders attribute" -ForegroundColor Green
+        # Set debug to false for production
+        if ($content -match 'debug="true"') {
+          $content = $content -replace 'debug="true"', 'debug="false"'
+          Write-Host "✓ Set debug=false" -ForegroundColor Green
           $changes++
         }
-        
-        # Set debug to false for production
-        $content = $content -replace 'debug="true"', 'debug="false"'
-        Write-Host "✓ Set debug=false" -ForegroundColor Green
-        $changes++
         
         Set-Content $webConfigPath $content -NoNewline
         Write-Host "`n✓ Total replacements made: $changes" -ForegroundColor Cyan
         
-        # Show the connectionStrings section for verification
-        Write-Host "`nConnectionStrings section preview:" -ForegroundColor Yellow
+        # Show the connectionStrings section AFTER for verification
+        Write-Host "`n========== AFTER REPLACEMENTS ==========" -ForegroundColor Magenta
+        Write-Host "ConnectionStrings section AFTER:" -ForegroundColor Yellow
         try {
           $xmlContent = [xml]$content
           $connStrings = $xmlContent.configuration.connectionStrings
           if ($connStrings) {
-            $connStrings.InnerXml | Write-Host
+            # Show the full XML including attributes
+            $connStrings.OuterXml | Write-Host
+            
+            # Verify each connection string
+            foreach ($add in $connStrings.add) {
+              Write-Host "`nConnection: $($add.name)" -ForegroundColor Cyan
+              $connStr = $add.connectionString
+              if ($connStr -match '__.*?__') {
+                Write-Error "  ❌ Still contains placeholder: $connStr"
+              } elseif ([string]::IsNullOrWhiteSpace($connStr)) {
+                Write-Error "  ❌ Connection string is empty!"
+              } else {
+                Write-Host "  ✓ Connection string populated (length: $($connStr.Length) chars)" -ForegroundColor Green
+                # Show first 50 chars to verify it's real
+                Write-Host "  Preview: $($connStr.Substring(0, [Math]::Min(50, $connStr.Length)))..." -ForegroundColor Gray
+              }
+            }
           } else {
-            Write-Warning "No connectionStrings section found!"
+            Write-Error "❌ No connectionStrings section found!"
+            exit 1
           }
         } catch {
-          Write-Warning "Could not parse XML: $_"
+          Write-Error "❌ Could not parse XML: $_"
+          Write-Host "Raw content around connectionStrings:" -ForegroundColor Yellow
+          if ($content -match '(?s)<connectionStrings[^>]*>.*?</connectionStrings>') {
+            Write-Host $matches[0]
+          }
+          exit 1
         }
     
     - name: List published files
