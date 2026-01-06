@@ -481,7 +481,6 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                //var user = await UserManager.FindByNameAsync(model.Email);
                 ApplicationUser user = await UserManager.FindByEmailAsync(model?.Email).ConfigureAwait(false);
 
                 if (user == null || !await UserManager.IsEmailConfirmedAsync(user.Id).ConfigureAwait(false))
@@ -492,16 +491,150 @@ namespace JCarrollOnlineV2.Controllers
                     return View("ForgotPasswordConfirmation", forgotPasswordConfirmationViewModel);
                 }
 
-                // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                // Send an email with this link
-                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id).ConfigureAwait(false);
-                string callbackUrl = Url.Action("ResetPassword", "Account", routeValues: new { userId = user.Id,  code }, protocol: Request.Url.Scheme);
-                await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>").ConfigureAwait(false);
-                return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                try
+                {
+                    // Generate password reset token
+                    string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id).ConfigureAwait(false);
+
+                    // URL encode the code
+                    string encodedCode = System.Web.HttpUtility.UrlEncode(code);
+
+                    // Generate callback URL
+                    string callbackUrl = Url.Action("ResetPassword", "Account",
+                        routeValues: new { userId = user.Id, code = encodedCode },
+                        protocol: Request.Url.Scheme);
+
+                    // Send password reset email using your custom method
+                    await SendPasswordResetEmail(user, callbackUrl).ConfigureAwait(false);
+
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                        "Password reset email sent successfully to {0}", user.Email));
+
+                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                        "Failed to send password reset email to {0}", user.Email));
+
+                    // Still redirect to confirmation page (don't reveal if user exists)
+                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                }
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        // Add this new helper method
+        private async Task SendPasswordResetEmail(ApplicationUser user, string callbackUrl)
+        {
+            // Create email content (you can create a Handlebars template for this too)
+            string emailBody = string.Format(
+                @"<html>
+        <body>
+            <h2>Reset Your Password</h2>
+            <p>Hello {0},</p>
+            <p>You recently requested to reset your password for your JCarrollOnline account.</p>
+            <p>Please click the button below to reset your password:</p>
+            <p><a href=""{1}"" style=""background-color: #4CAF50; color: white; padding: 14px 20px; text-decoration: none; display: inline-block; border-radius: 4px;"">Reset Password</a></p>
+            <p>If the button doesn't work, copy and paste this link into your browser:</p>
+            <p>{1}</p>
+            <p>If you didn't request a password reset, please ignore this email.</p>
+            <p>Thanks,<br/>The JCarrollOnline Team</p>
+        </body>
+        </html>",
+                user.UserName,
+                callbackUrl
+            );
+
+            // Create a simple view model for password reset
+            UserWelcomeViewModel passwordResetViewModel = new UserWelcomeViewModel
+            {
+                TargetUser = user,
+                Content = emailBody
+            };
+
+            await SendPasswordResetEmailViaHostGatorAsync(passwordResetViewModel).ConfigureAwait(false);
+        }
+
+        // Add this method (similar to SendEmailViaHostGatorAsync but for password reset)
+        private async Task SendPasswordResetEmailViaHostGatorAsync(UserWelcomeViewModel viewModel)
+        {
+            // Read SMTP settings from web.config/appSettings
+            string smtpHost = System.Configuration.ConfigurationManager.AppSettings["SmtpHost"];
+            string smtpPortStr = System.Configuration.ConfigurationManager.AppSettings["SmtpPort"];
+            string smtpUsername = System.Configuration.ConfigurationManager.AppSettings["SmtpUsername"];
+            string smtpPassword = System.Configuration.ConfigurationManager.AppSettings["SmtpPassword"];
+            string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SmtpFromEmail"];
+            string enableSslStr = System.Configuration.ConfigurationManager.AppSettings["SmtpEnableSsl"];
+
+            // Validate configuration
+            if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpPassword))
+            {
+                _logger.Error("SMTP configuration is incomplete. Check Web.config appSettings.");
+                throw new InvalidOperationException("SMTP configuration is missing required values.");
+            }
+
+            int smtpPort = int.Parse(smtpPortStr);
+            bool enableSsl = bool.Parse(enableSslStr);
+
+            // Configure certificate validation callback
+            System.Net.ServicePointManager.ServerCertificateValidationCallback =
+                (sender, certificate, chain, sslPolicyErrors) =>
+                {
+                    if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
+                        return true;
+
+                    if (sender is System.Net.Mail.SmtpClient)
+                    {
+                        _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                            "Accepting certificate from {0} despite SSL errors: {1}",
+                            smtpHost, sslPolicyErrors));
+                        return true;
+                    }
+
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Certificate validation failed for unknown sender. SSL errors: {0}",
+                        sslPolicyErrors));
+                    return false;
+                };
+
+            try
+            {
+                using (System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage())
+                {
+                    mailMessage.From = new System.Net.Mail.MailAddress(fromEmail, "JCarrollOnline");
+                    mailMessage.To.Add(new System.Net.Mail.MailAddress(viewModel?.TargetUser.Email));
+                    mailMessage.Subject = "Reset Your JCarrollOnline Password";
+                    mailMessage.Body = viewModel.Content;
+                    mailMessage.IsBodyHtml = true;
+
+                    using (System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
+                    {
+                        smtpClient.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
+                        smtpClient.EnableSsl = enableSsl;
+                        smtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
+
+                        await smtpClient.SendMailAsync(mailMessage).ConfigureAwait(false);
+                        _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                            "Password reset email sent successfully to {0}",
+                            viewModel.TargetUser.Email));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                    "Failed to send password reset email to {0}",
+                    viewModel.TargetUser.Email));
+                throw;
+            }
+            finally
+            {
+                // Reset certificate validation to default for security
+                System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
+            }
         }
 
         //
