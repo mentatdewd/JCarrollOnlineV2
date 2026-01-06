@@ -156,130 +156,104 @@ jobs:
           exit 1
         }
         
-        $content = Get-Content $webConfigPath -Raw
+        # Load as XML first for proper manipulation
+        [xml]$xml = Get-Content $webConfigPath
         
-        # First, show what we're working with
         Write-Host "`n========== BEFORE REPLACEMENTS ==========" -ForegroundColor Magenta
-        Write-Host "Connection strings section BEFORE:" -ForegroundColor Yellow
-        if ($content -match '(?s)<connectionStrings[^>]*>.*?</connectionStrings>') {
-          Write-Host $matches[0]
-        } else {
-          Write-Warning "Could not find connectionStrings section!"
-        }
         
-        # Track changes
-        $changes = 0
-        
-        # Remove configBuilders attribute FIRST (it interferes with connection strings)
-        if ($content -match 'configBuilders="Secrets"') {
-          $content = $content -replace '\s+configBuilders="Secrets"', ''
-          Write-Host "✓ Removed configBuilders attribute" -ForegroundColor Green
-          $changes++
-        }
-        
-        # Replace connection strings - NOTE: Using secrets with __ prefix/suffix
-        if ($content -match '__DEV_CONNECTION_STRING__') {
-          $content = $content -replace '__DEV_CONNECTION_STRING__', '${{ secrets.__DEV_CONNECTION_STRING__ }}'
-          Write-Host "✓ Replaced __DEV_CONNECTION_STRING__" -ForegroundColor Green
-          $changes++
-        } else {
-          Write-Warning "__DEV_CONNECTION_STRING__ placeholder not found"
-        }
-        
-        if ($content -match '__PROD_CONNECTION_STRING__') {
-          $content = $content -replace '__PROD_CONNECTION_STRING__', '${{ secrets.__PROD_CONNECTION_STRING__ }}'
-          Write-Host "✓ Replaced __PROD_CONNECTION_STRING__" -ForegroundColor Green
-          $changes++
-        } else {
-          Write-Warning "__PROD_CONNECTION_STRING__ placeholder not found"
-        }
-        
-        # Replace machine keys - check if you have these with __ as well
-        if ($content -match '__MACHINEKEY_VALIDATION__') {
-          $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.__MACHINEKEY_VALIDATION__ }}'
-          Write-Host "✓ Replaced __MACHINEKEY_VALIDATION__" -ForegroundColor Green
-          $changes++
-        } else {
-          Write-Host "⚠ __MACHINEKEY_VALIDATION__ placeholder not found" -ForegroundColor Yellow
-        }
-        
-        if ($content -match '__MACHINEKEY_DECRYPTION__') {
-          $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.__MACHINEKEY_DECRYPTION__ }}'
-          Write-Host "✓ Replaced __MACHINEKEY_DECRYPTION__" -ForegroundColor Green
-          $changes++
-        } else {
-          Write-Host "⚠ __MACHINEKEY_DECRYPTION__ placeholder not found" -ForegroundColor Yellow
-        }
-        
-        # Replace SMTP password
-        if ($content -match '__SMTP_PASSWORD__') {
-          $content = $content -replace '__SMTP_PASSWORD__', '${{ secrets.__SMTP_PASSWORD__ }}'
-          Write-Host "✓ Replaced __SMTP_PASSWORD__ placeholder" -ForegroundColor Green
-          $changes++
-        }
-        
-        # Handle hardcoded password (escape the special characters properly)
-        if ($content -match 'password="jV41wt\^5"') {
-          $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.__SMTP_PASSWORD__ }}"'
-          Write-Host "✓ Replaced hardcoded SMTP password" -ForegroundColor Green
-          $changes++
-        }
-        
-        # Also handle if the password is empty
-        if ($content -match 'password=""') {
-          $content = $content -replace 'password=""', 'password="${{ secrets.__SMTP_PASSWORD__ }}"'
-          Write-Host "✓ Replaced empty SMTP password" -ForegroundColor Green
-          $changes++
-        }
-        
-        # Set debug to false for production
-        if ($content -match 'debug="true"') {
-          $content = $content -replace 'debug="true"', 'debug="false"'
-          Write-Host "✓ Set debug=false" -ForegroundColor Green
-          $changes++
-        }
-        
-        Set-Content $webConfigPath $content -NoNewline
-        Write-Host "`n✓ Total replacements made: $changes" -ForegroundColor Cyan
-        
-        # Show the connectionStrings section AFTER for verification
-        Write-Host "`n========== AFTER REPLACEMENTS ==========" -ForegroundColor Magenta
-        Write-Host "ConnectionStrings section AFTER:" -ForegroundColor Yellow
-        try {
-          $xmlContent = [xml]$content
-          $connStrings = $xmlContent.configuration.connectionStrings
-          if ($connStrings) {
-            # Show the full XML including attributes
-            $connStrings.OuterXml | Write-Host
-            
-            # Verify each connection string
-            foreach ($add in $connStrings.add) {
-              Write-Host "`nConnection: $($add.name)" -ForegroundColor Cyan
-              $connStr = $add.connectionString
-              if ($connStr -match '__.*?__') {
-                Write-Error "  ❌ Still contains placeholder: $connStr"
-                exit 1
-              } elseif ([string]::IsNullOrWhiteSpace($connStr)) {
-                Write-Error "  ❌ Connection string is empty!"
-                exit 1
-              } else {
-                Write-Host "  ✓ Connection string populated (length: $($connStr.Length) chars)" -ForegroundColor Green
-                # Show first 50 chars to verify it's real
-                Write-Host "  Preview: $($connStr.Substring(0, [Math]::Min(50, $connStr.Length)))..." -ForegroundColor Gray
-              }
+        # Remove configBuilders attribute
+        $connStringsNode = $xml.configuration.connectionStrings
+        if ($connStringsNode) {
+          if ($connStringsNode.HasAttribute("configBuilders")) {
+            $connStringsNode.RemoveAttribute("configBuilders")
+            Write-Host "✓ Removed configBuilders attribute" -ForegroundColor Green
+          }
+          
+          # Replace connection strings using XML manipulation
+          foreach ($add in $connStringsNode.add) {
+            if ($add.connectionString -eq "__DEV_CONNECTION_STRING__") {
+              $add.connectionString = '${{ secrets.__DEV_CONNECTION_STRING__ }}'
+              Write-Host "✓ Replaced DEV connection string" -ForegroundColor Green
             }
-          } else {
-            Write-Error "❌ No connectionStrings section found!"
-            exit 1
+            if ($add.connectionString -eq "__PROD_CONNECTION_STRING__") {
+              $add.connectionString = '${{ secrets.__PROD_CONNECTION_STRING__ }}'
+              Write-Host "✓ Replaced PROD connection string" -ForegroundColor Green
+            }
           }
-        } catch {
-          Write-Error "❌ Could not parse XML: $_"
-          Write-Host "Raw content around connectionStrings:" -ForegroundColor Yellow
-          if ($content -match '(?s)<connectionStrings[^>]*>.*?</connectionStrings>') {
-            Write-Host $matches[0]
-          }
+        } else {
+          Write-Error "❌ No connectionStrings section found!"
           exit 1
         }
+        
+        # Handle machine keys
+        $systemWeb = $xml.configuration.'system.web'
+        if ($systemWeb) {
+          $machineKey = $systemWeb.machineKey
+          if ($machineKey) {
+            if ($machineKey.validationKey -eq "__MACHINEKEY_VALIDATION__") {
+              $machineKey.validationKey = '${{ secrets.__MACHINEKEY_VALIDATION__ }}'
+              Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
+            }
+            if ($machineKey.decryptionKey -eq "__MACHINEKEY_DECRYPTION__") {
+              $machineKey.decryptionKey = '${{ secrets.__MACHINEKEY_DECRYPTION__ }}'
+              Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
+            }
+          }
+          
+          # Set debug to false
+          $compilation = $systemWeb.compilation
+          if ($compilation -and $compilation.debug -eq "true") {
+            $compilation.debug = "false"
+            Write-Host "✓ Set debug=false" -ForegroundColor Green
+          }
+        }
+        
+        # Handle SMTP password
+        $systemNet = $xml.configuration.'system.net'
+        if ($systemNet) {
+          $smtp = $systemNet.mailSettings.smtp
+          if ($smtp) {
+            $network = $smtp.network
+            if ($network) {
+              if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
+                $network.password = '${{ secrets.__SMTP_PASSWORD__ }}'
+                Write-Host "✓ Replaced SMTP password" -ForegroundColor Green
+              }
+            }
+          }
+        }
+        
+        # Save the modified XML
+        $xml.Save($webConfigPath)
+        
+        Write-Host "`n========== VERIFICATION ==========" -ForegroundColor Magenta
+        
+        # Verify connection strings
+        [xml]$verifyXml = Get-Content $webConfigPath
+        $connStrings = $verifyXml.configuration.connectionStrings
+        
+        if ($connStrings) {
+          foreach ($add in $connStrings.add) {
+            Write-Host "`nConnection: $($add.name)" -ForegroundColor Cyan
+            $connStr = $add.connectionString
+            
+            if ($connStr -match '__.*?__') {
+              Write-Error "  ❌ Still contains placeholder: $connStr"
+              exit 1
+            } elseif ([string]::IsNullOrWhiteSpace($connStr)) {
+              Write-Error "  ❌ Connection string is empty!"
+              exit 1
+            } else {
+              Write-Host "  ✓ Valid (length: $($connStr.Length) chars)" -ForegroundColor Green
+              Write-Host "  Preview: $($connStr.Substring(0, [Math]::Min(60, $connStr.Length)))..." -ForegroundColor Gray
+            }
+          }
+        } else {
+          Write-Error "❌ No connectionStrings section found after save!"
+          exit 1
+        }
+        
+        Write-Host "`n✓ Web.config successfully updated" -ForegroundColor Green
     
     - name: List published files
       shell: pwsh
