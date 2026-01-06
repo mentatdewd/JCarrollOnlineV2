@@ -34,6 +34,26 @@ jobs:
           Write-Warning "Packages folder not found"
         }
     
+    - name: Clean output folders
+      shell: pwsh
+      run: |
+        Write-Host "Cleaning output folders..." -ForegroundColor Cyan
+        
+        $foldersToClean = @(
+          "JCarrollOnlineV2\bin",
+          "JCarrollOnlineV2\obj",
+          "publish-output"
+        )
+        
+        foreach ($folder in $foldersToClean) {
+          if (Test-Path $folder) {
+            Write-Host "  Removing: $folder" -ForegroundColor Yellow
+            Remove-Item -Path $folder -Recurse -Force -ErrorAction SilentlyContinue
+          }
+        }
+        
+        Write-Host "✓ Output folders cleaned" -ForegroundColor Green
+    
     - name: Build and Publish
       shell: pwsh
       run: |
@@ -47,7 +67,6 @@ jobs:
           /p:DeleteExistingFiles=true `
           /p:TransformWebConfigEnabled=true `
           /p:AutoParameterizationWebConfigConnectionStrings=false `
-          /t:Clean `
           /t:Build `
           /t:WebPublish `
           /v:normal
