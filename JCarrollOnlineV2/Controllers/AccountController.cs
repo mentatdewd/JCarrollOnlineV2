@@ -654,9 +654,19 @@ namespace JCarrollOnlineV2.Controllers
         [HttpGet]
         public ActionResult ResetPassword(string code)
         {
-            ResetPasswordViewModel resetPasswordViewModel = new ResetPasswordViewModel();
+            if (code == null)
+            {
+                _logger.Error("ResetPassword called with null code");
+                return View("Error");
+            }
 
-            return code == null ? View("Error") : View(resetPasswordViewModel);
+            ResetPasswordViewModel resetPasswordViewModel = new ResetPasswordViewModel
+            {
+                Code = code,
+                PageTitle = "Reset Password"
+            };
+
+            return View(resetPasswordViewModel);
         }
 
         //
@@ -670,19 +680,55 @@ namespace JCarrollOnlineV2.Controllers
             {
                 return View(model);
             }
-            ApplicationUser user = await UserManager.FindByEmailAsync(model?.Email).ConfigureAwait(false);
+
+            if (string.IsNullOrEmpty(model?.Code))
+            {
+                _logger.Error("ResetPassword POST called with null or empty code");
+                ModelState.AddModelError("", "Invalid password reset link.");
+                return View(model);
+            }
+
+            ApplicationUser user = await UserManager.FindByEmailAsync(model.Email).ConfigureAwait(false);
+
             if (user == null)
             {
+                _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                    "Password reset attempted for non-existent email: {0}", model.Email));
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            IdentityResult result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password).ConfigureAwait(false);
-            if (result.Succeeded)
+
+            try
             {
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
+                // URL decode the code
+                string decodedCode = System.Web.HttpUtility.UrlDecode(model.Code);
+
+                _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                    "Attempting password reset for user: {0}", user.Email));
+
+                IdentityResult result = await UserManager.ResetPasswordAsync(user.Id, decodedCode, model.Password).ConfigureAwait(false);
+
+                if (result.Succeeded)
+                {
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                        "Password reset successful for user: {0}", user.Email));
+                    return RedirectToAction("ResetPasswordConfirmation", "Account");
+                }
+
+                _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                    "Password reset failed for user {0}. Errors: {1}",
+                    user.Email, string.Join(", ", result.Errors)));
+
+                AddErrors(result);
             }
-            AddErrors(result);
-            return View();
+            catch (Exception ex)
+            {
+                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                    "Exception during password reset for user: {0}", user.Email));
+                ModelState.AddModelError("", "An error occurred while resetting your password. Please try again.");
+            }
+
+            return View(model);
         }
 
         //
