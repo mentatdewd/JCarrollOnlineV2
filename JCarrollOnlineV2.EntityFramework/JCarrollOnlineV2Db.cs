@@ -13,14 +13,12 @@ namespace JCarrollOnlineV2.EntityFramework
 
         public JCarrollOnlineV2DbContext()
 #if DEBUG
-        : base("JCarrollOnlineV2Connection")
+        : base("JCarrollOnlineV2ProductionConnection")
 #else
         : base("JCarrollOnlineV2ProductionConnection")
 #endif      
         {
-            //Database.Log = Console.WriteLine;
-            //LogEvent logEvent = new LogEvent("using {%0} as dbcontext" + "JCarrollOnlineV2");
-            //Database.Log = s => { logger.Info(s); };
+            Database.Log = sql => System.Diagnostics.Debug.WriteLine(sql);
         }
 
 
