@@ -11,61 +11,50 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v2
     
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1
+      uses: NuGet/setup-nuget@v2.0.0
+    
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
     
     - name: Restore NuGet packages
-      run: nuget restore JCarrollOnlineV2.sln
-      
-    - name: Verify NuGet restore
       shell: pwsh
       run: |
-        Write-Host "Verifying NuGet packages restored..." -ForegroundColor Cyan
-        $packagesPath = "packages"
-        if (Test-Path $packagesPath) {
-          $packageCount = (Get-ChildItem -Path $packagesPath -Directory).Count
-          Write-Host "✓ Found $packageCount NuGet packages" -ForegroundColor Green
-        } else {
-          Write-Warning "Packages folder not found"
+        Write-Host "Restoring NuGet packages..." -ForegroundColor Cyan
+        nuget restore JCarrollOnlineV2.sln
+        
+        # Quick verification
+        if (Test-Path "packages") {
+          $count = (Get-ChildItem -Path "packages" -Directory).Count
+          Write-Host "✓ Restored $count packages" -ForegroundColor Green
         }
     
-    - name: Clean output folders
+    - name: Clean and prepare output
       shell: pwsh
       run: |
         Write-Host "Cleaning output folders..." -ForegroundColor Cyan
         
-        $foldersToClean = @(
-          "JCarrollOnlineV2\bin",
-          "JCarrollOnlineV2\obj",
-          "publish-output"
-        )
-        
-        foreach ($folder in $foldersToClean) {
-          if (Test-Path $folder) {
-            Write-Host "  Removing: $folder" -ForegroundColor Yellow
-            Remove-Item -Path $folder -Recurse -Force -ErrorAction SilentlyContinue
+        @("JCarrollOnlineV2\bin", "JCarrollOnlineV2\obj", "publish-output") | ForEach-Object {
+          if (Test-Path $_) {
+            Remove-Item -Path $_ -Recurse -Force -ErrorAction SilentlyContinue
           }
         }
         
-        Write-Host "✓ Output folders cleaned" -ForegroundColor Green
+        New-Item -ItemType Directory -Path "publish-output" -Force | Out-Null
+        Write-Host "✓ Cleaned and created publish directory" -ForegroundColor Green
     
     - name: Build solution
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
-    
-    - name: Create publish directory
-      shell: pwsh
-      run: |
-        $publishDir = "publish-output"
-        if (Test-Path $publishDir) {
-          Remove-Item -Path $publishDir -Recurse -Force
-        }
-        New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
-        Write-Host "✓ Created publish directory: $publishDir" -ForegroundColor Green
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /p:DebugType=None /t:Build /v:minimal /m
     
     - name: Copy files for deployment
       shell: pwsh
@@ -75,74 +64,51 @@ jobs:
         $sourceDir = "JCarrollOnlineV2"
         $destDir = "publish-output"
         
-        # Copy content files (excluding build artifacts and project files)
-        Write-Host "Copying content files from $sourceDir to $destDir..." -ForegroundColor Cyan
-        robocopy $sourceDir $destDir /E /XD obj .vs node_modules bin /XF *.csproj *.user *.sln *.pubxml /NFL /NDL /NJH /NJS /nc /ns /np
-        
-        # Robocopy returns exit codes 0-7 for success (1 = files copied successfully)
+        # Copy all content files excluding build artifacts
+        robocopy $sourceDir $destDir /E /XD obj .vs node_modules /XF *.csproj *.user *.sln *.pubxml /NFL /NDL /NJH /NJS /nc /ns /np
         if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
         
-        # Copy the compiled bin folder with all assemblies
-        Write-Host "Copying compiled binaries..." -ForegroundColor Cyan
+        # Copy compiled binaries
         $binSource = Join-Path $sourceDir "bin"
         $binDest = Join-Path $destDir "bin"
         
         if (Test-Path $binSource) {
           robocopy $binSource $binDest /E /NFL /NDL /NJH /NJS /nc /ns /np
           if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
-          
-          # Verify critical DLLs
-          $criticalDlls = @("JCarrollOnlineV2.dll", "EntityFramework.dll")
-          foreach ($dll in $criticalDlls) {
-            $dllPath = Join-Path $binDest $dll
-            if (Test-Path $dllPath) {
-              Write-Host "  ✓ Found: $dll" -ForegroundColor Green
-            } else {
-              Write-Warning "  ⚠ Missing: $dll"
-            }
-          }
+          Write-Host "✓ Files copied successfully" -ForegroundColor Green
         } else {
-          Write-Error "Bin folder not found at: $binSource"
+          Write-Error "Bin folder not found"
           exit 1
         }
-        
-        Write-Host "✓ Files copied successfully" -ForegroundColor Green
     
-    - name: Verify published files
+    - name: Verify and prepare deployment
       id: find-publish
       shell: pwsh
       run: |
         $publishPath = "publish-output"
+        Write-Host "Verifying deployment files..." -ForegroundColor Cyan
         
-        Write-Host "Checking for published files..." -ForegroundColor Cyan
+        # Check critical files
+        $criticalFiles = @(
+          "$publishPath\Web.config",
+          "$publishPath\Global.asax",
+          "$publishPath\bin\JCarrollOnlineV2.dll",
+          "$publishPath\bin\EntityFramework.dll"
+        )
         
-        if (-not (Test-Path "$publishPath\Web.config")) {
-          Write-Error "Web.config not found in publish output"
-          exit 1
-        }
-        
-        if (-not (Test-Path "$publishPath\Global.asax")) {
-          Write-Error "Global.asax not found in publish output"
-          exit 1
-        }
-        
-        if (-not (Test-Path "$publishPath\bin\JCarrollOnlineV2.dll")) {
-          Write-Error "JCarrollOnlineV2.dll not found in bin folder"
-          Write-Host "Contents of bin folder:" -ForegroundColor Yellow
-          if (Test-Path "$publishPath\bin") {
-            Get-ChildItem -Path "$publishPath\bin" | Select-Object Name, Length
-          } else {
-            Write-Error "Bin folder does not exist!"
+        foreach ($file in $criticalFiles) {
+          if (-not (Test-Path $file)) {
+            Write-Error "Missing critical file: $file"
+            exit 1
           }
-          exit 1
         }
         
-        # Output the path for next steps
+        # Output paths
         $fullPath = (Resolve-Path $publishPath).Path
         echo "PUBLISH_PATH=$fullPath" >> $env:GITHUB_OUTPUT
         echo "PUBLISH_PATH_RELATIVE=$publishPath" >> $env:GITHUB_OUTPUT
         
-        Write-Host "✓ All critical files found" -ForegroundColor Green
+        Write-Host "✓ All critical files verified" -ForegroundColor Green
     
     - name: Replace secrets in Web.config
       shell: pwsh
@@ -155,41 +121,29 @@ jobs:
       run: |
         $webConfigPath = Join-Path "${{ steps.find-publish.outputs.PUBLISH_PATH }}" "Web.config"
         
-        Write-Host "Processing: $webConfigPath" -ForegroundColor Cyan
-        
         if (-not (Test-Path $webConfigPath)) {
-          Write-Error "Web.config not found at: $webConfigPath"
+          Write-Error "Web.config not found"
           exit 1
         }
         
-        # Load as XML
         [xml]$xml = Get-Content $webConfigPath
         
-        Write-Host "`n========== PROCESSING REPLACEMENTS ==========" -ForegroundColor Magenta
+        # Remove configBuilders
+        $connStrings = $xml.configuration.connectionStrings
+        if ($connStrings.HasAttribute("configBuilders")) {
+          $connStrings.RemoveAttribute("configBuilders")
+        }
         
-        # Remove configBuilders attribute
-        $connStringsNode = $xml.configuration.connectionStrings
-        if ($connStringsNode) {
-          if ($connStringsNode.HasAttribute("configBuilders")) {
-            $connStringsNode.RemoveAttribute("configBuilders")
-            Write-Host "✓ Removed configBuilders attribute" -ForegroundColor Green
+        # Replace connection strings
+        foreach ($add in $connStrings.add) {
+          if ($add.connectionString -eq "__DEV_CONNECTION_STRING__") {
+            $add.connectionString = $env:DEV_CONN
+            Write-Host "✓ Replaced DEV connection string" -ForegroundColor Green
           }
-          
-          # Replace connection strings - get values from environment variables
-          foreach ($add in $connStringsNode.add) {
-            if ($add.connectionString -eq "__DEV_CONNECTION_STRING__") {
-              # Set directly from environment variable (no encoding issues)
-              $add.connectionString = $env:DEV_CONN
-              Write-Host "✓ Replaced DEV connection string (length: $($env:DEV_CONN.Length))" -ForegroundColor Green
-            }
-            if ($add.connectionString -eq "__PROD_CONNECTION_STRING__") {
-              $add.connectionString = $env:PROD_CONN
-              Write-Host "✓ Replaced PROD connection string (length: $($env:PROD_CONN.Length))" -ForegroundColor Green
-            }
+          if ($add.connectionString -eq "__PROD_CONNECTION_STRING__") {
+            $add.connectionString = $env:PROD_CONN
+            Write-Host "✓ Replaced PROD connection string" -ForegroundColor Green
           }
-        } else {
-          Write-Error "❌ No connectionStrings section found!"
-          exit 1
         }
         
         # Handle machine keys
@@ -207,7 +161,7 @@ jobs:
             }
           }
           
-          # Set debug to false
+          # Set debug=false
           $compilation = $systemWeb.compilation
           if ($compilation -and $compilation.debug -eq "true") {
             $compilation.debug = "false"
@@ -217,89 +171,34 @@ jobs:
         
         # Handle SMTP password
         $systemNet = $xml.configuration.'system.net'
-        if ($systemNet) {
-          $smtp = $systemNet.mailSettings.smtp
-          if ($smtp) {
-            $network = $smtp.network
-            if ($network) {
-              if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
-                $network.password = $env:SMTP_PWD
-                Write-Host "✓ Replaced SMTP password" -ForegroundColor Green
-              }
-            }
+        if ($systemNet.mailSettings.smtp.network) {
+          $network = $systemNet.mailSettings.smtp.network
+          if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
+            $network.password = $env:SMTP_PWD
+            Write-Host "✓ Replaced SMTP password" -ForegroundColor Green
           }
         }
         
-        # Save with proper XML settings to avoid encoding issues
+        # Save with UTF-8 encoding
         $settings = New-Object System.Xml.XmlWriterSettings
         $settings.Indent = $true
         $settings.IndentChars = "  "
-        $settings.NewLineChars = "`r`n"
         $settings.Encoding = [System.Text.Encoding]::UTF8
         
         $writer = [System.Xml.XmlWriter]::Create($webConfigPath, $settings)
         $xml.Save($writer)
         $writer.Close()
         
-        Write-Host "`n========== VERIFICATION ==========" -ForegroundColor Magenta
-        
-        # Verify connection strings
-        [xml]$verifyXml = Get-Content $webConfigPath
-        $connStrings = $verifyXml.configuration.connectionStrings
-        
-        if ($connStrings) {
-          foreach ($add in $connStrings.add) {
-            Write-Host "`nConnection: $($add.name)" -ForegroundColor Cyan
-            $connStr = $add.connectionString
-            
-            if ($connStr -match '__.*?__') {
-              Write-Error "  ❌ Still contains placeholder!"
-              exit 1
-            } elseif ([string]::IsNullOrWhiteSpace($connStr)) {
-              Write-Error "  ❌ Connection string is empty!"
-              exit 1
-            } elseif ($connStr -match '&quot;|&lt;|&gt;|&amp;') {
-              Write-Error "  ❌ Connection string contains HTML entities: $connStr"
-              exit 1
-            } else {
-              Write-Host "  ✓ Valid (length: $($connStr.Length) chars)" -ForegroundColor Green
-              Write-Host "  Preview: $($connStr.Substring(0, [Math]::Min(60, $connStr.Length)))..." -ForegroundColor Gray
-            }
+        # Verify no placeholders remain
+        [xml]$verify = Get-Content $webConfigPath
+        foreach ($add in $verify.configuration.connectionStrings.add) {
+          if ($add.connectionString -match '__.*?__') {
+            Write-Error "Placeholder still exists in $($add.name)"
+            exit 1
           }
-        } else {
-          Write-Error "❌ No connectionStrings section found after save!"
-          exit 1
         }
         
-        Write-Host "`n✓ Web.config successfully updated" -ForegroundColor Green
-    
-    - name: List published files
-      shell: pwsh
-      run: |
-        Write-Host "`nPublished files structure:" -ForegroundColor Cyan
-        $publishPath = "${{ steps.find-publish.outputs.PUBLISH_PATH }}"
-        
-        if (Test-Path $publishPath) {
-          $files = Get-ChildItem -Path $publishPath -Recurse | Where-Object { -not $_.PSIsContainer }
-          Write-Host "Total files: $($files.Count)"
-          
-          # Show key directories
-          Write-Host "`nTop-level items:" -ForegroundColor Yellow
-          Get-ChildItem -Path $publishPath | 
-            Select-Object Name, @{Name='Type';Expression={if($_.PSIsContainer){'DIR'}else{'FILE'}}}, Length |
-            Format-Table -AutoSize
-          
-          # Show bin folder contents
-          Write-Host "`nBin folder DLLs:" -ForegroundColor Yellow
-          $binPath = Join-Path $publishPath "bin"
-          if (Test-Path $binPath) {
-            Get-ChildItem -Path $binPath -Filter "*.dll" | 
-              Select-Object Name, Length |
-              Format-Table -AutoSize
-          }
-        } else {
-          Write-Warning "Publish path not found: $publishPath"
-        }
+        Write-Host "✓ Web.config successfully updated and verified" -ForegroundColor Green
     
     - name: Deploy to HostGator via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -310,7 +209,7 @@ jobs:
         local-dir: ${{ steps.find-publish.outputs.PUBLISH_PATH_RELATIVE }}/
         server-dir: /httpdocs/jcarrollonline/
         dangerous-clean-slate: false
-        log-level: verbose
+        log-level: standard
         exclude: |
           **/.git*
           **/.git*/**
