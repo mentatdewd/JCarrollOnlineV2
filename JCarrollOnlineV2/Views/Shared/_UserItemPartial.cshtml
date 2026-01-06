@@ -16,7 +16,7 @@
         {
             @Html.Raw(" | ")
             <span>
-                @Html.ActionLink("Delete", "DeleteUser", "Account", new { userId = Model.User.Id }, null)
+                @Html.ActionLink("Delete", "DeleteUser", "Account", new { userId = Model.User.Id }, new { @class = "delete-link" })
             </span>
         }
     </div>

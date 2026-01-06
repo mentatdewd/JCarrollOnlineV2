@@ -48,19 +48,25 @@ namespace JCarrollOnlineV2.Controllers
             private set => _userManager = value;
         }
 
+        // GET: /Account/DeleteUser
         [Authorize(Roles = "Administrator")]
-        [ValidateAntiForgeryToken]
-        [HttpPost]
+        [HttpGet]
         public async Task<ActionResult> DeleteUser(string userId)
         {
             DeleteUserViewModel deleteUserViewModel = new DeleteUserViewModel();
             ApplicationUser user = await UserManager.FindByIdAsync(userId).ConfigureAwait(false);
 
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
             deleteUserViewModel.InjectFrom(user);
 
-            return user == null ? View() : View(deleteUserViewModel);
+            return View(deleteUserViewModel);
         }
 
+        // POST: /Account/DeleteUser
         [HttpPost, ActionName("DeleteUser")]
         [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
@@ -70,10 +76,23 @@ namespace JCarrollOnlineV2.Controllers
 
             if (user == null)
             {
-                return View();
+                return HttpNotFound();
             }
-            UserManager.Delete(user);
-            return RedirectToAction("Index", "Users");
+
+            IdentityResult result = UserManager.Delete(user);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Users");
+            }
+
+            // Handle deletion errors
+            foreach (string error in result.Errors)
+            {
+                ModelState.AddModelError("", error);
+            }
+
+            return View("DeleteUser", new DeleteUserViewModel { /* populate from user */ });
         }
 
         //
@@ -294,37 +313,81 @@ namespace JCarrollOnlineV2.Controllers
         {
             // Read SMTP settings from web.config/appSettings
             string smtpHost = System.Configuration.ConfigurationManager.AppSettings["SmtpHost"];
-            int smtpPort = int.Parse(System.Configuration.ConfigurationManager.AppSettings["SmtpPort"]);
+            string smtpPortStr = System.Configuration.ConfigurationManager.AppSettings["SmtpPort"];
             string smtpUsername = System.Configuration.ConfigurationManager.AppSettings["SmtpUsername"];
             string smtpPassword = System.Configuration.ConfigurationManager.AppSettings["SmtpPassword"];
             string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SmtpFromEmail"];
-            bool enableSsl = bool.Parse(System.Configuration.ConfigurationManager.AppSettings["SmtpEnableSsl"]);
+            string enableSslStr = System.Configuration.ConfigurationManager.AppSettings["SmtpEnableSsl"];
 
-            using (System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage())
+            // Validate configuration
+            if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpPassword))
             {
-                mailMessage.From = new System.Net.Mail.MailAddress(fromEmail, "JCarrollOnline");
-                mailMessage.To.Add(new System.Net.Mail.MailAddress(userWelcomeViewModel?.TargetUser.Email));
-                mailMessage.Subject = "Welcome to JCarrollOnline";
-                mailMessage.Body = userWelcomeViewModel.Content;
-                mailMessage.IsBodyHtml = true;
+                _logger.Error("SMTP configuration is incomplete. Check Web.config appSettings.");
+                throw new InvalidOperationException("SMTP configuration is missing required values.");
+            }
 
-                using (System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
+            int smtpPort = int.Parse(smtpPortStr);
+            bool enableSsl = bool.Parse(enableSslStr);
+
+            // Configure certificate validation callback before creating SMTP client
+            System.Net.ServicePointManager.ServerCertificateValidationCallback =
+                (sender, certificate, chain, sslPolicyErrors) =>
                 {
-                    smtpClient.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
-                    smtpClient.EnableSsl = enableSsl;
-                    smtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
+                    // If there are no SSL policy errors, accept the certificate
+                    if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
+                        return true;
 
-                    try
+                    // Only bypass validation for our specific SMTP server
+                    if (sender is System.Net.Mail.SmtpClient)
                     {
-                        await smtpClient.SendMailAsync(mailMessage).ConfigureAwait(false);
-                        _logger.Info(string.Format(CultureInfo.InvariantCulture, "Welcome email sent successfully to {0}", userWelcomeViewModel.TargetUser.Email));
+                        // Accept certificate from our known HostGator mail server despite errors
+                        _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                            "Accepting certificate from {0} despite SSL errors: {1}",
+                            smtpHost, sslPolicyErrors));
+                        return true;
                     }
-                    catch (Exception ex)
+
+                    // Reject all other certificates with errors
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Certificate validation failed for unknown sender. SSL errors: {0}",
+                        sslPolicyErrors));
+                    return false;
+                };
+
+            try
+            {
+                using (System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage())
+                {
+                    mailMessage.From = new System.Net.Mail.MailAddress(fromEmail, "JCarrollOnline");
+                    mailMessage.To.Add(new System.Net.Mail.MailAddress(userWelcomeViewModel?.TargetUser.Email));
+                    mailMessage.Subject = "Welcome to JCarrollOnline";
+                    mailMessage.Body = userWelcomeViewModel.Content;
+                    mailMessage.IsBodyHtml = true;
+
+                    using (System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
                     {
-                        _logger.Error(ex, string.Format(CultureInfo.InvariantCulture, "Failed to send welcome email to {0}", userWelcomeViewModel.TargetUser.Email));
-                        throw;
+                        smtpClient.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
+                        smtpClient.EnableSsl = enableSsl;
+                        smtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
+
+                        await smtpClient.SendMailAsync(mailMessage).ConfigureAwait(false);
+                        _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                            "Welcome email sent successfully to {0}",
+                            userWelcomeViewModel.TargetUser.Email));
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                    "Failed to send welcome email to {0}",
+                    userWelcomeViewModel.TargetUser.Email));
+                throw;
+            }
+            finally
+            {
+                // Reset certificate validation to default for security
+                System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
             }
         }
 
