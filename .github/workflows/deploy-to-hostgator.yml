@@ -54,29 +54,59 @@ jobs:
         
         Write-Host "✓ Output folders cleaned" -ForegroundColor Green
     
-    - name: Build and Publish with MSBuild
+    - name: Build solution
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
+    
+    - name: Create publish directory
       shell: pwsh
       run: |
-        Write-Host "Building and publishing with MSBuild..." -ForegroundColor Cyan
+        $publishDir = "publish-output"
+        if (Test-Path $publishDir) {
+          Remove-Item -Path $publishDir -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
+        Write-Host "✓ Created publish directory: $publishDir" -ForegroundColor Green
+    
+    - name: Copy files for deployment
+      shell: pwsh
+      run: |
+        Write-Host "Copying files for deployment..." -ForegroundColor Cyan
         
-        $publishDir = (Resolve-Path ".").Path + "\publish-output"
+        $sourceDir = "JCarrollOnlineV2"
+        $destDir = "publish-output"
         
-        msbuild JCarrollOnlineV2/JCarrollOnlineV2.csproj `
-          /p:Configuration=Release `
-          /p:Platform="AnyCPU" `
-          /p:DeployOnBuild=true `
-          /p:PublishProfile=FileSystem `
-          /p:PublishUrl="$publishDir" `
-          /p:DeleteExistingFiles=True `
-          /t:WebPublish `
-          /v:minimal
+        # Copy content files (excluding build artifacts and project files)
+        Write-Host "Copying content files from $sourceDir to $destDir..." -ForegroundColor Cyan
+        robocopy $sourceDir $destDir /E /XD obj .vs node_modules bin /XF *.csproj *.user *.sln *.pubxml /NFL /NDL /NJH /NJS /nc /ns /np
         
-        if ($LASTEXITCODE -ne 0) {
-          Write-Error "MSBuild publish failed with exit code $LASTEXITCODE"
+        # Robocopy returns exit codes 0-7 for success (1 = files copied successfully)
+        if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
+        
+        # Copy the compiled bin folder with all assemblies
+        Write-Host "Copying compiled binaries..." -ForegroundColor Cyan
+        $binSource = Join-Path $sourceDir "bin"
+        $binDest = Join-Path $destDir "bin"
+        
+        if (Test-Path $binSource) {
+          robocopy $binSource $binDest /E /NFL /NDL /NJH /NJS /nc /ns /np
+          if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
+          
+          # Verify critical DLLs
+          $criticalDlls = @("JCarrollOnlineV2.dll", "EntityFramework.dll")
+          foreach ($dll in $criticalDlls) {
+            $dllPath = Join-Path $binDest $dll
+            if (Test-Path $dllPath) {
+              Write-Host "  ✓ Found: $dll" -ForegroundColor Green
+            } else {
+              Write-Warning "  ⚠ Missing: $dll"
+            }
+          }
+        } else {
+          Write-Error "Bin folder not found at: $binSource"
           exit 1
         }
         
-        Write-Host "✓ Build and publish completed" -ForegroundColor Green
+        Write-Host "✓ Files copied successfully" -ForegroundColor Green
     
     - name: Verify published files
       id: find-publish
@@ -98,6 +128,12 @@ jobs:
         
         if (-not (Test-Path "$publishPath\bin\JCarrollOnlineV2.dll")) {
           Write-Error "JCarrollOnlineV2.dll not found in bin folder"
+          Write-Host "Contents of bin folder:" -ForegroundColor Yellow
+          if (Test-Path "$publishPath\bin") {
+            Get-ChildItem -Path "$publishPath\bin" | Select-Object Name, Length
+          } else {
+            Write-Error "Bin folder does not exist!"
+          }
           exit 1
         }
         
@@ -168,6 +204,13 @@ jobs:
           Write-Warning "SMTP_PASSWORD placeholder not found"
         }
         
+        # Handle hardcoded password
+        if ($content -match 'password="jV41wt\^5"') {
+          $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.SMTP_PASSWORD }}"'
+          Write-Host "✓ Replaced hardcoded SMTP password" -ForegroundColor Green
+          $changes++
+        }
+        
         # Also handle if the password is empty
         if ($content -match 'password=""') {
           $content = $content -replace 'password=""', 'password="${{ secrets.SMTP_PASSWORD }}"'
@@ -182,17 +225,26 @@ jobs:
           $changes++
         }
         
+        # Set debug to false for production
+        $content = $content -replace 'debug="true"', 'debug="false"'
+        Write-Host "✓ Set debug=false" -ForegroundColor Green
+        $changes++
+        
         Set-Content $webConfigPath $content -NoNewline
         Write-Host "`n✓ Total replacements made: $changes" -ForegroundColor Cyan
         
         # Show the connectionStrings section for verification
         Write-Host "`nConnectionStrings section preview:" -ForegroundColor Yellow
-        $xmlContent = [xml]$content
-        $connStrings = $xmlContent.configuration.connectionStrings
-        if ($connStrings) {
-          $connStrings.InnerXml | Write-Host
-        } else {
-          Write-Warning "No connectionStrings section found!"
+        try {
+          $xmlContent = [xml]$content
+          $connStrings = $xmlContent.configuration.connectionStrings
+          if ($connStrings) {
+            $connStrings.InnerXml | Write-Host
+          } else {
+            Write-Warning "No connectionStrings section found!"
+          }
+        } catch {
+          Write-Warning "Could not parse XML: $_"
         }
     
     - name: List published files
@@ -241,3 +293,5 @@ jobs:
           **/packages.config
           **/upgrade.log
           **/.vs/**
+          **/Web.Release.config
+          **/Web.Debug.config
