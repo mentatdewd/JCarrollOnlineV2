@@ -26,6 +26,33 @@
             color: white;
             background-color: blue;
         }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            background-color: #f8f9fa;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.25rem;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            padding: 0 0.5rem;
+            color: #6c757d;
+        }
+
+        .breadcrumb-item a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .breadcrumb-item a:hover {
+                text-decoration: underline;
+            }
+
+        .breadcrumb-item.active {
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -46,7 +73,8 @@
 
     <script type="text/javascript">
         InitializeBlogComments();
-    </script>    <nav class="navbar fixed top navbar-toggleable-md navbar-inverse bg-inverse">
+    </script>
+    <nav class="navbar fixed top navbar-toggleable-md navbar-inverse bg-inverse">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -71,7 +99,21 @@
     </nav>
     <div class="@Model.PageContainer">
         <div class="container body-content">
-            @Html.MvcSiteMap().SiteMapPath()
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    @foreach (var node in Html.MvcSiteMap().SiteMapPath())
+                    {
+                        if (node == Html.MvcSiteMap().SiteMapPath().Last())
+                        {
+                            <li class="breadcrumb-item active" aria-current="page">@node.Title</li>
+                        }
+                        else
+                        {
+                            <li class="breadcrumb-item"><a href="@node.Url">@node.Title</a></li>
+                        }
+                    }
+                </ol>
+            </nav>
             @RenderBody()
             @Html.Partial("_FooterPartial")
         </div>
