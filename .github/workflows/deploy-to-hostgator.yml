@@ -177,57 +177,57 @@ jobs:
           $changes++
         }
         
-        # Replace connection strings
+        # Replace connection strings - NOTE: Using secrets with __ prefix/suffix
         if ($content -match '__DEV_CONNECTION_STRING__') {
-          $content = $content -replace '__DEV_CONNECTION_STRING__', '${{ secrets.DEV_CONNECTION_STRING }}'
-          Write-Host "✓ Replaced DEV_CONNECTION_STRING" -ForegroundColor Green
+          $content = $content -replace '__DEV_CONNECTION_STRING__', '${{ secrets.__DEV_CONNECTION_STRING__ }}'
+          Write-Host "✓ Replaced __DEV_CONNECTION_STRING__" -ForegroundColor Green
           $changes++
         } else {
-          Write-Warning "DEV_CONNECTION_STRING placeholder not found"
+          Write-Warning "__DEV_CONNECTION_STRING__ placeholder not found"
         }
         
         if ($content -match '__PROD_CONNECTION_STRING__') {
-          $content = $content -replace '__PROD_CONNECTION_STRING__', '${{ secrets.PROD_CONNECTION_STRING }}'
-          Write-Host "✓ Replaced PROD_CONNECTION_STRING" -ForegroundColor Green
+          $content = $content -replace '__PROD_CONNECTION_STRING__', '${{ secrets.__PROD_CONNECTION_STRING__ }}'
+          Write-Host "✓ Replaced __PROD_CONNECTION_STRING__" -ForegroundColor Green
           $changes++
         } else {
-          Write-Warning "PROD_CONNECTION_STRING placeholder not found"
+          Write-Warning "__PROD_CONNECTION_STRING__ placeholder not found"
         }
         
-        # Replace machine keys
+        # Replace machine keys - check if you have these with __ as well
         if ($content -match '__MACHINEKEY_VALIDATION__') {
-          $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.MACHINEKEY_VALIDATION }}'
-          Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
+          $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.__MACHINEKEY_VALIDATION__ }}'
+          Write-Host "✓ Replaced __MACHINEKEY_VALIDATION__" -ForegroundColor Green
           $changes++
         } else {
-          Write-Host "⚠ MACHINEKEY_VALIDATION placeholder not found" -ForegroundColor Yellow
+          Write-Host "⚠ __MACHINEKEY_VALIDATION__ placeholder not found" -ForegroundColor Yellow
         }
         
         if ($content -match '__MACHINEKEY_DECRYPTION__') {
-          $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.MACHINEKEY_DECRYPTION }}'
-          Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
+          $content = $content -replace '__MACHINEKEY_DECRYPTION__', '${{ secrets.__MACHINEKEY_DECRYPTION__ }}'
+          Write-Host "✓ Replaced __MACHINEKEY_DECRYPTION__" -ForegroundColor Green
           $changes++
         } else {
-          Write-Host "⚠ MACHINEKEY_DECRYPTION placeholder not found" -ForegroundColor Yellow
+          Write-Host "⚠ __MACHINEKEY_DECRYPTION__ placeholder not found" -ForegroundColor Yellow
         }
         
         # Replace SMTP password
         if ($content -match '__SMTP_PASSWORD__') {
-          $content = $content -replace '__SMTP_PASSWORD__', '${{ secrets.SMTP_PASSWORD }}'
-          Write-Host "✓ Replaced SMTP_PASSWORD placeholder" -ForegroundColor Green
+          $content = $content -replace '__SMTP_PASSWORD__', '${{ secrets.__SMTP_PASSWORD__ }}'
+          Write-Host "✓ Replaced __SMTP_PASSWORD__ placeholder" -ForegroundColor Green
           $changes++
         }
         
         # Handle hardcoded password (escape the special characters properly)
         if ($content -match 'password="jV41wt\^5"') {
-          $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.SMTP_PASSWORD }}"'
+          $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.__SMTP_PASSWORD__ }}"'
           Write-Host "✓ Replaced hardcoded SMTP password" -ForegroundColor Green
           $changes++
         }
         
         # Also handle if the password is empty
         if ($content -match 'password=""') {
-          $content = $content -replace 'password=""', 'password="${{ secrets.SMTP_PASSWORD }}"'
+          $content = $content -replace 'password=""', 'password="${{ secrets.__SMTP_PASSWORD__ }}"'
           Write-Host "✓ Replaced empty SMTP password" -ForegroundColor Green
           $changes++
         }
@@ -258,8 +258,10 @@ jobs:
               $connStr = $add.connectionString
               if ($connStr -match '__.*?__') {
                 Write-Error "  ❌ Still contains placeholder: $connStr"
+                exit 1
               } elseif ([string]::IsNullOrWhiteSpace($connStr)) {
                 Write-Error "  ❌ Connection string is empty!"
+                exit 1
               } else {
                 Write-Host "  ✓ Connection string populated (length: $($connStr.Length) chars)" -ForegroundColor Green
                 # Show first 50 chars to verify it's real
