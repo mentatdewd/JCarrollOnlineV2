@@ -4,6 +4,14 @@
 # Connection strings with sensitive data
 connectionStrings.config
 
+# Build outputs
+[Ll]ibs/
+*.dll
+*.exe
+*.pdb
+[Bb]in/
+[Oo]bj/
+
 # User-specific files
 *.suo
 *.user
