@@ -54,65 +54,37 @@ jobs:
         
         Write-Host "✓ Output folders cleaned" -ForegroundColor Green
     
-    - name: Build solution
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
-    
-    - name: Create publish directory
+    - name: Build and Publish with MSBuild
       shell: pwsh
       run: |
-        $publishDir = "publish-output"
-        if (Test-Path $publishDir) {
-          Remove-Item -Path $publishDir -Recurse -Force
-        }
-        New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
-        Write-Host "✓ Created publish directory: $publishDir" -ForegroundColor Green
-    
-    - name: Publish web application
-      shell: pwsh
-      run: |
-        Write-Host "Publishing web application..." -ForegroundColor Cyan
+        Write-Host "Building and publishing with MSBuild..." -ForegroundColor Cyan
         
-        $sourceDir = "JCarrollOnlineV2"
-        $destDir = "publish-output"
+        $publishDir = (Resolve-Path ".").Path + "\publish-output"
         
-        # Copy content files (excluding build artifacts and project files)
-        Write-Host "Copying content files from $sourceDir to $destDir..." -ForegroundColor Cyan
-        robocopy $sourceDir $destDir /E /XD obj .vs node_modules bin /XF *.csproj *.user *.sln /NFL /NDL /NJH /NJS /nc /ns /np
+        msbuild JCarrollOnlineV2/JCarrollOnlineV2.csproj `
+          /p:Configuration=Release `
+          /p:Platform="AnyCPU" `
+          /p:DeployOnBuild=true `
+          /p:PublishProfile=FileSystem `
+          /p:PublishUrl="$publishDir" `
+          /p:DeleteExistingFiles=True `
+          /t:WebPublish `
+          /v:minimal
         
-        # Robocopy returns exit codes 0-7 for success (1 = files copied successfully)
-        if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
-        
-        # Copy the compiled bin folder with all assemblies
-        Write-Host "Copying compiled binaries..." -ForegroundColor Cyan
-        $binSource = Join-Path $sourceDir "bin"
-        $binDest = Join-Path $destDir "bin"
-        
-        if (Test-Path $binSource) {
-          robocopy $binSource $binDest /E /NFL /NDL /NJH /NJS /nc /ns /np
-          if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
-          
-          # Verify critical DLLs
-          $criticalDlls = @("JCarrollOnlineV2.dll", "EntityFramework.dll", "System.Web.Mvc.dll")
-          foreach ($dll in $criticalDlls) {
-            $dllPath = Join-Path $binDest $dll
-            if (Test-Path $dllPath) {
-              Write-Host "  ✓ Found: $dll" -ForegroundColor Green
-            } else {
-              Write-Warning "  ⚠ Missing: $dll"
-            }
-          }
-        } else {
-          Write-Error "Bin folder not found at: $binSource"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "MSBuild publish failed with exit code $LASTEXITCODE"
           exit 1
         }
         
-        Write-Host "✓ Publish completed" -ForegroundColor Green
+        Write-Host "✓ Build and publish completed" -ForegroundColor Green
     
     - name: Verify published files
       id: find-publish
       shell: pwsh
       run: |
         $publishPath = "publish-output"
+        
+        Write-Host "Checking for published files..." -ForegroundColor Cyan
         
         if (-not (Test-Path "$publishPath\Web.config")) {
           Write-Error "Web.config not found in publish output"
@@ -126,12 +98,6 @@ jobs:
         
         if (-not (Test-Path "$publishPath\bin\JCarrollOnlineV2.dll")) {
           Write-Error "JCarrollOnlineV2.dll not found in bin folder"
-          Write-Host "Contents of bin folder:" -ForegroundColor Yellow
-          if (Test-Path "$publishPath\bin") {
-            Get-ChildItem -Path "$publishPath\bin" | Select-Object Name, Length
-          } else {
-            Write-Error "Bin folder does not exist!"
-          }
           exit 1
         }
         
@@ -140,7 +106,7 @@ jobs:
         echo "PUBLISH_PATH=$fullPath" >> $env:GITHUB_OUTPUT
         echo "PUBLISH_PATH_RELATIVE=$publishPath" >> $env:GITHUB_OUTPUT
         
-        Write-Host "✓ Found published files at: $publishPath" -ForegroundColor Green
+        Write-Host "✓ All critical files found" -ForegroundColor Green
     
     - name: Replace secrets in Web.config
       shell: pwsh
@@ -159,13 +125,13 @@ jobs:
         # Track changes
         $changes = 0
         
-        # Replace machine keys (commented out in source, so may not match)
+        # Replace machine keys
         if ($content -match '__MACHINEKEY_VALIDATION__') {
           $content = $content -replace '__MACHINEKEY_VALIDATION__', '${{ secrets.MACHINEKEY_VALIDATION }}'
           Write-Host "✓ Replaced MACHINEKEY_VALIDATION" -ForegroundColor Green
           $changes++
         } else {
-          Write-Host "⚠ MACHINEKEY_VALIDATION placeholder not found (may be commented out)" -ForegroundColor Yellow
+          Write-Host "⚠ MACHINEKEY_VALIDATION placeholder not found" -ForegroundColor Yellow
         }
         
         if ($content -match '__MACHINEKEY_DECRYPTION__') {
@@ -173,7 +139,7 @@ jobs:
           Write-Host "✓ Replaced MACHINEKEY_DECRYPTION" -ForegroundColor Green
           $changes++
         } else {
-          Write-Host "⚠ MACHINEKEY_DECRYPTION placeholder not found (may be commented out)" -ForegroundColor Yellow
+          Write-Host "⚠ MACHINEKEY_DECRYPTION placeholder not found" -ForegroundColor Yellow
         }
         
         # Replace connection strings
@@ -181,29 +147,53 @@ jobs:
           $content = $content -replace '__DEV_CONNECTION_STRING__', '${{ secrets.DEV_CONNECTION_STRING }}'
           Write-Host "✓ Replaced DEV_CONNECTION_STRING" -ForegroundColor Green
           $changes++
+        } else {
+          Write-Warning "DEV_CONNECTION_STRING placeholder not found"
         }
         
         if ($content -match '__PROD_CONNECTION_STRING__') {
           $content = $content -replace '__PROD_CONNECTION_STRING__', '${{ secrets.PROD_CONNECTION_STRING }}'
           Write-Host "✓ Replaced PROD_CONNECTION_STRING" -ForegroundColor Green
           $changes++
+        } else {
+          Write-Warning "PROD_CONNECTION_STRING placeholder not found"
         }
         
         # Replace SMTP password
-        if ($content -match 'password="jV41wt\^5"') {
-          $content = $content -replace 'password="jV41wt\^5"', 'password="${{ secrets.SMTP_PASSWORD }}"'
-          Write-Host "✓ Replaced hardcoded SMTP password" -ForegroundColor Green
-          $changes++
-        }
-        
         if ($content -match '__SMTP_PASSWORD__') {
           $content = $content -replace '__SMTP_PASSWORD__', '${{ secrets.SMTP_PASSWORD }}'
           Write-Host "✓ Replaced SMTP_PASSWORD placeholder" -ForegroundColor Green
+          $changes++
+        } else {
+          Write-Warning "SMTP_PASSWORD placeholder not found"
+        }
+        
+        # Also handle if the password is empty
+        if ($content -match 'password=""') {
+          $content = $content -replace 'password=""', 'password="${{ secrets.SMTP_PASSWORD }}"'
+          Write-Host "✓ Replaced empty SMTP password" -ForegroundColor Green
+          $changes++
+        }
+        
+        # Remove configBuilders attribute from production (it's dev-only)
+        if ($content -match 'configBuilders="Secrets"') {
+          $content = $content -replace '\s*configBuilders="Secrets"', ''
+          Write-Host "✓ Removed configBuilders attribute" -ForegroundColor Green
           $changes++
         }
         
         Set-Content $webConfigPath $content -NoNewline
         Write-Host "`n✓ Total replacements made: $changes" -ForegroundColor Cyan
+        
+        # Show the connectionStrings section for verification
+        Write-Host "`nConnectionStrings section preview:" -ForegroundColor Yellow
+        $xmlContent = [xml]$content
+        $connStrings = $xmlContent.configuration.connectionStrings
+        if ($connStrings) {
+          $connStrings.InnerXml | Write-Host
+        } else {
+          Write-Warning "No connectionStrings section found!"
+        }
     
     - name: List published files
       shell: pwsh
@@ -222,7 +212,7 @@ jobs:
             Format-Table -AutoSize
           
           # Show bin folder contents
-          Write-Host "`nBin folder contents:" -ForegroundColor Yellow
+          Write-Host "`nBin folder DLLs:" -ForegroundColor Yellow
           $binPath = Join-Path $publishPath "bin"
           if (Test-Path $binPath) {
             Get-ChildItem -Path $binPath -Filter "*.dll" | 
