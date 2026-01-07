@@ -103,12 +103,32 @@ namespace JCarrollOnlineV2.Test.DataContexts
 
         public override Task<TEntity> FindAsync(CancellationToken cancellationToken, params object[] keyValues)
         {
-            return base.FindAsync(cancellationToken, keyValues);
+            if (keyValues == null || keyValues.Length == 0)
+            {
+                return Task.FromResult<TEntity>(null);
+            }
+
+            // Get the primary key property (assumes Id property)
+            var keyProperty = typeof(TEntity).GetProperty("Id");
+            if (keyProperty == null)
+            {
+                return Task.FromResult<TEntity>(null);
+            }
+
+            // Find entity matching the key value
+            var keyValue = keyValues[0];
+            var entity = _data.FirstOrDefault(e => 
+            {
+                var entityKeyValue = keyProperty.GetValue(e);
+                return entityKeyValue != null && entityKeyValue.Equals(keyValue);
+            });
+
+            return Task.FromResult(entity);
         }
 
         public override Task<TEntity> FindAsync(params object[] keyValues)
         {
-            return base.FindAsync(keyValues);
+            return FindAsync(CancellationToken.None, keyValues);
         }
 
         public override IEnumerable<TEntity> AddRange(IEnumerable<TEntity> entities)

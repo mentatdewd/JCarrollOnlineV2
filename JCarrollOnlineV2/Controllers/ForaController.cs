@@ -109,11 +109,16 @@ namespace JCarrollOnlineV2.Controllers
             }
 
             Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
+            
+            if (forum == null)
+            {
+                return HttpNotFound();
+            }
+            
             ForumEditViewModel forumEditViewModel = new ForumEditViewModel();
-
             forumEditViewModel.InjectFrom(forum);
 
-            return forum == null ? HttpNotFound() : (ActionResult)View(forumEditViewModel);
+            return View(forumEditViewModel);
         }
 
         // POST: Fora/Edit/5
@@ -146,11 +151,16 @@ namespace JCarrollOnlineV2.Controllers
             }
 
             Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
-            ForumDeleteViewModel forumDeleteViewModel = new ForumDeleteViewModel();
+            
+            if (forum == null)
+            {
+                return HttpNotFound();
+            }
 
+            ForumDeleteViewModel forumDeleteViewModel = new ForumDeleteViewModel();
             forumDeleteViewModel.InjectFrom(forum);
 
-            return forum == null ? HttpNotFound() : (ActionResult)View(forumDeleteViewModel);
+            return View(forumDeleteViewModel);
         }
 
         // POST: Fora/Delete/5

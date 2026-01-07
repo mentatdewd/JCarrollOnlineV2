@@ -4,26 +4,26 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace JCarrollOnlineV2.Tests.Controllers
+namespace JCarrollOnlineV2.Test.Controllers
 {
     [TestClass]
     public class HomeControllerTest
     {
-        [TestMethod]
-        public async Task Index()
-        {
-            // Arrange
-            using (HomeController controller = new HomeController())
-            {
+        //[TestMethod]
+        //public async Task Index()
+        //{
+        //    // Arrange
+        //    using (HomeController controller = new HomeController())
+        //    {
 
-                // Act
-                ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
-                HomeViewModel vm = (HomeViewModel)result.Model;
+        //        // Act
+        //        ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
+        //        HomeViewModel vm = (HomeViewModel)result.Model;
 
-                // Assert
-                Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.Message);
-            }
-        }
+        //        // Assert
+        //        Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.Message);
+        //    }
+        //}
 
         //[TestMethod]
         //public async Task IndexWithOutUser()

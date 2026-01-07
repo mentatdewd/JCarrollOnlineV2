@@ -87,13 +87,13 @@ namespace JCarrollOnlineV2.EntityFramework
         public virtual DbSet<IdentityUserLogin> IdentityUserLogin { get; set; }
         public virtual DbSet<IdentityUserRole> IdentityUserRole { get; set; }
 
-        public DbSet<Forum> Forum { get; set; }
-        public DbSet<ForumModerator> ForumModerator { get; set; }
-        public DbSet<ThreadEntry> ForumThreadEntry { get; set; }
-        public DbSet<MicroPost> MicroPost { get; set; }
-        public DbSet<BlogItem> BlogItem { get; set; }
-        public DbSet<BlogItemComment> BlogItemComment { get; set; }
-        public DbSet<Entities.NLog> NLog { get; set; }
-        public DbSet<ChatMessage> ChatMessages { get; set; }
+        public virtual DbSet<Forum> Forum { get; set; }
+        public virtual DbSet<ForumModerator> ForumModerator { get; set; }
+        public virtual DbSet<ThreadEntry> ForumThreadEntry { get; set; }
+        public virtual DbSet<MicroPost> MicroPost { get; set; }
+        public virtual DbSet<BlogItem> BlogItem { get; set; }
+        public virtual DbSet<BlogItemComment> BlogItemComment { get; set; }
+        public virtual DbSet<Entities.NLog> NLog { get; set; }
+        public virtual DbSet<ChatMessage> ChatMessages { get; set; }
     }
 }
