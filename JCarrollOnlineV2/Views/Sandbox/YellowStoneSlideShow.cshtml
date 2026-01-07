@@ -7,11 +7,13 @@
 }
 
 <h2>YellowStoneSlideShow</h2>
-
+<div>
+    Click on the right arrow to start the slide show.
+</div>
 <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
     <div class="carousel-inner">
         <div class="carousel-item active">
-            <img src=@Model.ImageFiles.FirstOrDefault().Path alt=@Model.ImageFiles.FirstOrDefault().AltString />
+            <img src="@Model.ImageFiles.FirstOrDefault().Path" alt="@Model.ImageFiles.FirstOrDefault().AltString" class="d-block w-100" />
             <div class="carousel-caption">
                 <h3>Arrival in Yellowstone City</h3>
                 <p>The day of our arrival Ally went shopping</p>
@@ -19,13 +21,9 @@
         </div>
         @foreach (var image in Model.ImageFiles.Skip(1))
         {
-            @Html.Raw("<div class='carousel-item'>")
-            @Html.Raw("<img src='")
-            @image.Path
-            @Html.Raw("' alt='")
-            @image.AltString
-            @Html.Raw("' />");
-            @Html.Raw("</div>")
+            <div class="carousel-item">
+                <img src="@image.Path" alt="@image.AltString" class="d-block w-100" />
+            </div>
         }
     </div>
     <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
