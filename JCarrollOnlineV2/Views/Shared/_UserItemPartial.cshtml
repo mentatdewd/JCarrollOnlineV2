@@ -1,7 +1,7 @@
 ﻿@using JCarrollOnlineV2.ViewModels.Users
 @model UserItemViewModel
 
-<li lang="en">
+<li>
     <div class="user_item">
         <a href='@Url.Action("Details", "Users", new { userId = Model.User.Id })'>
             @{
@@ -9,6 +9,7 @@
             }
         </a>
         <span>
+            <span class="sr-only">User: </span>
             @Html.ActionLink(Model.User.UserName, "Details", new { userId = Model.User.Id })
         </span>
 

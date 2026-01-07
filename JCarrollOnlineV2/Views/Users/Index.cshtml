@@ -5,12 +5,17 @@
 @{
     Model.PageTitle = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Lang = "en";
 }
 
-<div class="container" lang="en">
+@section head {
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="en">
+}
+
+<div class="container">
     <h1>Users</h1>
-    <ul lang="en" aria-label="List of users">
+    <p class="lead">Browse all registered users on the site.</p>
+    <ul class="list-unstyled">
         @foreach (var item in Model.Users)
         {
             if (User.Identity.GetUserId() != item.User.Id)
