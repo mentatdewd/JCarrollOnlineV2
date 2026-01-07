@@ -29,12 +29,30 @@
     #carouselExampleIndicators {
         background-color: #000;
         padding: 20px 0;
+        min-height: 500px; /* Prevent collapse */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .carousel-inner {
+        width: 100%;
+        min-height: 500px;
+    }
+    .carousel-item {
+        min-height: 500px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background-color: #000;
     }
     .carousel-item img {
         max-height: 70vh;
+        max-width: 100%;
         width: auto;
+        height: auto;
         margin: 0 auto;
         object-fit: contain;
+        display: block;
     }
     .carousel-caption {
         background-color: rgba(0, 0, 0, 0.7);
@@ -50,6 +68,24 @@
         padding: 5px 10px;
         border-radius: 3px;
         z-index: 10;
+    }
+    /* Loading spinner */
+    .carousel-item.loading::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50px;
+        height: 50px;
+        margin: -25px 0 0 -25px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>
 
@@ -129,13 +165,37 @@
             var progressInterval;
             var totalSlides = @Model.ImageFiles.Count();
 
-            // Initialize carousel
-            $carousel.carousel({
-                interval: interval,
-                pause: false,
-                wrap: true,
-                keyboard: false  // We'll handle keyboard ourselves
-            });
+            // Preload all images
+            function preloadAllImages() {
+                $('.carousel-item img').each(function() {
+                    var $img = $(this);
+                    var $item = $img.closest('.carousel-item');
+                    
+                    // Add loading class
+                    $item.addClass('loading');
+                    
+                    // Create preload image
+                    var img = new Image();
+                    img.onload = function() {
+                        $item.removeClass('loading');
+                    };
+                    img.onerror = function() {
+                        $item.removeClass('loading');
+                        console.error('Failed to load image: ' + $img.attr('src'));
+                    };
+                    img.src = $img.attr('src');
+                });
+            }
+
+            // Initialize carousel - wait a moment for first image to load
+            setTimeout(function() {
+                $carousel.carousel({
+                    interval: interval,
+                    pause: false,
+                    wrap: true,
+                    keyboard: false  // We'll handle keyboard ourselves
+                });
+            }, 100);
 
             // Update progress bar and counters
             function updateProgress() {
@@ -154,7 +214,16 @@
                 var $preloadImg = $allItems.eq(nextIndex).find('img');
                 
                 if ($preloadImg.length && !$preloadImg[0].complete) {
+                    var $item = $allItems.eq(nextIndex);
+                    $item.addClass('loading');
+                    
                     var img = new Image();
+                    img.onload = function() {
+                        $item.removeClass('loading');
+                    };
+                    img.onerror = function() {
+                        $item.removeClass('loading');
+                    };
                     img.src = $preloadImg.attr('src');
                 }
             }
@@ -218,7 +287,18 @@
                 }
             });
 
-            // Update on slide change
+            // Update on slide change - use 'slide.bs.carousel' to preload before transition starts
+            $carousel.on('slide.bs.carousel', function (e) {
+                var nextIndex = $(e.relatedTarget).index();
+                var $nextItem = $('.carousel-item').eq(nextIndex);
+                var $nextImg = $nextItem.find('img');
+                
+                // Make sure next image is loaded before transitioning
+                if (!$nextImg[0].complete) {
+                    $nextItem.addClass('loading');
+                }
+            });
+            
             $carousel.on('slid.bs.carousel', function () {
                 updateProgress();
                 preloadNextImage();
@@ -226,7 +306,8 @@
 
             // Initialize
             updateProgress();
-            preloadNextImage();
+            preloadAllImages(); // Preload all images in background
+            preloadNextImage(); // Ensure first few are loaded
 
             // Pause on hover
             $carousel.hover(
