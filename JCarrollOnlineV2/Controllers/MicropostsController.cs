@@ -103,7 +103,7 @@ namespace JCarrollOnlineV2.Controllers
             {
                 if (user.MicroPostEmailNotifications == true)
                 {
-                    MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, user);
+                    MicroPostNotificationViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, user);
                     
                     await SendEmail(microPostNotificationEmailViewModel).ConfigureAwait(false);
                 }
@@ -111,15 +111,15 @@ namespace JCarrollOnlineV2.Controllers
 
             if (currentUser.MicroPostEmailNotifications == true)
             {
-                MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, currentUser);
+                MicroPostNotificationViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, currentUser);
 
                 await SendEmail(microPostNotificationEmailViewModel).ConfigureAwait(false);
             }
         }
 
-        private static MicroPostNotificationEmailViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
+        private static MicroPostNotificationViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
         {
-            MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel = new MicroPostNotificationEmailViewModel
+            MicroPostNotificationViewModel microPostNotificationEmailViewModel = new MicroPostNotificationViewModel
             {
                 TargetUser = user,
                 MicroPostAuthor = currentUser,
@@ -129,7 +129,7 @@ namespace JCarrollOnlineV2.Controllers
             return microPostNotificationEmailViewModel;
         }
 
-        private async Task SendEmail(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
+        private async Task SendEmail(MicroPostNotificationViewModel microPostNotificationEmailViewModel)
         {
             // Convert to anonymous object for Handlebars
             var templateData = new
@@ -155,7 +155,7 @@ namespace JCarrollOnlineV2.Controllers
             await SendEmailAsync(microPostNotificationEmailViewModel).ConfigureAwait(false);
         }
 
-        public async Task SendEmailAsync(MicroPostNotificationEmailViewModel microPostNotificationEmailViewModel)
+        public async Task SendEmailAsync(MicroPostNotificationViewModel microPostNotificationEmailViewModel)
         {
             if (microPostNotificationEmailViewModel != null)
             {

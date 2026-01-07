@@ -3,9 +3,8 @@ using JCarrollOnlineV2.ViewModels.Chat;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using JCarrollOnlineV2.ViewModels.Rss;
 using JCarrollOnlineV2.ViewModels.Users;
-using System.Collections.Generic;
 
-namespace JCarrollOnlineV2.ViewModels
+namespace JCarrollOnlineV2.ViewModels.Home
 {
     public class HomeViewModel : ViewModelBase
     {

@@ -1,9 +1,9 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
-using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Blog;
 using JCarrollOnlineV2.ViewModels.Chat;
+using JCarrollOnlineV2.ViewModels.Home;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using JCarrollOnlineV2.ViewModels.Rss;
 using JCarrollOnlineV2.ViewModels.Users;

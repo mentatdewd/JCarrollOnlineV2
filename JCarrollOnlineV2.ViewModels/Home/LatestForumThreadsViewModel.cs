@@ -1,9 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
-namespace JCarrollOnlineV2.ViewModels
+namespace JCarrollOnlineV2.ViewModels.Home
 {
     public class LatestForumThreadsViewModel : ViewModelBase
     {
-        public Collection<LatestForumThreadItemViewModel> LatestForumThreads { get; private set; } = new Collection<LatestForumThreadItemViewModel>();
+        public IList<LatestForumThreadItemViewModel> LatestForumThreads { get; set; } = new Collection<LatestForumThreadItemViewModel>();
+
+        public LatestForumThreadsViewModel()
+        {
+            LatestForumThreads = new List<LatestForumThreadItemViewModel>();
+        }
     }
 }

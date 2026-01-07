@@ -1117,9 +1117,6 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Project_Readme.html" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\EmailModels\JCarrollOnlineV2.EmailViewModels.csproj">
       <Project>{a5845c0d-2b3e-4109-9a02-04125cd49b08}</Project>
       <Name>JCarrollOnlineV2.EmailViewModels</Name>

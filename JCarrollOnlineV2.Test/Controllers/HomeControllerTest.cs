@@ -1,5 +1,5 @@
 ﻿using JCarrollOnlineV2.Controllers;
-using JCarrollOnlineV2.ViewModels;
+using JCarrollOnlineV2.ViewModels.Home;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using System.Web.Mvc;

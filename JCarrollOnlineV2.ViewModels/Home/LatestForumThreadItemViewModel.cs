@@ -1,4 +1,4 @@
-﻿namespace JCarrollOnlineV2.ViewModels
+﻿namespace JCarrollOnlineV2.ViewModels.Home
 {
     public class LatestForumThreadItemViewModel : ViewModelBase
     {

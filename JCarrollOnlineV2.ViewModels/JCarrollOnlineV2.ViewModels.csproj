@@ -202,9 +202,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\JCarrollOnlineV2.Entities\JCarrollOnlineV2.Entities.csproj">
       <Project>{5d0cbbda-1f49-4c1b-a508-fdab11b4d72f}</Project>
       <Name>JCarrollOnlineV2.Entities</Name>
