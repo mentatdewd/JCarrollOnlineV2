@@ -9,7 +9,8 @@
 }
 
 <div class="container" lang="en">
-    <ul>
+    <h1>Users</h1>
+    <ul lang="en" aria-label="List of users">
         @foreach (var item in Model.Users)
         {
             if (User.Identity.GetUserId() != item.User.Id)
