@@ -153,25 +153,6 @@
         height: 100%;
         object-fit: cover;
     }
-
-    .loading-spinner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #007bff;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        z-index: 5;
-    }
-
-    @@keyframes spin {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
 </style>
 
 <div class="container-fluid">
@@ -198,8 +179,6 @@
             <div class="slide-counter">
                 <span id="slideCounter">1 / @Model.ImageFiles.Count()</span>
             </div>
-
-            <div id="loadingSpinner" class="loading-spinner" style="display: none;"></div>
 
             @{
                 var slideIndex = 0;
@@ -255,34 +234,6 @@
             var isPlaying = true;
             var interval = 4000;
             var slideTimer;
-
-            // Preload all images
-            function preloadImages() {
-                $('.slide img').each(function() {
-                    if (!this.complete) {
-                        $('#loadingSpinner').show();
-                    }
-                });
-
-                // Hide spinner when all images loaded
-                var images = $('.slide img').toArray();
-                var loadedCount = 0;
-                images.forEach(function(img) {
-                    if (img.complete) {
-                        loadedCount++;
-                    } else {
-                        $(img).on('load', function() {
-                            loadedCount++;
-                            if (loadedCount === images.length) {
-                                $('#loadingSpinner').hide();
-                            }
-                        });
-                    }
-                });
-                if (loadedCount === images.length) {
-                    $('#loadingSpinner').hide();
-                }
-            }
 
             function showSlide(index) {
                 // Wrap around
@@ -405,7 +356,6 @@
             });
 
             // Initialize
-            preloadImages();
             startSlideshow();
         });
     </script>
