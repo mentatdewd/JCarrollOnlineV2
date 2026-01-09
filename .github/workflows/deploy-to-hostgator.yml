@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        lfs: true  # Add this to pull Git LFS files if you're using them
     
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
@@ -68,6 +70,27 @@ jobs:
         robocopy $sourceDir $destDir /E /XD obj .vs node_modules /XF *.csproj *.user *.sln *.pubxml /NFL /NDL /NJH /NJS /nc /ns /np
         if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
         
+        # Explicitly verify Unity WebGL files were copied
+        $gamesPath = Join-Path $destDir "Content\games\Build"
+        if (Test-Path $gamesPath) {
+          $fileCount = (Get-ChildItem -Path $gamesPath -File).Count
+          Write-Host "✓ Found $fileCount Unity WebGL files in Content/games/Build" -ForegroundColor Green
+          Get-ChildItem -Path $gamesPath -File | ForEach-Object {
+            Write-Host "  - $($_.Name) ($([math]::Round($_.Length / 1MB, 2)) MB)" -ForegroundColor Gray
+          }
+        } else {
+          Write-Warning "Unity WebGL files not found at: $gamesPath"
+          Write-Host "Checking if files exist in source..." -ForegroundColor Yellow
+          $sourceGamesPath = Join-Path $sourceDir "Content\games\Build"
+          if (Test-Path $sourceGamesPath) {
+            $sourceFileCount = (Get-ChildItem -Path $sourceGamesPath -File).Count
+            Write-Host "Found $sourceFileCount files in source directory" -ForegroundColor Yellow
+          } else {
+            Write-Error "Unity WebGL files not found in source repository!"
+            exit 1
+          }
+        }
+        
         # Copy compiled binaries
         $binSource = Join-Path $sourceDir "bin"
         $binDest = Join-Path $destDir "bin"
@@ -100,6 +123,22 @@ jobs:
           if (-not (Test-Path $file)) {
             Write-Error "Missing critical file: $file"
             exit 1
+          }
+        }
+        
+        # Verify Unity WebGL files
+        $unityFiles = @(
+          "$publishPath\Content\games\Build\Build.loader.js",
+          "$publishPath\Content\games\Build\Build.framework.js.unityweb",
+          "$publishPath\Content\games\Build\Build.wasm.unityweb"
+        )
+        
+        foreach ($file in $unityFiles) {
+          if (-not (Test-Path $file)) {
+            Write-Warning "Unity file not found: $file"
+          } else {
+            $size = (Get-Item $file).Length
+            Write-Host "✓ Found: $file ($([math]::Round($size / 1MB, 2)) MB)" -ForegroundColor Green
           }
         }
         
