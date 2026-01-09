@@ -13,7 +13,11 @@ namespace JCarrollOnlineV2
             //Extra ignores to support WCF in ASP.NET MVC
             routes.IgnoreRoute("JCarrollOnlineV2.WCFService/{resource}.svc/{*pathInfo}");
             routes.IgnoreRoute("JCarrollOnlineV2.WCFService/{resource}.svc");
-            
+
+            // Ignore Unity WebGL build files
+            routes.IgnoreRoute("Content/games/{*pathInfo}");
+            routes.IgnoreRoute("Content/games/Build/{*pathInfo}");
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
