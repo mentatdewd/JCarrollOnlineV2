@@ -2,148 +2,189 @@
 @model SandboxViewModel
 
 @{
-    Model.PageTitle = "Sandbox";
+    Model.PageTitle = "Sandbox - Unity WebGL";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<title>Unity Web Player | 3dViewer</title>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | 3dViewer</title>
-    <script type='text/javascript' src='https://ssl-webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/jquery.min.js'></script>
-    <script type="text/javascript">
-		var unityObjectUrl = "http://webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/UnityObject2.js";
-		if (document.location.protocol == 'https:')
-			unityObjectUrl = unityObjectUrl.replace("http://", "https://ssl-");
-		document.write('<script type="text\/javascript" src="' + unityObjectUrl + '"><\/script>');
-    </script>
-    <script type="text/javascript">
-			var config = {
-				width: 960,
-				height: 600,
-				params: { enableDebugging:"0" }
+<style>
+    #gameContainer {
+        width: 960px;
+        height: 600px;
+        margin: 20px auto;
+        background-color: #231F20;
+        position: relative;
+    }
+    
+    #gameCanvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    
+    .game-info {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        padding: 20px;
+        background: rgba(0,0,0,0.7);
+        border-radius: 5px;
+        z-index: 10;
+    }
+</style>
 
-			};
-			var u = new UnityObject2(config);
+<div class="container">
+    <h2>Unity WebGL 3D Viewer</h2>
+    <p class="text-muted">Interactive 3D content powered by Unity WebGL</p>
 
-			jQuery(function() {
-
-				var $missingScreen = jQuery("#unityPlayer").find(".missing");
-				var $brokenScreen = jQuery("#unityPlayer").find(".broken");
-				$missingScreen.hide();
-				$brokenScreen.hide();
-
-				u.observeProgress(function (progress) {
-					switch(progress.pluginStatus) {
-						case "broken":
-							$brokenScreen.find("a").click(function (e) {
-								e.stopPropagation();
-								e.preventDefault();
-								u.installPlugin();
-								return false;
-							});
-							$brokenScreen.show();
-						break;
-						case "missing":
-							$missingScreen.find("a").click(function (e) {
-								e.stopPropagation();
-								e.preventDefault();
-								u.installPlugin();
-								return false;
-							});
-							$missingScreen.show();
-						break;
-						case "installed":
-							$missingScreen.remove();
-						break;
-						case "first":
-						break;
-					}
-				});
-				u.initPlugin(jQuery("#unityPlayer")[0], "@Url.Content("~/Content/games/WebPlayer.unity3d")");
-			});
-    </script>
-    <style type="text/css">
-        <!--
-        body {
-            font-family: Helvetica, Verdana, Arial, sans-serif;
-            background-color: white;
-            color: black;
-            text-align: center;
-        }
-
-        a:link, a:visited {
-            color: #000;
-        }
-
-        a:active, a:hover {
-            color: #666;
-        }
-
-        p.header {
-            font-size: small;
-        }
-
-            p.header span {
-                font-weight: bold;
-            }
-
-        p.footer {
-            font-size: x-small;
-        }
-
-        div.content {
-            margin: auto;
-            width: 960px;
-        }
-
-        div.broken,
-        div.missing {
-            margin: auto;
-            position: relative;
-            top: 50%;
-            width: 193px;
-        }
-
-            div.broken a,
-            div.missing a {
-                height: 63px;
-                position: relative;
-                top: -31px;
-            }
-
-            div.broken img,
-            div.missing img {
-                border-width: 0px;
-            }
-
-        div.broken {
-            display: none;
-        }
-
-        div#unityPlayer {
-            cursor: default;
-            height: 600px;
-            width: 960px;
-        }
-        -->
-    </style>
-</head>
-<body>
-    <p class="header"><span>Unity Web Player | </span>3dViewer</p>
-    <div class="content">
-        <div id="unityPlayer">
-            <div class="missing">
-                <a href="http://unity3d.com/webplayer/" title="Unity Web Player. Install now!">
-                    <img alt="Unity Web Player. Install now!" src="http://webplayer.unity3d.com/installation/getunity.png" width="193" height="63" />
-                </a>
-            </div>
-            <div class="broken">
-                <a href="http://unity3d.com/webplayer/" title="Unity Web Player. Install now! Restart your browser after install.">
-                    <img alt="Unity Web Player. Install now! Restart your browser after install." src="http://webplayer.unity3d.com/installation/getunityrestart.png" width="193" height="63" />
-                </a>
-            </div>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-info" id="gameInfo">
+            <p>Loading...</p>
         </div>
     </div>
-    <p class="footer">&laquo; created with <a href="http://unity3d.com/unity/" title="Go to unity3d.com">Unity</a> &raquo;</p>
-</body>
+
+    <div class="text-center mt-3">
+        <button id="fullscreenBtn" class="btn btn-primary" style="display:none;">Fullscreen</button>
+        <div id="debugInfo" style="margin-top: 10px; font-size: 12px; color: #666;"></div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            var buildUrl = "@Url.Content("~/Content/games/Build")";
+            var canvas = document.querySelector("#gameCanvas");
+            var gameInfo = document.querySelector("#gameInfo");
+            var debugInfo = document.querySelector("#debugInfo");
+            
+            console.log("Build URL:", buildUrl);
+            debugInfo.innerHTML = "Build URL: " + buildUrl;
+            
+            // Set canvas size explicitly
+            canvas.width = 960;
+            canvas.height = 600;
+            
+            // Try multiple Unity WebGL formats
+            var attempts = [
+                {
+                    // Modern Unity (2020+)
+                    loader: buildUrl + "/Build.loader.js",
+                    config: {
+                        dataUrl: buildUrl + "/Build.data.unityweb",
+                        frameworkUrl: buildUrl + "/Build.framework.js.unityweb",
+                        codeUrl: buildUrl + "/Build.wasm.unityweb",
+                        streamingAssetsUrl: "StreamingAssets",
+                        companyName: "JCarrollOnline",
+                        productName: "3D Viewer"
+                    }
+                },
+                {
+                    // Unity 2018-2019
+                    loader: buildUrl + "/Build.loader.js",
+                    config: {
+                        dataUrl: buildUrl + "/Build.data",
+                        frameworkUrl: buildUrl + "/Build.framework.js",
+                        codeUrl: buildUrl + "/Build.wasm",
+                        streamingAssetsUrl: "StreamingAssets",
+                        companyName: "JCarrollOnline",
+                        productName: "3D Viewer"
+                    }
+                },
+                {
+                    // Legacy Unity
+                    loader: buildUrl + "/UnityLoader.js",
+                    config: buildUrl + "/Build.json"
+                }
+            ];
+            
+            var currentAttempt = 0;
+            
+            function tryLoadUnity() {
+                if (currentAttempt >= attempts.length) {
+                    gameInfo.innerHTML = 
+                        '<h4>WebGL Build Not Found</h4>' +
+                        '<p>Could not find Unity WebGL build files.</p>' +
+                        '<p>To use this feature:</p>' +
+                        '<ol style="text-align: left; display: inline-block; margin: 10px auto;">' +
+                        '<li>Build your Unity project for WebGL</li>' +
+                        '<li>Copy the Build folder contents to: <br><code>Content/games/Build/</code></li>' +
+                        '<li>Refresh this page</li>' +
+                        '</ol>' +
+                        '<p style="margin-top: 20px; font-size: 12px;">Tried loader paths:<br>' +
+                        attempts.map(function(a) { return '<code>' + a.loader + '</code>'; }).join('<br>') +
+                        '</p>';
+                    return;
+                }
+                
+                var attempt = attempts[currentAttempt];
+                console.log("Trying loader:", attempt.loader);
+                debugInfo.innerHTML += "<br>Trying: " + attempt.loader;
+                
+                var loaderScript = document.createElement('script');
+                loaderScript.src = attempt.loader;
+                
+                loaderScript.onload = function() {
+                    console.log("Loader loaded successfully");
+                    
+                    // Modern Unity
+                    if (typeof createUnityInstance !== 'undefined') {
+                        console.log("Using createUnityInstance");
+                        createUnityInstance(canvas, attempt.config, function(progress) {
+                            gameInfo.innerHTML = '<p>Loading: ' + Math.round(progress * 100) + '%</p>';
+                            console.log("Loading progress:", progress);
+                        }).then(function(unityInstance) {
+                            console.log("Unity instance created successfully");
+                            gameInfo.style.display = 'none';
+                            window.unityInstance = unityInstance;
+                            document.getElementById('fullscreenBtn').style.display = 'inline-block';
+                            
+                            // Setup fullscreen button
+                            document.getElementById('fullscreenBtn').addEventListener('click', function() {
+                                unityInstance.SetFullscreen(1);
+                            });
+                            
+                            debugInfo.innerHTML = "✓ Loaded successfully";
+                        }).catch(function(message) {
+                            console.error("Unity load error:", message);
+                            gameInfo.innerHTML = '<p style="color: #ff6b6b;">Error:<br>' + message + '</p>';
+                            debugInfo.innerHTML += "<br>Error: " + message;
+                        });
+                    }
+                    // Legacy Unity
+                    else if (typeof UnityLoader !== 'undefined') {
+                        console.log("Using UnityLoader");
+                        gameInfo.innerHTML = '<p>Loading legacy Unity...</p>';
+                        UnityLoader.instantiate("gameContainer", attempt.config, {
+                            onProgress: function(instance, progress) {
+                                gameInfo.innerHTML = '<p>Loading: ' + Math.round(progress * 100) + '%</p>';
+                            }
+                        });
+                        setTimeout(function() {
+                            gameInfo.style.display = 'none';
+                            document.getElementById('fullscreenBtn').style.display = 'inline-block';
+                            debugInfo.innerHTML = "✓ Loaded successfully (legacy)";
+                        }, 1000);
+                    }
+                    else {
+                        console.log("No Unity loader found, trying next...");
+                        currentAttempt++;
+                        tryLoadUnity();
+                    }
+                };
+                
+                loaderScript.onerror = function() {
+                    console.log("Loader not found, trying next...");
+                    currentAttempt++;
+                    tryLoadUnity();
+                };
+                
+                document.head.appendChild(loaderScript);
+            }
+            
+            tryLoadUnity();
+        });
+    </script>
+}
