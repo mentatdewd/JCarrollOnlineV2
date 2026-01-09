@@ -36,6 +36,14 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+
+# Or add an exception for this specific path
+!Content/games/Build
+!Content/games/Build/*.unityweb
+!Content/games/Build/*.wasm
+!Content/games/Build/*.data
+!Content/games/Build/*.js
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
