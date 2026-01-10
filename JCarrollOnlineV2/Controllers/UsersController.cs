@@ -1,13 +1,15 @@
-﻿using JCarrollOnlineV2.DataContexts;
-using JCarrollOnlineV2.Entities;
+﻿using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security.Provider;
 using NLog;
 using Omu.ValueInjecter;
+using System;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
+using System.Net.Mail;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -52,6 +54,124 @@ namespace JCarrollOnlineV2.Controllers
             }
 
             return View(usersIndexViewModel);
+        }
+
+        // POST: Users/SendMassEmail
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SendMassEmail(UsersIndexViewModel model)
+        {
+            // Validate only the email-related fields
+            ModelState.Remove("Users");
+
+            if (string.IsNullOrWhiteSpace(model.EmailSubject) || string.IsNullOrWhiteSpace(model.EmailBody))
+            {
+                TempData["Error"] = "Please provide both a subject and message.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                System.Collections.Generic.List<ApplicationUser> users = await Data.ApplicationUser
+                    .Where(u => !string.IsNullOrEmpty(u.Email))
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+
+                if (!users.Any())
+                {
+                    TempData["Error"] = "No users with email addresses found.";
+                    return RedirectToAction("Index");
+                }
+
+                string smtpHost = ConfigurationManager.AppSettings["SmtpHost"];
+                int smtpPort = int.Parse(ConfigurationManager.AppSettings["SmtpPort"] ?? "587");
+                string smtpUsername = ConfigurationManager.AppSettings["SmtpUsername"];
+                string smtpPassword = ConfigurationManager.AppSettings["SmtpPassword"];
+                string smtpFromEmail = ConfigurationManager.AppSettings["SmtpFromEmail"];
+                bool smtpEnableSsl = bool.Parse(ConfigurationManager.AppSettings["SmtpEnableSsl"] ?? "true");
+
+                string emailBody = BuildEmailBody(model.EmailSubject, model.EmailBody, model.IsHtml);
+                int sentCount = 0;
+                int failedCount = 0;
+
+                using (SmtpClient smtp = new SmtpClient(smtpHost, smtpPort))
+                {
+                    smtp.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
+                    smtp.EnableSsl = smtpEnableSsl;
+
+                    foreach (ApplicationUser user in users)
+                    {
+                        try
+                        {
+                            MailMessage message = new MailMessage
+                            {
+                                From = new MailAddress(smtpFromEmail, "Administrator - JCarrollOnline"),
+                                Subject = model.EmailSubject,
+                                Body = emailBody,
+                                IsBodyHtml = model.IsHtml
+                            };
+
+                            message.To.Add(user.Email);
+
+                            await smtp.SendMailAsync(message).ConfigureAwait(false);
+                            sentCount++;
+                        }
+                        catch (Exception ex)
+                        {
+                            failedCount++;
+                            _logger.Error(ex, string.Format("Failed to send email to {0}", user.Email));
+                        }
+                    }
+                }
+
+                TempData["Success"] = string.Format("Mass email sent successfully to {0} users. {1}",
+                    sentCount,
+                    failedCount > 0 ? failedCount + " emails failed." : "");
+                
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error sending mass email");
+                TempData["Error"] = "Error sending mass email: " + ex.Message;
+                return RedirectToAction("Index");
+            }
+        }
+
+        private string BuildEmailBody(string subject, string body, bool isHtml)
+        {
+            if (!isHtml)
+            {
+                return body;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<!DOCTYPE html>");
+            sb.AppendLine("<html>");
+            sb.AppendLine("<head>");
+            sb.AppendLine("<style>");
+            sb.AppendLine("body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }");
+            sb.AppendLine(".header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; }");
+            sb.AppendLine(".content { padding: 20px; }");
+            sb.AppendLine(".footer { background-color: #f1f1f1; padding: 10px; text-align: center; font-size: 12px; }");
+            sb.AppendLine("</style>");
+            sb.AppendLine("</head>");
+            sb.AppendLine("<body>");
+            sb.AppendLine("<div class='header'>");
+            sb.AppendLine("<h1>JCarrollOnline</h1>");
+            sb.AppendLine("</div>");
+            sb.AppendLine("<div class='content'>");
+            sb.AppendLine(body);
+            sb.AppendLine("</div>");
+            sb.AppendLine("<div class='footer'>");
+            sb.AppendLine("<p>This message was sent by the Administrator of JCarrollOnline</p>");
+            sb.AppendLine(string.Format("<p>&copy; {0} JCarrollOnline. All rights reserved.</p>", DateTime.Now.Year));
+            sb.AppendLine("</div>");
+            sb.AppendLine("</body>");
+            sb.AppendLine("</html>");
+
+            return sb.ToString();
         }
 
         // GET: Users/Details/5
@@ -249,17 +369,6 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        //// POST: Users/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> Create()
-        //{
-        //    return await Task.Run<ActionResult>(() =>
-        //    {
-        //        return RedirectToAction("Index");
-        //    }).ConfigureAwait(false);
-        //}
-
         // GET: Users/Edit/5
         [HttpGet]
         public async Task<ActionResult> Edit()
@@ -270,17 +379,6 @@ namespace JCarrollOnlineV2.Controllers
             }).ConfigureAwait(false);
         }
 
-        // POST: Users/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> Edit(int id, FormCollection collection)
-        //{
-        //    return await Task.Run<ActionResult>(() =>
-        //    {
-        //        return RedirectToAction("Index");
-        //    }).ConfigureAwait(false);
-        //}
-
         // GET: Users/Delete/5
         [HttpGet]
         public async Task<ActionResult> Delete()
@@ -290,18 +388,6 @@ namespace JCarrollOnlineV2.Controllers
                 return View();
             }).ConfigureAwait(false);
         }
-
-        // POST: Users/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> Delete()
-        //{
-        //    return await Task.Run<ActionResult>(() =>
-        //    {
-        //        // TODO: Add delete logic here
-        //        return RedirectToAction("Index");
-        //    }).ConfigureAwait(false);
-        //}
 
         protected override void Dispose(bool disposing)
         {

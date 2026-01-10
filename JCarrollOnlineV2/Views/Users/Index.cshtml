@@ -15,6 +15,76 @@
 <div class="container">
     <h1>Users</h1>
     <p class="lead">Browse all registered users on the site.</p>
+
+    @* Display success/error messages *@
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @TempData["Error"]
+        </div>
+    }
+
+    @* Mass Email Section - Only visible to Administrators *@
+    @if (User.IsInRole("Administrator"))
+    {
+        <div class="well" style="margin-bottom: 30px;">
+            <h4 style="margin-top: 0;">
+                <i class="glyphicon glyphicon-envelope"></i> Send Mass Email
+            </h4>
+            @using (Html.BeginForm("SendMassEmail", "Users", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EmailSubject, new { @class = "col-sm-2 control-label" })
+                    <div class="col-sm-10">
+                        @Html.TextBoxFor(m => m.EmailSubject, new { @class = "form-control", placeholder = "Enter email subject" })
+                        @Html.ValidationMessageFor(m => m.EmailSubject, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EmailBody, new { @class = "col-sm-2 control-label" })
+                    <div class="col-sm-10">
+                        @Html.TextAreaFor(m => m.EmailBody, 4, 80, new { @class = "form-control", placeholder = "Enter your message here..." })
+                        @Html.ValidationMessageFor(m => m.EmailBody, "", new { @class = "text-danger" })
+                        <small class="text-muted">
+                            This message will be sent to all users with the JCarrollOnline header and footer.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <div class="checkbox">
+                            <label>
+                                @Html.CheckBoxFor(m => m.IsHtml)
+                                @Html.DisplayNameFor(m => m.IsHtml)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to send this email to all users?');">
+                            <i class="glyphicon glyphicon-send"></i> Send to All Users
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
     <ul class="list-unstyled">
         @foreach (var item in Model.Users)
         {
@@ -25,3 +95,7 @@
         }
     </ul>
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
