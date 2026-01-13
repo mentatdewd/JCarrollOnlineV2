@@ -72,18 +72,6 @@ namespace JCarrollOnlineV2.Controllers
             }).ConfigureAwait(false);
         }
 
-        // POST: Sandbox/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> Create()
-        //{
-        //    return await Task.Run<ActionResult>(() =>
-        //    {
-        //        // TODO: Add insert logic here
-        //        return RedirectToAction("Index");
-        //    }).ConfigureAwait(false);
-        //}
-
         // GET: Sandbox/Edit/5
         [HttpGet]
         public async Task<ActionResult> Edit()
@@ -94,18 +82,6 @@ namespace JCarrollOnlineV2.Controllers
             }).ConfigureAwait(false);
         }
 
-        //// POST: Sandbox/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> Edit()
-        //{
-        //    return await Task.Run<ActionResult>(() =>
-        //    {
-        //        // TODO: Add update logic here
-        //        return RedirectToAction("Index");
-        //    }).ConfigureAwait(false);
-        //}
-
         // GET: Sandbox/Delete/5
         [HttpGet]
         public async Task<ActionResult> Delete()
@@ -115,24 +91,5 @@ namespace JCarrollOnlineV2.Controllers
                 return View();
             }).ConfigureAwait(false);
         }
-
-        // POST: Sandbox/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> Delete()
-        //{
-        //    return await Task.Run<ActionResult>(() =>
-        //    {
-        //        try
-        //        {
-        //            // TODO: Add delete logic here
-        //            return RedirectToAction("Index");
-        //        }
-        //        catch
-        //        {
-        //            return View();
-        //        }
-        //    }).ConfigureAwait(false);
-        //}
     }
 }

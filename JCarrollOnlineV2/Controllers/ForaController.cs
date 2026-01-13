@@ -1,5 +1,4 @@
-﻿using JCarrollOnlineV2.DataContexts;
-using JCarrollOnlineV2.Entities;
+﻿using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Fora;
 using Omu.ValueInjecter;
@@ -14,11 +13,11 @@ namespace JCarrollOnlineV2.Controllers
 {
     public class ForaController : Controller
     {
-        private JCarrollOnlineV2DbContext Data { get; set; }
+        private readonly JCarrollOnlineV2DbContext _context;
 
-        public ForaController()
+        public ForaController(JCarrollOnlineV2DbContext context)
         {
-            Data = new JCarrollOnlineV2DbContext();
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         // GET: Fora
@@ -30,18 +29,18 @@ namespace JCarrollOnlineV2.Controllers
                 ForaIndexItems = new List<ForaIndexItemViewModel>()
             };
 
-            List<Forum> fora = await Data.Forum.ToListAsync().ConfigureAwait(false);
+            List<Forum> fora = await _context.Forum.ToListAsync().ConfigureAwait(false);
 
             foreach(Forum forum in fora)
             {
                 ForaIndexItemViewModel foraIndexItemViewModel = new ForaIndexItemViewModel();
 
                 foraIndexItemViewModel.InjectFrom(forum);
-                foraIndexItemViewModel.ThreadCount = await ControllerHelpers.GetThreadCountAsync(forum, Data).ConfigureAwait(false);
+                foraIndexItemViewModel.ThreadCount = await ControllerHelpers.GetThreadCountAsync(forum, _context).ConfigureAwait(false);
 
                 if (foraIndexItemViewModel.ThreadCount > 0)
                 {
-                    foraIndexItemViewModel.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(forum, Data).ConfigureAwait(false);
+                    foraIndexItemViewModel.LastThread = await ControllerHelpers.GetLatestThreadDataAsync(forum, _context).ConfigureAwait(false);
                 }
 
                 foraIndexViewModel.ForaIndexItems.Add(foraIndexItemViewModel);
@@ -59,7 +58,7 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
+            Forum forum = await _context.Forum.FindAsync(id).ConfigureAwait(false);
 
             return forum == null ? HttpNotFound() : (ActionResult)View(forum);
         }
@@ -89,8 +88,8 @@ namespace JCarrollOnlineV2.Controllers
                 forum.InjectFrom(forumViewModel);
                 forum.CreatedAt = DateTime.Now;
                 forum.UpdatedAt = DateTime.Now;
-                Data.Forum.Add(forum);
-                await Data.SaveChangesAsync().ConfigureAwait(false);
+                _context.Forum.Add(forum);
+                await _context.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -108,7 +107,7 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
+            Forum forum = await _context.Forum.FindAsync(id).ConfigureAwait(false);
             
             if (forum == null)
             {
@@ -131,8 +130,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                Data.Entry(forum).State = EntityState.Modified;
-                await Data.SaveChangesAsync().ConfigureAwait(false);
+                _context.Entry(forum).State = EntityState.Modified;
+                await _context.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -150,7 +149,7 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
+            Forum forum = await _context.Forum.FindAsync(id).ConfigureAwait(false);
             
             if (forum == null)
             {
@@ -169,10 +168,10 @@ namespace JCarrollOnlineV2.Controllers
         [Authorize]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Forum forum = await Data.Forum.FindAsync(id).ConfigureAwait(false);
+            Forum forum = await _context.Forum.FindAsync(id).ConfigureAwait(false);
 
-            Data.Forum.Remove(forum);
-            await Data.SaveChangesAsync().ConfigureAwait(false);
+            _context.Forum.Remove(forum);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index");
         }

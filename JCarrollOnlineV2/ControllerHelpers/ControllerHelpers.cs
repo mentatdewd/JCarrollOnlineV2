@@ -98,6 +98,7 @@ namespace JCarrollOnlineV2
             return null;
         }
 
+        [Obsolete("Use IRssService.GetRssFeedAsync() instead. This method will be removed in a future version.")]
         public static async Task<RssFeedViewModel> UpdateRssAsync()
         {
             _logger.Info("Obtaining rss data");

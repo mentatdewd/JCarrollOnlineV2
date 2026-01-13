@@ -1,6 +1,7 @@
 ﻿using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
+using JCarrollOnlineV2.Services;
 using JCarrollOnlineV2.ViewModels.Blog;
 using JCarrollOnlineV2.ViewModels.Chat;
 using JCarrollOnlineV2.ViewModels.Home;
@@ -12,6 +13,7 @@ using Microsoft.Owin.Security;
 using NLog;
 using Omu.ValueInjecter;
 using PagedList;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -25,12 +27,13 @@ namespace JCarrollOnlineV2.Controllers
     public class HomeController : Controller
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly JCarrollOnlineV2DbContext _context;
+        private readonly IRssService _rssService;
 
-        private JCarrollOnlineV2DbContext Data { get; set; }
-
-        public HomeController()
+        public HomeController(JCarrollOnlineV2DbContext context, IRssService rssService)
         {
-            Data = new JCarrollOnlineV2DbContext();
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _rssService = rssService ?? throw new ArgumentNullException(nameof(rssService));
         }
 
         private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
@@ -53,12 +56,45 @@ namespace JCarrollOnlineV2.Controllers
             homeViewModel.UserStatsViewModel.UsersFollowing = new UserFollowingViewModel();
 
             _logger.Info("Checking for blog entries");
-            List<BlogItem> blogItems = await Data.BlogItem.Include("BlogItemComments").OrderByDescending(m => m.UpdatedAt).ToListAsync().ConfigureAwait(false);
+
+            // Use strongly-typed Include with lambda expression and add error handling
+            List<BlogItem> blogItems = null;
+            try
+            {
+                blogItems = await _context.BlogItem
+                    .Include(b => b.BlogItemComments)
+                    .Include(b => b.Author)
+                    .AsNoTracking()
+                    .OrderByDescending(m => m.UpdatedAt)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+            }
+            catch (System.Data.ConstraintException ex)
+            {
+                _logger.Error(ex, "Database constraint violation when loading blog items");
+                blogItems = new List<BlogItem>();
+            }
+            catch (System.Data.SqlClient.SqlException ex)
+            {
+                _logger.Error(ex, "SQL error when loading blog items");
+                blogItems = new List<BlogItem>();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Unexpected error when loading blog items");
+                blogItems = new List<BlogItem>();
+            }
 
             homeViewModel.LatestForumThreadsViewModel = new LatestForumThreadsViewModel();
-            List<ThreadEntry> threads = await Data.ForumThreadEntry.Include(forumThreadEntry => forumThreadEntry.Forum).OrderByDescending(threadEntry => threadEntry.UpdatedAt).Take(5).ToListAsync().ConfigureAwait(false);
+            List<ThreadEntry> threads = await _context.ForumThreadEntry
+                .Include(forumThreadEntry => forumThreadEntry.Forum)
+                .AsNoTracking()
+                .OrderByDescending(threadEntry => threadEntry.UpdatedAt)
+                .Take(5)
+                .ToListAsync()
+                .ConfigureAwait(false);
 
-            foreach(ThreadEntry thread in threads)
+            foreach (ThreadEntry thread in threads)
             {
                 LatestForumThreadItemViewModel latestForumThreadItemViewModel = new LatestForumThreadItemViewModel
                 {
@@ -79,16 +115,23 @@ namespace JCarrollOnlineV2.Controllers
 
                 blogFeedItemViewModel.InjectFrom(item);
                 blogFeedItemViewModel.Comments.BlogItemId = item.Id;
-                blogFeedItemViewModel.Author.InjectFrom(item.Author);
 
-                foreach(BlogItemComment comment in item.BlogItemComments.ToList())
+                if (item.Author != null)
                 {
-                    BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel(item.Id);
+                    blogFeedItemViewModel.Author.InjectFrom(item.Author);
+                }
 
-                    blogCommentItemViewModel.InjectFrom(comment);
-                    blogCommentItemViewModel.BlogItemId = comment.BlogItem.Id;
-                    blogCommentItemViewModel.TimeAgo = blogCommentItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
-                    blogFeedItemViewModel.Comments.BlogComments.Add(blogCommentItemViewModel);
+                if (item.BlogItemComments != null)
+                {
+                    foreach (BlogItemComment comment in item.BlogItemComments.ToList())
+                    {
+                        BlogCommentItemViewModel blogCommentItemViewModel = new BlogCommentItemViewModel(item.Id);
+
+                        blogCommentItemViewModel.InjectFrom(comment);
+                        blogCommentItemViewModel.BlogItemId = comment.BlogItem.Id;
+                        blogCommentItemViewModel.TimeAgo = blogCommentItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
+                        blogFeedItemViewModel.Comments.BlogComments.Add(blogCommentItemViewModel);
+                    }
                 }
 
                 homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(blogFeedItemViewModel);
@@ -96,17 +139,17 @@ namespace JCarrollOnlineV2.Controllers
 
             _logger.Info("Processing rss");
 
-            Task<RssFeedViewModel> rss = ControllerHelpers.UpdateRssAsync();
+            Task<RssFeedViewModel> rss = _rssService.GetRssFeedAsync();
 
             if (User != null && User.Identity.IsAuthenticated == true)
             {
                 string currentUserId = User.Identity.GetUserId();
-                
+
                 // Use SingleOrDefaultAsync instead of SingleAsync to avoid exception
-                ApplicationUser user = await Data.ApplicationUser
-                    .Include("Following")
-                    .Include("Followers")
-                    .Include("MicroPosts")
+                ApplicationUser user = await _context.ApplicationUser
+                    .Include(u => u.Following)
+                    .Include(u => u.Followers)
+                    .Include(u => u.MicroPosts)
                     .SingleOrDefaultAsync(u => u.Id == currentUserId)
                     .ConfigureAwait(false);
 
@@ -151,7 +194,12 @@ namespace JCarrollOnlineV2.Controllers
                     UserItemViewModel userItemViewModel = new UserItemViewModel(_logger);
 
                     userItemViewModel.InjectFrom(item);
-                    userItemViewModel.MicroPostsAuthored = await Data.ApplicationUser.Include("MicroPosts").Where(u => u.Id == item.Id).Select(u => u.MicroPosts).CountAsync().ConfigureAwait(false);
+                    userItemViewModel.MicroPostsAuthored = await _context.ApplicationUser
+                        .Include(u => u.MicroPosts)
+                        .Where(u => u.Id == item.Id)
+                        .Select(u => u.MicroPosts.Count)
+                        .FirstOrDefaultAsync()
+                        .ConfigureAwait(false);
                     homeViewModel.UserStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
                 }
 
@@ -178,8 +226,9 @@ namespace JCarrollOnlineV2.Controllers
             homeViewModel.ChatViewModel = new ChatViewModel();
 
             // Load recent chat messages (last 50)
-            List<ChatMessage> recentMessages = await Data.ChatMessages
+            List<ChatMessage> recentMessages = await _context.ChatMessages
                 .Include(c => c.Author)
+                .AsNoTracking()
                 .OrderByDescending(c => c.CreatedAt)
                 .Take(50)
                 .ToListAsync()
@@ -234,9 +283,11 @@ namespace JCarrollOnlineV2.Controllers
                 PageContainer = "Welcome"
             };
 
+            bool isAuthenticated = Request?.IsAuthenticated ?? false;
+
             return await Task.Run<ActionResult>(() =>
             {
-                return Request.IsAuthenticated ? RedirectToAction("Index", "Home") : (ActionResult)View("Welcome", "_LayoutWelcome", homeViewModel);
+                return isAuthenticated ? RedirectToAction("Index", "Home") : (ActionResult)View("Welcome", "_LayoutWelcome", homeViewModel);
             }).ConfigureAwait(false);
         }
     }

@@ -26,24 +26,18 @@ namespace JCarrollOnlineV2.Controllers
             private set => _userManager = value;
         }
 
-        private JCarrollOnlineV2DbContext Data { get; set; }
+        private readonly JCarrollOnlineV2DbContext _context;
 
-        public MicroPostsController()
-            : this(null)
+        public MicroPostsController(JCarrollOnlineV2DbContext context)
         {
-
-        }
-
-        public MicroPostsController(JCarrollOnlineV2DbContext dataContext)
-        {
-            Data = dataContext ?? new JCarrollOnlineV2DbContext();
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         // GET: MicroPosts
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            return View(await Data.MicroPost.ToListAsync().ConfigureAwait(false));
+            return View(await _context.MicroPost.ToListAsync().ConfigureAwait(false));
         }
 
         // GET: MicroPosts/Details/5
@@ -55,7 +49,7 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            MicroPost microPost = await Data.MicroPost.FindAsync(id).ConfigureAwait(false);
+            MicroPost microPost = await _context.MicroPost.FindAsync(id).ConfigureAwait(false);
 
             return microPost == null ? HttpNotFound() : (ActionResult)View(microPost);
         }
@@ -83,11 +77,11 @@ namespace JCarrollOnlineV2.Controllers
                 microPost.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await Data.ApplicationUser.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
+                ApplicationUser currentUser = await _context.ApplicationUser.Include("Followers").FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
 
                 microPost.Author = currentUser;
-                Data.MicroPost.Add(microPost);
-                await Data.SaveChangesAsync().ConfigureAwait(false);
+                _context.MicroPost.Add(microPost);
+                await _context.SaveChangesAsync().ConfigureAwait(false);
 
                 await SendMicroPostNotification(microPost, currentUser).ConfigureAwait(false);
 
@@ -179,7 +173,7 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            MicroPost micropost = await Data.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
+            MicroPost micropost = await _context.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
 
             return micropost == null ? HttpNotFound() : (ActionResult)View(micropost);
         }
@@ -193,8 +187,8 @@ namespace JCarrollOnlineV2.Controllers
         {
             if (ModelState.IsValid)
             {
-                Data.Entry(microPost).State = EntityState.Modified;
-                await Data.SaveChangesAsync().ConfigureAwait(false);
+                _context.Entry(microPost).State = EntityState.Modified;
+                await _context.SaveChangesAsync().ConfigureAwait(false);
 
                 return RedirectToAction("Index");
             }
@@ -211,7 +205,7 @@ namespace JCarrollOnlineV2.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            MicroPost micropost = await Data.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
+            MicroPost micropost = await _context.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
 
             return micropost == null ? HttpNotFound() : (ActionResult)View(micropost);
         }
@@ -221,10 +215,10 @@ namespace JCarrollOnlineV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int microPostId)
         {
-            MicroPost micropost = await Data.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
+            MicroPost micropost = await _context.MicroPost.FindAsync(microPostId).ConfigureAwait(false);
 
-            Data.MicroPost.Remove(micropost);
-            await Data.SaveChangesAsync().ConfigureAwait(false);
+            _context.MicroPost.Remove(micropost);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index");
         }

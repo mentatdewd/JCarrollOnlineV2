@@ -16,7 +16,7 @@ namespace JCarrollOnlineV2.Controllers
     [Authorize(Roles = "Administrator")]
     public class BlogController : Controller
     {
-        private JCarrollOnlineV2DbContext Data { get; set; }
+        private readonly JCarrollOnlineV2DbContext _context;
 
         public BlogController()
             : this(null)
@@ -24,9 +24,9 @@ namespace JCarrollOnlineV2.Controllers
 
         }
 
-        public BlogController(JCarrollOnlineV2DbContext dataContext)
+        public BlogController(JCarrollOnlineV2DbContext context)
         {
-            Data = dataContext ?? new JCarrollOnlineV2DbContext();
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         // GET: BlogItemId
@@ -36,8 +36,8 @@ namespace JCarrollOnlineV2.Controllers
             BlogIndexViewModel blogIndexViewModel = new BlogIndexViewModel();
 
             string currentUserId = User.Identity.GetUserId();
-            ApplicationUser user = await Data.ApplicationUser.FindAsync(currentUserId).ConfigureAwait(false);
-            List<BlogItem> blogItems = await Data.BlogItem.Include("BlogItemComments").ToListAsync().ConfigureAwait(false);
+            ApplicationUser user = await _context.ApplicationUser.FindAsync(currentUserId).ConfigureAwait(false);
+            List<BlogItem> blogItems = await _context.BlogItem.Include("BlogItemComments").ToListAsync().ConfigureAwait(false);
 
             foreach(BlogItem blogItem in blogItems.OrderByDescending(m => m.UpdatedAt))
             {
@@ -81,10 +81,10 @@ namespace JCarrollOnlineV2.Controllers
 
                 if (blogCommentItemViewModel != null)
                 {
-                    blogItemComment.BlogItem = Data.BlogItem.Find(blogCommentItemViewModel.Id);
+                    blogItemComment.BlogItem = _context.BlogItem.Find(blogCommentItemViewModel.Id);
                 }
-                Data.BlogItemComment.Add(blogItemComment);
-                Data.SaveChanges();
+                _context.BlogItemComment.Add(blogItemComment);
+                _context.SaveChanges();
             }
         }
 
@@ -116,12 +116,12 @@ namespace JCarrollOnlineV2.Controllers
                 blogItem.UpdatedAt = DateTime.Now;
 
                 string currentUserId = User.Identity.GetUserId();
-                ApplicationUser currentUser = await Data.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
+                ApplicationUser currentUser = await _context.ApplicationUser.FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
 
                 blogItem.Author = currentUser;
 
-                Data.BlogItem.Add(blogItem);
-                await Data.SaveChangesAsync().ConfigureAwait(false);
+                _context.BlogItem.Add(blogItem);
+                await _context.SaveChangesAsync().ConfigureAwait(false);
 
                 return new RedirectResult(Url.Action("Index"));
             }
@@ -135,7 +135,7 @@ namespace JCarrollOnlineV2.Controllers
         {
             BlogFeedItemViewModel blogFeedItemViewModel = new BlogFeedItemViewModel();
 
-            BlogItem blogItem = await Data.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId).ConfigureAwait(false);
+            BlogItem blogItem = await _context.BlogItem.Include("Author").SingleOrDefaultAsync(m => m.Id == blogItemId).ConfigureAwait(false);
 
             if (blogItem == null)
             {
@@ -161,12 +161,12 @@ namespace JCarrollOnlineV2.Controllers
                 blogItem.InjectFrom(blogItemVM);
                 if (blogItemVM != null)
                 {
-                    blogItem.Author = await Data.ApplicationUser.FindAsync(blogItemVM.AuthorId).ConfigureAwait(false);
+                    blogItem.Author = await _context.ApplicationUser.FindAsync(blogItemVM.AuthorId).ConfigureAwait(false);
                 }
                 blogItem.UpdatedAt = DateTime.Now;
 
-                Data.Entry(blogItem).State = EntityState.Modified;
-                await Data.SaveChangesAsync().ConfigureAwait(false);
+                _context.Entry(blogItem).State = EntityState.Modified;
+                await _context.SaveChangesAsync().ConfigureAwait(false);
 
                 return Redirect(Url.RouteUrl(new { controller = "Blog", action = "Index"}));
             }

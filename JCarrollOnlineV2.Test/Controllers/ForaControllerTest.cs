@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -54,20 +55,20 @@ namespace JCarrollOnlineV2.Test.Controllers
 
             // Setup fake DbContext
             _fakeContext = new FakeJCarrollOnlineV2DbContext();
-            
-            var mockSet = new FakeJCarrollOnlineV2Db<Forum>();
-            foreach (var forum in _testForumData)
+
+            FakeJCarrollOnlineV2Db<Forum> mockSet = new FakeJCarrollOnlineV2Db<Forum>();
+            foreach (Forum forum in _testForumData)
             {
                 mockSet.Add(forum);
             }
 
             // Use reflection to replace the Forum DbSet with our fake
-            var forumProperty = typeof(JCarrollOnlineV2DbContext).GetProperty("Forum");
+            PropertyInfo forumProperty = typeof(JCarrollOnlineV2DbContext).GetProperty("Forum");
             forumProperty.SetValue(_fakeContext, mockSet);
 
             // Setup ForumThreadEntry DbSet to prevent database queries
-            var mockThreadEntrySet = new FakeJCarrollOnlineV2Db<ThreadEntry>();
-            var threadEntryProperty = typeof(JCarrollOnlineV2DbContext).GetProperty("ForumThreadEntry");
+            FakeJCarrollOnlineV2Db<ThreadEntry> mockThreadEntrySet = new FakeJCarrollOnlineV2Db<ThreadEntry>();
+            PropertyInfo threadEntryProperty = typeof(JCarrollOnlineV2DbContext).GetProperty("ForumThreadEntry");
             threadEntryProperty.SetValue(_fakeContext, mockThreadEntrySet);
         }
 
@@ -77,10 +78,10 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_ReturnsViewResult_WithForaIndexViewModel()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
 
             // Act
-            var result = await controller.Index().ConfigureAwait(false) as ViewResult;
+            ViewResult result = await controller.Index().ConfigureAwait(false) as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
@@ -91,11 +92,11 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_ReturnsAllForums_InViewModel()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
 
             // Act
-            var result = await controller.Index().ConfigureAwait(false) as ViewResult;
-            var model = result.Model as ForaIndexViewModel;
+            ViewResult result = await controller.Index().ConfigureAwait(false) as ViewResult;
+            ForaIndexViewModel model = result.Model as ForaIndexViewModel;
 
             // Assert
             Assert.IsNotNull(model);
@@ -110,16 +111,16 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Details_WithValidId_ReturnsViewResult_WithForum()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int validId = 1;
 
             // Act
-            var result = await controller.Details(validId).ConfigureAwait(false) as ViewResult;
+            ViewResult result = await controller.Details(validId).ConfigureAwait(false) as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result.Model, typeof(Forum));
-            var model = result.Model as Forum;
+            Forum model = result.Model as Forum;
             Assert.AreEqual(validId, model.Id);
         }
 
@@ -127,14 +128,14 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Details_WithNullId_ReturnsBadRequest()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
 
             // Act
-            var result = await controller.Details(null).ConfigureAwait(false);
+            ActionResult result = await controller.Details(null).ConfigureAwait(false);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(HttpStatusCodeResult));
-            var statusResult = result as HttpStatusCodeResult;
+            HttpStatusCodeResult statusResult = result as HttpStatusCodeResult;
             Assert.AreEqual((int)HttpStatusCode.BadRequest, statusResult.StatusCode);
         }
 
@@ -142,11 +143,11 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Details_WithInvalidId_ReturnsHttpNotFound()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int invalidId = 999;
 
             // Act
-            var result = await controller.Details(invalidId).ConfigureAwait(false);
+            ActionResult result = await controller.Details(invalidId).ConfigureAwait(false);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(HttpNotFoundResult));
@@ -160,10 +161,10 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Create_Get_ReturnsViewResult_WithForaCreateViewModel()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
 
             // Act
-            var result = controller.Create() as ViewResult;
+            ViewResult result = controller.Create() as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
@@ -174,15 +175,15 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Create_Post_WithValidModel_RedirectsToIndex()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
-            var viewModel = new ForaCreateViewModel
+            ForaController controller = CreateControllerWithMockContext();
+            ForaCreateViewModel viewModel = new ForaCreateViewModel
             {
                 Title = "New Forum",
                 Description = "New forum description"
             };
 
             // Act
-            var result = await controller.Create(viewModel).ConfigureAwait(false) as RedirectToRouteResult;
+            RedirectToRouteResult result = await controller.Create(viewModel).ConfigureAwait(false) as RedirectToRouteResult;
 
             // Assert
             Assert.IsNotNull(result);
@@ -194,15 +195,15 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Create_Post_WithInvalidModel_ReturnsViewWithModel()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             controller.ModelState.AddModelError("Title", "Title is required");
-            var viewModel = new ForaCreateViewModel
+            ForaCreateViewModel viewModel = new ForaCreateViewModel
             {
                 Description = "Description without title"
             };
 
             // Act
-            var result = await controller.Create(viewModel).ConfigureAwait(false) as ViewResult;
+            ViewResult result = await controller.Create(viewModel).ConfigureAwait(false) as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
@@ -214,19 +215,19 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Create_Post_SetsCreatedAtAndUpdatedAt()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
-            var viewModel = new ForaCreateViewModel
+            ForaController controller = CreateControllerWithMockContext();
+            ForaCreateViewModel viewModel = new ForaCreateViewModel
             {
                 Title = "New Forum",
                 Description = "New forum description"
             };
-            var beforeCreate = DateTime.Now;
+            DateTime beforeCreate = DateTime.Now;
 
             // Act
             await controller.Create(viewModel).ConfigureAwait(false);
 
             // Assert
-            var addedForum = _fakeContext.Forum.Local.Last();
+            Forum addedForum = _fakeContext.Forum.Local.Last();
             Assert.IsTrue(addedForum.CreatedAt >= beforeCreate);
             Assert.IsTrue(addedForum.UpdatedAt >= beforeCreate);
             Assert.AreEqual(addedForum.CreatedAt, addedForum.UpdatedAt);
@@ -240,16 +241,16 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Edit_Get_WithValidId_ReturnsViewResult_WithForumEditViewModel()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int validId = 1;
 
             // Act - CAST validId to int? to resolve ambiguity
-            var result = await controller.Edit((int?)validId).ConfigureAwait(false) as ViewResult;
+            ViewResult result = await controller.Edit((int?)validId).ConfigureAwait(false) as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result.Model, typeof(ForumEditViewModel));
-            var model = result.Model as ForumEditViewModel;
+            ForumEditViewModel model = result.Model as ForumEditViewModel;
             Assert.AreEqual(validId, model.Id);
         }
 
@@ -257,11 +258,11 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Edit_Get_WithInvalidId_ReturnsHttpNotFound()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int invalidId = 999;
 
             // Act - CAST invalidId to int? to resolve ambiguity
-            var result = await controller.Edit((int?)invalidId).ConfigureAwait(false);
+            ActionResult result = await controller.Edit((int?)invalidId).ConfigureAwait(false);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(HttpNotFoundResult));
@@ -271,14 +272,14 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Edit_Get_WithNullId_ReturnsBadRequest()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
 
             // Act
-            var result = await controller.Edit((int?)null).ConfigureAwait(false);
+            ActionResult result = await controller.Edit((int?)null).ConfigureAwait(false);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(HttpStatusCodeResult));
-            var statusResult = result as HttpStatusCodeResult;
+            HttpStatusCodeResult statusResult = result as HttpStatusCodeResult;
             Assert.AreEqual((int)HttpStatusCode.BadRequest, statusResult.StatusCode);
         }
 
@@ -286,12 +287,12 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Edit_Post_WithValidModel_RedirectsToIndex()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
-            var forum = _testForumData.First();
+            ForaController controller = CreateControllerWithMockContext();
+            Forum forum = _testForumData.First();
             forum.Title = "Updated Title";
 
             // Act
-            var result = await controller.Edit(forum).ConfigureAwait(false) as RedirectToRouteResult;
+            RedirectToRouteResult result = await controller.Edit(forum).ConfigureAwait(false) as RedirectToRouteResult;
 
             // Assert
             Assert.IsNotNull(result);
@@ -303,12 +304,12 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Edit_Post_WithInvalidModel_ReturnsViewWithModel()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             controller.ModelState.AddModelError("Title", "Title is required");
-            var forum = _testForumData.First();
+            Forum forum = _testForumData.First();
 
             // Act
-            var result = await controller.Edit(forum).ConfigureAwait(false) as ViewResult;
+            ViewResult result = await controller.Edit(forum).ConfigureAwait(false) as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
@@ -324,16 +325,16 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Delete_Get_WithValidId_ReturnsViewResult_WithForumDeleteViewModel()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int validId = 1;
 
             // Act
-            var result = await controller.Delete(validId).ConfigureAwait(false) as ViewResult;
+            ViewResult result = await controller.Delete(validId).ConfigureAwait(false) as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result.Model, typeof(ForumDeleteViewModel));
-            var model = result.Model as ForumDeleteViewModel;
+            ForumDeleteViewModel model = result.Model as ForumDeleteViewModel;
             Assert.AreEqual(validId, model.Id);
         }
 
@@ -341,14 +342,14 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Delete_Get_WithNullId_ReturnsBadRequest()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
 
             // Act
-            var result = await controller.Delete(null).ConfigureAwait(false);
+            ActionResult result = await controller.Delete(null).ConfigureAwait(false);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(HttpStatusCodeResult));
-            var statusResult = result as HttpStatusCodeResult;
+            HttpStatusCodeResult statusResult = result as HttpStatusCodeResult;
             Assert.AreEqual((int)HttpStatusCode.BadRequest, statusResult.StatusCode);
         }
 
@@ -356,11 +357,11 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Delete_Get_WithInvalidId_ReturnsHttpNotFound()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int invalidId = 999;
 
             // Act
-            var result = await controller.Delete(invalidId).ConfigureAwait(false);
+            ActionResult result = await controller.Delete(invalidId).ConfigureAwait(false);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(HttpNotFoundResult));
@@ -370,12 +371,12 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task DeleteConfirmed_WithValidId_RemovesForumAndRedirectsToIndex()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int validId = 1;
-            var initialCount = _fakeContext.Forum.Local.Count;
+            int initialCount = _fakeContext.Forum.Local.Count;
 
             // Act
-            var result = await controller.DeleteConfirmed(validId).ConfigureAwait(false) as RedirectToRouteResult;
+            RedirectToRouteResult result = await controller.DeleteConfirmed(validId).ConfigureAwait(false) as RedirectToRouteResult;
 
             // Assert
             Assert.IsNotNull(result);
@@ -388,9 +389,9 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task DeleteConfirmed_RemovesCorrectForum()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
             int idToDelete = 2;
-            var forumToDelete = _testForumData.First(f => f.Id == idToDelete);
+            Forum forumToDelete = _testForumData.First(f => f.Id == idToDelete);
 
             // Act
             await controller.DeleteConfirmed(idToDelete).ConfigureAwait(false);
@@ -408,7 +409,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Dispose_CallsBaseDispose()
         {
             // Arrange
-            var controller = CreateControllerWithMockContext();
+            ForaController controller = CreateControllerWithMockContext();
 
             // Act & Assert - Should not throw
             controller.Dispose();
@@ -420,12 +421,7 @@ namespace JCarrollOnlineV2.Test.Controllers
 
         private ForaController CreateControllerWithMockContext()
         {
-            var controller = new ForaController();
-            
-            // Use reflection to set the private Data property
-            var dataProperty = typeof(ForaController).GetProperty("Data", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            dataProperty.SetValue(controller, _fakeContext);
+            ForaController controller = new ForaController(_fakeContext);
 
             return controller;
         }

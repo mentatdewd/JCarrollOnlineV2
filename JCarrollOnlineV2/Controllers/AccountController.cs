@@ -110,8 +110,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/JCarrollOnlineV2Service
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#")]
         [AllowAnonymous]
         [HttpGet]
         public ActionResult Login(string returnUrl)
@@ -128,8 +126,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Account/JCarrollOnlineV2Service
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -175,7 +171,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/VerifyCode
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
@@ -654,9 +649,9 @@ namespace JCarrollOnlineV2.Controllers
         [HttpGet]
         public ActionResult ResetPassword(string code)
         {
-            if (code == null)
+            if (string.IsNullOrEmpty(code))
             {
-                _logger.Error("ResetPassword called with null code");
+                _logger.Error("ResetPassword called with null or empty code");
                 return View("Error");
             }
 

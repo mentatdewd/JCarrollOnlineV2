@@ -191,6 +191,7 @@
     <Compile Include="Users\UserStatsViewModel.cs" />
     <Compile Include="Users\UserUnfollowViewModel.cs" />
     <Compile Include="Users\UserViewModelBase.cs" />
+    <None Include="app.config" />
     <None Include="Mapper.cs" />
     <Compile Include="Manage\ManageViewModels.cs" />
     <Compile Include="MicroPosts\MicroPostIndexViewModels.cs" />

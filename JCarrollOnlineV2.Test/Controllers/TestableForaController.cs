@@ -8,12 +8,10 @@ namespace JCarrollOnlineV2.Test.Controllers
     /// </summary>
     public class TestableForaController : ForaController
     {
-        public TestableForaController(JCarrollOnlineV2DbContext context)
+        public TestableForaController(JCarrollOnlineV2DbContext context) : base(context)
         {
-            // Use reflection to set the private Data property
-            var dataProperty = typeof(ForaController).GetProperty("Data",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            dataProperty.SetValue(this, context);
+            // The base constructor already handles context initialization
+            // No additional setup needed
         }
     }
 }

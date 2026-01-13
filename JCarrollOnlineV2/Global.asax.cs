@@ -1,9 +1,5 @@
-﻿using JCarrollOnlineV2.DataContexts;
-using System;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+﻿using System;
 using System.Net;
-using System.Threading;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -12,10 +8,11 @@ using System.Web.Routing;
 
 namespace JCarrollOnlineV2
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class MvcApplication : HttpApplication
     {
         protected void Application_Start()
         {
+            AutofacConfig.ConfigureContainer();
             // Enable TLS 1.2 and TLS 1.3 for HTTPS requests
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             AreaRegistration.RegisterAllAreas();

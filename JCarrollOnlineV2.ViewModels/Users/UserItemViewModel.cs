@@ -8,7 +8,7 @@ namespace JCarrollOnlineV2.ViewModels.Users
     public class UserItemViewModel : UserViewModelBase
     {
         public UserItemViewModel() { }
-        public UserItemViewModel(Logger logger)
+        public UserItemViewModel(ILogger logger)
         {
             Logger = logger;
         }
@@ -22,8 +22,7 @@ namespace JCarrollOnlineV2.ViewModels.Users
         public bool MicroPostSmsNotifications { get; set; }
 
         public int? MicroPostsAuthored { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public ICollection<MicroPostFeedItemViewModel> MicroPosts { get; set; }
-        public Logger Logger { get; set; }
+        public ILogger Logger { get; set; }
     }
 }
