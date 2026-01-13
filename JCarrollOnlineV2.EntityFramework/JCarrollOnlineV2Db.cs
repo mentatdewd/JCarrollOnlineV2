@@ -13,12 +13,14 @@ namespace JCarrollOnlineV2.EntityFramework
 
         public JCarrollOnlineV2DbContext()
 #if DEBUG
-        : base("JCarrollOnlineV2ProductionConnection")
+        : base("JCarrollOnlineV2Connection")  // Use DEV connection
 #else
-        : base("JCarrollOnlineV2ProductionConnection")
+        : base("JCarrollOnlineV2ProductionConnection")  // Use PROD connection
 #endif      
         {
+#if DEBUG
             Database.Log = sql => System.Diagnostics.Debug.WriteLine(sql);
+#endif
         }
 
 
@@ -35,7 +37,11 @@ namespace JCarrollOnlineV2.EntityFramework
                 throw new ArgumentNullException(nameof(modelBuilder));
             }
 
+#if DEBUG
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<JCarrollOnlineV2DbContext, Configuration>());
+#else
+            Database.SetInitializer<JCarrollOnlineV2DbContext>(null); // No automatic migrations in production
+#endif
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
