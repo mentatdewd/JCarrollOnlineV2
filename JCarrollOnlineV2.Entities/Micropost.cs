@@ -14,6 +14,9 @@ namespace JCarrollOnlineV2.Entities
         public string Content { get; set; }
 
         [Required]
+        public string AuthorId { get; set; }
+
+        [Required]
         public ApplicationUser Author { get; set; }
 
         [DataType(DataType.DateTime)]

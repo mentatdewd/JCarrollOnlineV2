@@ -38,22 +38,4 @@ namespace JCarrollOnlineV2.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public virtual ICollection<ApplicationUser> Followers { get; private set; }
     }
-
-    //public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IContext
-    //{
-    //    public ApplicationDbContext(string nameOrConnectionString)
-    //        : base(nameOrConnectionString)
-    //    {
-    //    }
-        
-    //    public ApplicationDbContext()
-    //        : base("JCarrollOnlineV2Connection", throwIfV1Schema: false)
-    //    {
-    //    }
-
-    //    public static ApplicationDbContext Create()
-    //    {
-    //        return new ApplicationDbContext();
-    //    }
-    //}
 }

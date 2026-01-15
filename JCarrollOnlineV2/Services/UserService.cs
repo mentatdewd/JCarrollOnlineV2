@@ -3,6 +3,7 @@ using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.ViewModels.Users;
 using NLog;
 using Omu.ValueInjecter;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace JCarrollOnlineV2.Services
 
         public UserService(JCarrollOnlineV2DbContext context, ILogger logger)
         {
-            _context = context;
-            _logger = logger;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<List<UserItemViewModel>> GetAllUsersAsync(string currentUserId = null)
@@ -230,7 +231,7 @@ namespace JCarrollOnlineV2.Services
             }
 
             user.MicroPostEmailNotifications = emailNotifications;
-            // user.MicroPostSMSNotifications = smsNotifications;
+            user.MicroPostSmsNotifications = smsNotifications;
             await _context.SaveChangesAsync().ConfigureAwait(false);
             return true;
         }

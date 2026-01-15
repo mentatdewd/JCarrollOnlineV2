@@ -26,10 +26,10 @@ namespace JCarrollOnlineV2.Services
         public async Task<MicroPostFeedViewModel> BuildMicroPostFeedViewModelAsync(string userId, int pageNumber, int pageSize)
         {
             _logger.Info($"===== BuildMicroPostFeedViewModelAsync CALLED ===== User: {userId}, Page: {pageNumber}, Size: {pageSize}");
-            
-            if (string.IsNullOrEmpty(userId))
+
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                _logger.Error("userId is null or empty!");
+                _logger.Error("userId is null, empty, or whitespace!");
                 throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
             }
 
@@ -38,13 +38,12 @@ namespace JCarrollOnlineV2.Services
             try
             {
                 _logger.Info($"Context.MicroPost DbSet is null: {_context.MicroPost == null}");
-                
+
                 // Get the IDs of users that the current user is following
                 // ApplicationUser_Id = current user, ApplicationUser_Id1 = user being followed
-                List<string> followedUserIds = await _context.Database
-                    .SqlQuery<string>(
-                        "SELECT ApplicationUser_Id1 FROM ApplicationUserApplicationUser WHERE ApplicationUser_Id = @p0",
-                        userId)
+                List<string> followedUserIds = await _context.ApplicationUser
+                    .Where(u => u.Id == userId)
+                    .SelectMany(u => u.Following.Select(f => f.Id))
                     .ToListAsync()
                     .ConfigureAwait(false);
 
@@ -57,8 +56,8 @@ namespace JCarrollOnlineV2.Services
 
                 // Get all microposts from the current user AND all followed users in one query
                 List<MicroPost> allMicroPosts = await _context.MicroPost
+                    .Where(mp => userIdsToInclude.Contains(mp.AuthorId))
                     .Include(mp => mp.Author)
-                    .Where(mp => userIdsToInclude.Contains(mp.Author.Id))
                     .AsNoTracking()
                     .ToListAsync()
                     .ConfigureAwait(false);
@@ -78,7 +77,7 @@ namespace JCarrollOnlineV2.Services
                     microPostFeedItemViewModel.Author.InjectFrom(microPost.Author);
                     microPostFeedItemViewModel.TimeAgo = microPostFeedItemViewModel.CreatedAt.ToUniversalTime().ToString("o");
                     microPostFeedViewModel.MicroPostFeedItems.Add(microPostFeedItemViewModel);
-                    
+
                     _logger.Debug($"Added micropost ID {microPost.Id} from {microPost.Author?.UserName} created {microPost.CreatedAt}");
                 }
 
@@ -91,7 +90,7 @@ namespace JCarrollOnlineV2.Services
 
                 int totalItems = orderedMicroPosts.Count;
                 int totalPages = totalItems > 0 ? (int)Math.Ceiling((double)totalItems / pageSize) : 1;
-                
+
                 // Ensure page number is within valid range
                 if (pageNumber < 1)
                 {
@@ -110,7 +109,7 @@ namespace JCarrollOnlineV2.Services
                 microPostFeedViewModel.OnePageOfMicroPosts = orderedMicroPosts.ToPagedList(pageNumber, pageSize);
 
                 _logger.Info($"SUCCESS: Built feed with {microPostFeedViewModel.MicroPostFeedItems.Count} total items, Page {microPostFeedViewModel.OnePageOfMicroPosts.PageNumber}/{microPostFeedViewModel.OnePageOfMicroPosts.PageCount}, {microPostFeedViewModel.OnePageOfMicroPosts.Count} items on current page");
-                
+
                 if (microPostFeedViewModel.OnePageOfMicroPosts.Count == 0 && totalItems > 0)
                 {
                     _logger.Error($"WARNING: Pagination resulted in 0 items but total is {totalItems}!");
@@ -130,7 +129,7 @@ namespace JCarrollOnlineV2.Services
             }
 
             _logger.Info($"===== BuildMicroPostFeedViewModelAsync RETURNING ===== OnePageOfMicroPosts is null: {microPostFeedViewModel.OnePageOfMicroPosts == null}, Count: {microPostFeedViewModel.OnePageOfMicroPosts?.Count ?? -1}");
-            
+
             return microPostFeedViewModel;
         }
     }
