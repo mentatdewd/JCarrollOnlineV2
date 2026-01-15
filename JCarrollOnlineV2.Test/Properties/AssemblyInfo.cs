@@ -35,6 +35,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-// MSTest Configuration - Disable test parallelization for integration tests
-// that share database contexts to avoid concurrency issues
-[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]
+// MSTest Configuration - Disable test parallelization completely for CI stability
+// This prevents concurrency issues and makes debugging easier
+[assembly: DoNotParallelize]

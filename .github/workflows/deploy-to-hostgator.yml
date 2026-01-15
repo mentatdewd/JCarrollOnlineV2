@@ -245,9 +245,18 @@ jobs:
         Write-Host "Found $($testAssemblies.Count) test assemblies:" -ForegroundColor Green
         $testAssemblies | ForEach-Object { Write-Host "  - $($_.Name)" -ForegroundColor Gray }
         
-        # Run tests
+        # List dependencies to verify they're present
+        Write-Host "`nChecking for System.Threading.Tasks.Extensions..." -ForegroundColor Cyan
+        $taskExtensions = Get-ChildItem -Path "JCarrollOnlineV2.Test\bin\Release" -Recurse -Filter "System.Threading.Tasks.Extensions.dll"
+        if ($taskExtensions) {
+          Write-Host "? Found: $($taskExtensions.FullName)" -ForegroundColor Green
+        } else {
+          Write-Warning "System.Threading.Tasks.Extensions.dll not found in output directory"
+        }
+        
+        # Run tests with InIsolation for better dependency resolution
         New-Item -ItemType Directory -Force -Path "TestResults" | Out-Null
-        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults
+        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults /InIsolation
         
         if ($LASTEXITCODE -ne 0) {
           Write-Error "Tests failed with exit code $LASTEXITCODE"

@@ -219,3 +219,4 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /docs/TEST_DEPENDENCY_FIX.md
+/docs/TEST_PARALLELIZATION_FIX.md

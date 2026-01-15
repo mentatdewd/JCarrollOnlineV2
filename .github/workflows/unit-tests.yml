@@ -63,8 +63,8 @@ jobs:
         Write-Host "Found $($testAssemblies.Count) test assemblies:"
         $testAssemblies | ForEach-Object { Write-Host "  - $($_.FullName)" }
         
-        # Run tests
-        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults
+        # Run tests with InIsolation for better dependency resolution
+        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults /InIsolation
         
         if ($LASTEXITCODE -ne 0) {
           Write-Error "Tests failed with exit code $LASTEXITCODE"
