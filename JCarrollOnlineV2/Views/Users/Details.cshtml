@@ -19,7 +19,8 @@
             @Html.Partial("_UserStatsPartial", Model.UserStatsViewModel)
         </section>
         <section>
-            @if (@Model.UserInfoViewModel.UserId != @Model.UserInfoViewModel.User.Id)
+            @* Show Follow button if viewing someone else's profile, Settings if viewing own profile *@
+            @if (User.Identity.GetUserId() != Model.UserInfoViewModel.UserId)
             {
                 @Html.Partial("_FollowFormPartial", Model)
             }
@@ -41,10 +42,7 @@
                     {
                         foreach (var user in Model.UserStatsViewModel.UsersFollowing.Users)
                         {
-                            if (user.User.Id != Model.UserInfoViewModel.UserId)
-                            {
-                                @Html.Partial("_UserInfoPartial", user)
-                            }
+                            @Html.Partial("_UserItemPartial", user)
                         }
                     }
                     else
@@ -58,10 +56,7 @@
                     {
                         foreach (var user in Model.UserStatsViewModel.UserFollowers.Users)
                         {
-                            if (user.User.Id != Model.UserInfoViewModel.UserId)
-                            {
-                                @Html.Partial("_UserInfoPartial", user)
-                            }
+                            @Html.Partial("_UserItemPartial", user)
                         }
                     }
                     else
