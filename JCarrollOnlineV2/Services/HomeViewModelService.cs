@@ -45,11 +45,13 @@ namespace JCarrollOnlineV2.Services
             var homeViewModel = new HomeViewModel
             {
                 Message = "JCarrollOnlineV2 Home - Index",
-                BlogFeed = await _blogViewModelService.BuildBlogFeedViewModelAsync().ConfigureAwait(false),
-                LatestForumThreadsViewModel = await BuildLatestForumThreadsViewModelAsync().ConfigureAwait(false),
-                ChatViewModel = await BuildChatViewModelAsync().ConfigureAwait(false),
                 PageContainer = "Home"
             };
+
+            // Run database operations sequentially to avoid DbContext concurrency issues
+            homeViewModel.BlogFeed = await _blogViewModelService.BuildBlogFeedViewModelAsync().ConfigureAwait(false);
+            homeViewModel.LatestForumThreadsViewModel = await BuildLatestForumThreadsViewModelAsync().ConfigureAwait(false);
+            homeViewModel.ChatViewModel = await BuildChatViewModelAsync().ConfigureAwait(false);
 
             return homeViewModel;
         }
@@ -75,42 +77,52 @@ namespace JCarrollOnlineV2.Services
                 PageContainer = "Home"
             };
 
-            // Load user information
-            var user = await _context.ApplicationUser
-                .Include(u => u.MicroPosts)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.Id == userId)
-                .ConfigureAwait(false);
-
-            if (user == null)
+            try
             {
-                _logger.Warn($"User {userId} not found");
-                return await BuildAnonymousHomeViewModelAsync().ConfigureAwait(false);
+                // Load user information first
+                var user = await _context.ApplicationUser
+                    .Include(u => u.MicroPosts)
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync(u => u.Id == userId)
+                    .ConfigureAwait(false);
+
+                if (user == null)
+                {
+                    _logger.Warn($"User {userId} not found");
+                    return await BuildAnonymousHomeViewModelAsync().ConfigureAwait(false);
+                }
+
+                // Set user info
+                homeViewModel.UserInfoViewModel.User.InjectFrom(user);
+                homeViewModel.UserInfoViewModel.UserId = user.Id;
+                homeViewModel.UserInfoViewModel.MicroPostsAuthored = user.MicroPosts.Count;
+
+                // Run all database operations SEQUENTIALLY to avoid DbContext concurrency issues
+                _logger.Info("Loading blog feed...");
+                homeViewModel.BlogFeed = await _blogViewModelService.BuildBlogFeedViewModelAsync().ConfigureAwait(false);
+                
+                _logger.Info("Loading forum threads...");
+                homeViewModel.LatestForumThreadsViewModel = await BuildLatestForumThreadsViewModelAsync().ConfigureAwait(false);
+                
+                _logger.Info("Loading micropost feed...");
+                homeViewModel.MicroPostFeedViewModel = await _microPostViewModelService.BuildMicroPostFeedViewModelAsync(userId, microPostPage ?? 1, 4).ConfigureAwait(false);
+                
+                _logger.Info("Loading user stats...");
+                homeViewModel.UserStatsViewModel = await _userStatsViewModelService.BuildUserStatsViewModelAsync(userId).ConfigureAwait(false);
+                
+                _logger.Info("Loading chat...");
+                homeViewModel.ChatViewModel = await BuildChatViewModelAsync().ConfigureAwait(false);
+                
+                _logger.Info("Loading RSS feed...");
+                homeViewModel.RssFeedViewModel = await _rssService.GetRssFeedAsync().ConfigureAwait(false);
+
+                _logger.Info("Successfully built authenticated home view model");
             }
-
-            // Set user info
-            homeViewModel.UserInfoViewModel.User.InjectFrom(user);
-            homeViewModel.UserInfoViewModel.UserId = user.Id;
-            homeViewModel.UserInfoViewModel.MicroPostsAuthored = user.MicroPosts.Count;
-
-            // Build view models in parallel for better performance
-            var blogFeedTask = _blogViewModelService.BuildBlogFeedViewModelAsync();
-            var forumThreadsTask = BuildLatestForumThreadsViewModelAsync();
-            var microPostFeedTask = _microPostViewModelService.BuildMicroPostFeedViewModelAsync(userId, microPostPage ?? 1, 4);
-            var userStatsTask = _userStatsViewModelService.BuildUserStatsViewModelAsync(userId);
-            var chatTask = BuildChatViewModelAsync();
-            var rssTask = _rssService.GetRssFeedAsync();
-
-            await Task.WhenAll(blogFeedTask, forumThreadsTask, microPostFeedTask, userStatsTask, chatTask, rssTask).ConfigureAwait(false);
-
-            homeViewModel.BlogFeed = await blogFeedTask;
-            homeViewModel.LatestForumThreadsViewModel = await forumThreadsTask;
-            homeViewModel.MicroPostFeedViewModel = await microPostFeedTask;
-            homeViewModel.UserStatsViewModel = await userStatsTask;
-            homeViewModel.ChatViewModel = await chatTask;
-            homeViewModel.RssFeedViewModel = await rssTask;
-
-            _logger.Info("Successfully built authenticated home view model");
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Error building authenticated home view model for user {userId}");
+                throw;
+            }
 
             return homeViewModel;
         }

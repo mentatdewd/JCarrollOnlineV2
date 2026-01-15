@@ -4,6 +4,7 @@ using JCarrollOnlineV2.ViewModels.Users;
 using NLog;
 using Omu.ValueInjecter;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,6 +54,21 @@ namespace JCarrollOnlineV2.Services
 
                 userStatsViewModel.User.InjectFrom(user);
 
+                // Get all user IDs we need to query for micropost counts
+                List<string> allUserIds = new List<string>();
+                allUserIds.AddRange(user.Followers.Select(f => f.Id));
+                allUserIds.AddRange(user.Following.Select(f => f.Id));
+
+                // Get micropost counts for all users in ONE query to avoid multiple database calls
+                _logger.Info($"Loading micropost counts for {allUserIds.Distinct().Count()} users");
+                var microPostCounts = await _context.MicroPost
+                    .AsNoTracking()
+                    .Where(mp => allUserIds.Contains(mp.Author.Id))
+                    .GroupBy(mp => mp.Author.Id)
+                    .Select(g => new { UserId = g.Key, Count = g.Count() })
+                    .ToDictionaryAsync(x => x.UserId, x => x.Count)
+                    .ConfigureAwait(false);
+
                 // Build followers view models
                 _logger.Info($"Processing {user.Followers.Count} followers");
                 foreach (ApplicationUser follower in user.Followers)
@@ -60,12 +76,10 @@ namespace JCarrollOnlineV2.Services
                     var userItemViewModel = new UserItemViewModel(_logger);
                     userItemViewModel.InjectFrom(follower);
                     
-                    // Get micro post count efficiently
-                    userItemViewModel.MicroPostsAuthored = await _context.MicroPost
-                        .AsNoTracking()
-                        .Where(mp => mp.Author.Id == follower.Id)
-                        .CountAsync()
-                        .ConfigureAwait(false);
+                    // Get micro post count from the dictionary
+                    userItemViewModel.MicroPostsAuthored = microPostCounts.ContainsKey(follower.Id) 
+                        ? microPostCounts[follower.Id] 
+                        : 0;
 
                     userStatsViewModel.UserFollowers.Users.Add(userItemViewModel);
                 }
@@ -77,12 +91,10 @@ namespace JCarrollOnlineV2.Services
                     var userItemViewModel = new UserItemViewModel(_logger);
                     userItemViewModel.InjectFrom(followedUser);
                     
-                    // Get micro post count efficiently
-                    userItemViewModel.MicroPostsAuthored = await _context.MicroPost
-                        .AsNoTracking()
-                        .Where(mp => mp.Author.Id == followedUser.Id)
-                        .CountAsync()
-                        .ConfigureAwait(false);
+                    // Get micro post count from the dictionary
+                    userItemViewModel.MicroPostsAuthored = microPostCounts.ContainsKey(followedUser.Id) 
+                        ? microPostCounts[followedUser.Id] 
+                        : 0;
 
                     userStatsViewModel.UsersFollowing.Users.Add(userItemViewModel);
                 }

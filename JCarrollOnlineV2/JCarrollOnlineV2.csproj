@@ -920,6 +920,9 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="EmailTemplates\Web.config" />
     <Content Include="Mvc.sitemap" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
