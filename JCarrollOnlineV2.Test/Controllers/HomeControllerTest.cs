@@ -1,12 +1,10 @@
 ﻿using JCarrollOnlineV2.Controllers;
-using JCarrollOnlineV2.Entities;
-using JCarrollOnlineV2.EntityFramework;
-using JCarrollOnlineV2.Test.DataContexts;
 using JCarrollOnlineV2.Test.Services;
 using JCarrollOnlineV2.ViewModels.Blog;
 using JCarrollOnlineV2.ViewModels.Chat;
 using JCarrollOnlineV2.ViewModels.Home;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,22 +16,13 @@ namespace JCarrollOnlineV2.Test.Controllers
     [TestClass]
     public class HomeControllerTest
     {
-        private FakeJCarrollOnlineV2DbContext _fakeContext;
-        private MockRssService _mockRssService;
+        private static readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
+        private MockHomeViewModelService _mockHomeViewModelService;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            // Setup fake DbContext with empty collections
-            _fakeContext = new FakeJCarrollOnlineV2DbContext();
-            
-            // Initialize required DbSets with empty data
-            _fakeContext.BlogItem = new FakeJCarrollOnlineV2Db<BlogItem>();
-            _fakeContext.ForumThreadEntry = new FakeJCarrollOnlineV2Db<ThreadEntry>();
-            _fakeContext.ChatMessages = new FakeJCarrollOnlineV2Db<ChatMessage>();
-
-            // Initialize mock RSS service
-            _mockRssService = new MockRssService();
+            _mockHomeViewModelService = new MockHomeViewModelService();
         }
 
         #region Index Tests
@@ -42,7 +31,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_ReturnsViewResult_WithHomeViewModel()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -57,7 +46,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_SetsCorrectMessage()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -72,7 +61,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_SetsCorrectPageContainer()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -87,7 +76,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_InitializesBlogFeed()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -103,7 +92,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_InitializesChatViewModel()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -119,7 +108,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_InitializesLatestForumThreadsViewModel()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -135,26 +124,32 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithChatMessages_LoadsRecentMessages()
         {
             // Arrange
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "testuser" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
-
-            _fakeContext.ChatMessages.Add(new ChatMessage
+            HomeViewModel homeViewModel = new HomeViewModel
             {
-                Id = 1,
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
+
+            homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
+            {
+                UserName = "testuser",
                 Message = "Test message 1",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddMinutes(-10)
-            });
-            _fakeContext.ChatMessages.Add(new ChatMessage
-            {
-                Id = 2,
-                Message = "Test message 2",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddMinutes(-5)
+                TimeAgo = DateTime.Now.AddMinutes(-10).ToUniversalTime().ToString("o")
             });
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
+            {
+                UserName = "testuser",
+                Message = "Test message 2",
+                TimeAgo = DateTime.Now.AddMinutes(-5).ToUniversalTime().ToString("o")
+            });
+
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -169,33 +164,39 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithChatMessages_OrdersChronologically()
         {
             // Arrange
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "testuser" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
-
-            _fakeContext.ChatMessages.Add(new ChatMessage
+            HomeViewModel homeViewModel = new HomeViewModel
             {
-                Id = 1,
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
+
+            homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
+            {
+                UserName = "testuser",
                 Message = "First message",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddMinutes(-10)
-            });
-            _fakeContext.ChatMessages.Add(new ChatMessage
-            {
-                Id = 2,
-                Message = "Third message",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddMinutes(-3)
-            });
-            _fakeContext.ChatMessages.Add(new ChatMessage
-            {
-                Id = 3,
-                Message = "Second message",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddMinutes(-7)
+                TimeAgo = DateTime.Now.AddMinutes(-10).ToUniversalTime().ToString("o")
             });
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
+            {
+                UserName = "testuser",
+                Message = "Second message",
+                TimeAgo = DateTime.Now.AddMinutes(-7).ToUniversalTime().ToString("o")
+            });
+
+            homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
+            {
+                UserName = "testuser",
+                Message = "Third message",
+                TimeAgo = DateTime.Now.AddMinutes(-3).ToUniversalTime().ToString("o")
+            });
+
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -214,23 +215,29 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithMoreThan50ChatMessages_LoadsOnly50()
         {
             // Arrange
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "testuser" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
-
-            // Add 60 chat messages
-            for (int i = 1; i <= 60; i++)
+            HomeViewModel homeViewModel = new HomeViewModel
             {
-                _fakeContext.ChatMessages.Add(new ChatMessage
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
+
+            // Add 50 chat messages (service should limit to 50)
+            for (int i = 1; i <= 50; i++)
+            {
+                homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
                 {
-                    Id = i,
+                    UserName = "testuser",
                     Message = $"Test message {i}",
-                    Author = testUser,
-                    CreatedAt = DateTime.Now.AddMinutes(-i)
+                    TimeAgo = DateTime.Now.AddMinutes(-i).ToUniversalTime().ToString("o")
                 });
             }
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -245,22 +252,27 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithBlogItems_LoadsBlogFeed()
         {
             // Arrange
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "blogauthor" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
+            HomeViewModel homeViewModel = new HomeViewModel
+            {
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
 
-            _fakeContext.BlogItem.Add(new BlogItem
+            homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(new BlogFeedItemViewModel
             {
                 Id = 1,
                 Title = "Test Blog Post",
                 Content = "Test content",
-                Author = testUser,
                 CreatedAt = DateTime.Now.AddDays(-1),
-                UpdatedAt = DateTime.Now.AddDays(-1),
-                BlogItemComments = new System.Collections.ObjectModel.Collection<BlogItemComment>()
+                UpdatedAt = DateTime.Now.AddDays(-1)
             });
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -275,36 +287,37 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithBlogItemsWithComments_LoadsComments()
         {
             // Arrange
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "blogauthor" };
-            ApplicationUser commentUser = new ApplicationUser { Id = "test-user-2", UserName = "commenter" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
-            _fakeContext.ApplicationUser.Add(commentUser);
+            HomeViewModel homeViewModel = new HomeViewModel
+            {
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
 
-            BlogItem blogItem = new BlogItem
+            BlogFeedItemViewModel blogFeedItem = new BlogFeedItemViewModel
             {
                 Id = 1,
                 Title = "Test Blog Post",
                 Content = "Test content",
-                Author = testUser,
                 CreatedAt = DateTime.Now.AddDays(-1),
-                UpdatedAt = DateTime.Now.AddDays(-1),
-                BlogItemComments = new System.Collections.ObjectModel.Collection<BlogItemComment>()
+                UpdatedAt = DateTime.Now.AddDays(-1)
             };
 
-            BlogItemComment comment = new BlogItemComment
+            blogFeedItem.Comments.BlogComments.Add(new BlogCommentItemViewModel(1)
             {
                 Id = 1,
                 Content = "Test comment",
-                Author = commentUser.UserName,
-                BlogItem = blogItem,
+                Author = "commenter",
+                BlogItemId = 1,
                 CreatedAt = DateTime.Now.AddHours(-2)
-            };
+            });
 
-            blogItem.BlogItemComments.Add(comment);
-            _fakeContext.BlogItem.Add(blogItem);
+            homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(blogFeedItem);
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -322,44 +335,43 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithMultipleBlogItems_OrdersByUpdatedAtDescending()
         {
             // Arrange
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "blogauthor" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
-
-            _fakeContext.BlogItem.Add(new BlogItem
+            HomeViewModel homeViewModel = new HomeViewModel
             {
-                Id = 1,
-                Title = "Older Blog Post",
-                Content = "Test content 1",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddDays(-3),
-                UpdatedAt = DateTime.Now.AddDays(-3),
-                BlogItemComments = new System.Collections.ObjectModel.Collection<BlogItemComment>()
-            });
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
 
-            _fakeContext.BlogItem.Add(new BlogItem
-            {
-                Id = 2,
-                Title = "Newer Blog Post",
-                Content = "Test content 2",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddDays(-1),
-                UpdatedAt = DateTime.Now.AddDays(-1),
-                BlogItemComments = new System.Collections.ObjectModel.Collection<BlogItemComment>()
-            });
-
-            _fakeContext.BlogItem.Add(new BlogItem
+            // Service should return these in order
+            homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(new BlogFeedItemViewModel
             {
                 Id = 3,
                 Title = "Newest Blog Post",
                 Content = "Test content 3",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddDays(-2),
-                UpdatedAt = DateTime.Now.AddHours(-1), // Most recently updated
-                BlogItemComments = new System.Collections.ObjectModel.Collection<BlogItemComment>()
+                UpdatedAt = DateTime.Now.AddHours(-1)
             });
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(new BlogFeedItemViewModel
+            {
+                Id = 2,
+                Title = "Newer Blog Post",
+                Content = "Test content 2",
+                UpdatedAt = DateTime.Now.AddDays(-1)
+            });
+
+            homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(new BlogFeedItemViewModel
+            {
+                Id = 1,
+                Title = "Older Blog Post",
+                Content = "Test content 1",
+                UpdatedAt = DateTime.Now.AddDays(-3)
+            });
+
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -378,28 +390,26 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithForumThreads_LoadsLatestThreads()
         {
             // Arrange
-            Forum testForum = new Forum
+            HomeViewModel homeViewModel = new HomeViewModel
             {
-                Id = 1,
-                Title = "Test Forum",
-                Description = "Test Description",
-                CreatedAt = DateTime.Now.AddDays(-30),
-                UpdatedAt = DateTime.Now.AddDays(-1)
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
             };
 
-            _fakeContext.Forum = new FakeJCarrollOnlineV2Db<Forum>();
-            _fakeContext.Forum.Add(testForum);
-
-            _fakeContext.ForumThreadEntry.Add(new ThreadEntry
+            homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(new LatestForumThreadItemViewModel
             {
-                Id = 1,
-                Title = "Test Thread",
-                Forum = testForum,
-                CreatedAt = DateTime.Now.AddHours(-2),
-                UpdatedAt = DateTime.Now.AddHours(-1)
+                ThreadId = 1,
+                ThreadTitle = "Test Thread",
+                ForumId = 1,
+                ForumTitle = "Test Forum"
             });
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -417,32 +427,30 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithMoreThanFiveForumThreads_LoadsOnlyTopFive()
         {
             // Arrange
-            Forum testForum = new Forum
+            HomeViewModel homeViewModel = new HomeViewModel
             {
-                Id = 1,
-                Title = "Test Forum",
-                Description = "Test Description",
-                CreatedAt = DateTime.Now.AddDays(-30),
-                UpdatedAt = DateTime.Now.AddDays(-1)
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
             };
 
-            _fakeContext.Forum = new FakeJCarrollOnlineV2Db<Forum>();
-            _fakeContext.Forum.Add(testForum);
-
-            // Add 7 threads
-            for (int i = 1; i <= 7; i++)
+            // Add only 5 threads (service should limit to 5)
+            for (int i = 1; i <= 5; i++)
             {
-                _fakeContext.ForumThreadEntry.Add(new ThreadEntry
+                homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(new LatestForumThreadItemViewModel
                 {
-                    Id = i,
-                    Title = $"Test Thread {i}",
-                    Forum = testForum,
-                    CreatedAt = DateTime.Now.AddHours(-i),
-                    UpdatedAt = DateTime.Now.AddHours(-i)
+                    ThreadId = i,
+                    ThreadTitle = $"Test Thread {i}",
+                    ForumId = 1,
+                    ForumTitle = "Test Forum"
                 });
             }
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -457,46 +465,43 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithMultipleForumThreads_OrdersByUpdatedAtDescending()
         {
             // Arrange
-            Forum testForum = new Forum
+            HomeViewModel homeViewModel = new HomeViewModel
             {
-                Id = 1,
-                Title = "Test Forum",
-                Description = "Test Description",
-                CreatedAt = DateTime.Now.AddDays(-30),
-                UpdatedAt = DateTime.Now.AddDays(-1)
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
             };
 
-            _fakeContext.Forum = new FakeJCarrollOnlineV2Db<Forum>();
-            _fakeContext.Forum.Add(testForum);
-
-            _fakeContext.ForumThreadEntry.Add(new ThreadEntry
+            // Service should return these in order
+            homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(new LatestForumThreadItemViewModel
             {
-                Id = 1,
-                Title = "Oldest Thread",
-                Forum = testForum,
-                CreatedAt = DateTime.Now.AddDays(-5),
-                UpdatedAt = DateTime.Now.AddDays(-5)
+                ThreadId = 2,
+                ThreadTitle = "Newest Thread",
+                ForumId = 1,
+                ForumTitle = "Test Forum"
             });
 
-            _fakeContext.ForumThreadEntry.Add(new ThreadEntry
+            homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(new LatestForumThreadItemViewModel
             {
-                Id = 2,
-                Title = "Newest Thread",
-                Forum = testForum,
-                CreatedAt = DateTime.Now.AddHours(-1),
-                UpdatedAt = DateTime.Now.AddHours(-1)
+                ThreadId = 3,
+                ThreadTitle = "Middle Thread",
+                ForumId = 1,
+                ForumTitle = "Test Forum"
             });
 
-            _fakeContext.ForumThreadEntry.Add(new ThreadEntry
+            homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(new LatestForumThreadItemViewModel
             {
-                Id = 3,
-                Title = "Middle Thread",
-                Forum = testForum,
-                CreatedAt = DateTime.Now.AddDays(-2),
-                UpdatedAt = DateTime.Now.AddDays(-2)
+                ThreadId = 1,
+                ThreadTitle = "Oldest Thread",
+                ForumId = 1,
+                ForumTitle = "Test Forum"
             });
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -514,54 +519,41 @@ namespace JCarrollOnlineV2.Test.Controllers
         [TestMethod]
         public async Task Index_WithAllDataTypes_LoadsAllSections()
         {
-            // Arrange - Setup all data types
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "testuser" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
+            // Arrange
+            HomeViewModel homeViewModel = new HomeViewModel
+            {
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
 
-            // Add blog item
-            _fakeContext.BlogItem.Add(new BlogItem
+            homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(new BlogFeedItemViewModel
             {
                 Id = 1,
                 Title = "Test Blog",
-                Content = "Content",
-                Author = testUser,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-                BlogItemComments = new System.Collections.ObjectModel.Collection<BlogItemComment>()
+                Content = "Content"
             });
 
-            // Add forum thread
-            Forum testForum = new Forum
+            homeViewModel.LatestForumThreadsViewModel.LatestForumThreads.Add(new LatestForumThreadItemViewModel
             {
-                Id = 1,
-                Title = "Test Forum",
-                Description = "Description",
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-            _fakeContext.Forum = new FakeJCarrollOnlineV2Db<Forum>();
-            _fakeContext.Forum.Add(testForum);
-
-            _fakeContext.ForumThreadEntry.Add(new ThreadEntry
-            {
-                Id = 1,
-                Title = "Test Thread",
-                Forum = testForum,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                ThreadId = 1,
+                ThreadTitle = "Test Thread",
+                ForumId = 1,
+                ForumTitle = "Test Forum"
             });
 
-            // Add chat message
-            _fakeContext.ChatMessages.Add(new ChatMessage
+            homeViewModel.ChatViewModel.RecentMessages.Add(new ChatMessageViewModel
             {
-                Id = 1,
+                UserName = "testuser",
                 Message = "Test Chat Message",
-                Author = testUser,
-                CreatedAt = DateTime.Now
+                TimeAgo = DateTime.Now.ToUniversalTime().ToString("o")
             });
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
+
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -582,55 +574,47 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Index_WithBlogItemMultipleComments_LoadsAllComments()
         {
             // Arrange
-            ApplicationUser testUser = new ApplicationUser { Id = "test-user-1", UserName = "author" };
-            ApplicationUser commenter1 = new ApplicationUser { Id = "test-user-2", UserName = "commenter1" };
-            ApplicationUser commenter2 = new ApplicationUser { Id = "test-user-3", UserName = "commenter2" };
-            _fakeContext.ApplicationUser = new FakeJCarrollOnlineV2Db<ApplicationUser>();
-            _fakeContext.ApplicationUser.Add(testUser);
-            _fakeContext.ApplicationUser.Add(commenter1);
-            _fakeContext.ApplicationUser.Add(commenter2);
+            HomeViewModel homeViewModel = new HomeViewModel
+            {
+                Message = "JCarrollOnlineV2 Home - Index",
+                BlogFeed = new BlogFeedViewModel(),
+                LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
+                ChatViewModel = new ChatViewModel(),
+                PageContainer = "Home"
+            };
 
-            BlogItem blogItem = new BlogItem
+            BlogFeedItemViewModel blogFeedItem = new BlogFeedItemViewModel
             {
                 Id = 1,
                 Title = "Test Blog Post",
-                Content = "Test content",
-                Author = testUser,
-                CreatedAt = DateTime.Now.AddDays(-1),
-                UpdatedAt = DateTime.Now.AddDays(-1),
-                BlogItemComments = new System.Collections.ObjectModel.Collection<BlogItemComment>()
+                Content = "Test content"
             };
 
-            blogItem.BlogItemComments.Add(new BlogItemComment
+            blogFeedItem.Comments.BlogComments.Add(new BlogCommentItemViewModel(1)
             {
                 Id = 1,
                 Content = "First comment",
-                Author = commenter1.UserName,
-                BlogItem = blogItem,
-                CreatedAt = DateTime.Now.AddHours(-5)
+                Author = "commenter1"
             });
 
-            blogItem.BlogItemComments.Add(new BlogItemComment
+            blogFeedItem.Comments.BlogComments.Add(new BlogCommentItemViewModel(1)
             {
                 Id = 2,
                 Content = "Second comment",
-                Author = commenter2.UserName,
-                BlogItem = blogItem,
-                CreatedAt = DateTime.Now.AddHours(-3)
+                Author = "commenter2"
             });
 
-            blogItem.BlogItemComments.Add(new BlogItemComment
+            blogFeedItem.Comments.BlogComments.Add(new BlogCommentItemViewModel(1)
             {
                 Id = 3,
                 Content = "Third comment",
-                Author = commenter1.UserName,
-                BlogItem = blogItem,
-                CreatedAt = DateTime.Now.AddHours(-1)
+                Author = "commenter1"
             });
 
-            _fakeContext.BlogItem.Add(blogItem);
+            homeViewModel.BlogFeed.BlogFeedItemViewModels.Add(blogFeedItem);
+            _mockHomeViewModelService.MockAnonymousViewModel = homeViewModel;
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -645,9 +629,9 @@ namespace JCarrollOnlineV2.Test.Controllers
         [TestMethod]
         public async Task Index_WithEmptyData_ReturnsViewModelWithEmptyCollections()
         {
-            // Arrange - No data added
+            // Arrange - Mock service returns default empty view model
 
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = await controller.Index(null).ConfigureAwait(false) as ViewResult;
@@ -655,9 +639,9 @@ namespace JCarrollOnlineV2.Test.Controllers
 
                 // Assert
                 Assert.IsNotNull(vm);
-                Assert.HasCount(0, vm.BlogFeed.BlogFeedItemViewModels);
-                Assert.HasCount(0, vm.LatestForumThreadsViewModel.LatestForumThreads);
-                Assert.HasCount(0, vm.ChatViewModel.RecentMessages);
+                Assert.IsEmpty(vm.BlogFeed.BlogFeedItemViewModels);
+                Assert.IsEmpty(vm.LatestForumThreadsViewModel.LatestForumThreads);
+                Assert.IsEmpty(vm.ChatViewModel.RecentMessages);
                 Assert.AreEqual("JCarrollOnlineV2 Home - Index", vm.Message);
                 Assert.AreEqual("Home", vm.PageContainer);
             }
@@ -671,7 +655,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void About_ReturnsViewResult_WithAboutViewModel()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = controller.About() as ViewResult;
@@ -686,7 +670,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void About_SetsCorrectMessage()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = controller.About() as ViewResult;
@@ -701,7 +685,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void About_SetsCorrectPageContainer()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = controller.About() as ViewResult;
@@ -720,7 +704,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Contact_ReturnsViewResult_WithContactViewModel()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = controller.Contact() as ViewResult;
@@ -735,7 +719,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Contact_SetsCorrectMessage()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = controller.Contact() as ViewResult;
@@ -750,7 +734,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Contact_SetsCorrectPageContainer()
         {
             // Arrange
-            using (HomeController controller = new HomeController(_fakeContext, _mockRssService))
+            using (HomeController controller = new HomeController(_mockHomeViewModelService))
             {
                 // Act
                 ViewResult result = controller.Contact() as ViewResult;
@@ -769,7 +753,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Welcome_ReturnsViewResult_WithHomeViewModel()
         {
             // Arrange
-            HomeController controller = new HomeController(_fakeContext, _mockRssService);
+            HomeController controller = new HomeController(_mockHomeViewModelService);
 
             // Act
             ViewResult result = await controller.Welcome() as ViewResult;
@@ -783,7 +767,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Welcome_WithoutAuthentication_ReturnsWelcomeView()
         {
             // Arrange
-            HomeController controller = new HomeController(_fakeContext, _mockRssService);
+            HomeController controller = new HomeController(_mockHomeViewModelService);
 
             // Act
             ViewResult result = await controller.Welcome() as ViewResult;
@@ -799,7 +783,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Welcome_SetsCorrectMessage()
         {
             // Arrange
-            HomeController controller = new HomeController(_fakeContext, _mockRssService);
+            HomeController controller = new HomeController(_mockHomeViewModelService);
 
             // Act
             ViewResult result = await controller.Welcome() as ViewResult;
@@ -813,7 +797,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public async Task Welcome_SetsCorrectPageContainer()
         {
             // Arrange
-            HomeController controller = new HomeController(_fakeContext, _mockRssService);
+            HomeController controller = new HomeController(_mockHomeViewModelService);
 
             // Act
             ViewResult result = await controller.Welcome() as ViewResult;
@@ -828,27 +812,12 @@ namespace JCarrollOnlineV2.Test.Controllers
         #region Constructor Tests
 
         [TestMethod]
-        public void Constructor_WithNullContext_ThrowsArgumentNullException()
+        public void Constructor_WithNullService_ThrowsArgumentNullException()
         {
             // Act & Assert
             try
             {
-                HomeController controller = new HomeController(null, _mockRssService);
-                Assert.Fail("Expected ArgumentNullException was not thrown.");
-            }
-            catch (ArgumentNullException)
-            {
-                // Expected exception
-            }
-        }
-
-        [TestMethod]
-        public void Constructor_WithNullRssService_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            try
-            {
-                HomeController controller = new HomeController(_fakeContext, null);
+                HomeController controller = new HomeController(null);
                 Assert.Fail("Expected ArgumentNullException was not thrown.");
             }
             catch (ArgumentNullException)
@@ -861,7 +830,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Constructor_WithValidParameters_CreatesController()
         {
             // Act
-            HomeController controller = new HomeController(_fakeContext, _mockRssService);
+            HomeController controller = new HomeController(_mockHomeViewModelService);
 
             // Assert
             Assert.IsNotNull(controller);

@@ -34,6 +34,23 @@ namespace JCarrollOnlineV2
                 .As<IRssService>()
                 .InstancePerRequest();
 
+            // Register ViewModel services
+            builder.RegisterType<BlogViewModelService>()
+                .As<IBlogViewModelService>()
+                .InstancePerRequest();
+
+            builder.RegisterType<MicroPostViewModelService>()
+                .As<IMicroPostViewModelService>()
+                .InstancePerRequest();
+
+            builder.RegisterType<UserStatsViewModelService>()
+                .As<IUserStatsViewModelService>()
+                .InstancePerRequest();
+
+            builder.RegisterType<HomeViewModelService>()
+                .As<IHomeViewModelService>()
+                .InstancePerRequest();
+
             // Register NLog
             builder.Register(c => LogManager.GetCurrentClassLogger())
                 .As<ILogger>()

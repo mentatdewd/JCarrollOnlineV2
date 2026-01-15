@@ -54,6 +54,11 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Replace the Forum DbSet with our fake
             var forumProperty = typeof(JCarrollOnlineV2DbContext).GetProperty("Forum");
             forumProperty.SetValue(_testContext, fakeForumSet);
+
+            // Setup fake ForumThreadEntry DbSet (empty, but prevents database access)
+            var fakeThreadEntrySet = new FakeJCarrollOnlineV2Db<ThreadEntry>();
+            var threadEntryProperty = typeof(JCarrollOnlineV2DbContext).GetProperty("ForumThreadEntry");
+            threadEntryProperty.SetValue(_testContext, fakeThreadEntrySet);
         }
 
         [TestCleanup]

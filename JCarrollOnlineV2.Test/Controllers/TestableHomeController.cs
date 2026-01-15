@@ -1,5 +1,4 @@
 using JCarrollOnlineV2.Controllers;
-using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.Services;
 
 namespace JCarrollOnlineV2.Test.Controllers
@@ -9,10 +8,10 @@ namespace JCarrollOnlineV2.Test.Controllers
     /// </summary>
     public class TestableHomeController : HomeController
     {
-        public TestableHomeController(JCarrollOnlineV2DbContext context, IRssService rssService) 
-            : base(context, rssService)
+        public TestableHomeController(IHomeViewModelService homeViewModelService) 
+            : base(homeViewModelService)
         {
-            // The base constructor already handles context and service initialization
+            // The base constructor already handles service initialization
             // No additional setup needed
         }
     }
