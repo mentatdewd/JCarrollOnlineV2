@@ -1,4 +1,4 @@
-﻿name: Deploy to HostGator
+name: Deploy to HostGator
 
 on:
   push:
@@ -6,14 +6,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  # Step 1: Run unit tests
+  test:
+    name: ?? Run Unit Tests
+    uses: ./.github/workflows/unit-tests.yml
+  
+  # Step 2: Build for production (only if tests pass)
+  build:
+    name: ?? Build for Production
+    needs: test
     runs-on: windows-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        lfs: true  # Add this to pull Git LFS files if you're using them
+        lfs: true
     
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
@@ -35,10 +43,9 @@ jobs:
         Write-Host "Restoring NuGet packages..." -ForegroundColor Cyan
         nuget restore JCarrollOnlineV2.sln
         
-        # Quick verification
         if (Test-Path "packages") {
           $count = (Get-ChildItem -Path "packages" -Directory).Count
-          Write-Host "✓ Restored $count packages" -ForegroundColor Green
+          Write-Host "? Restored $count packages" -ForegroundColor Green
         }
     
     - name: Clean and prepare output
@@ -53,10 +60,19 @@ jobs:
         }
         
         New-Item -ItemType Directory -Path "publish-output" -Force | Out-Null
-        Write-Host "✓ Cleaned and created publish directory" -ForegroundColor Green
+        Write-Host "? Cleaned and created publish directory" -ForegroundColor Green
     
-    - name: Build solution
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /p:DebugType=None /t:Build /v:minimal /m
+    - name: Build solution for production
+      shell: pwsh
+      run: |
+        Write-Host "Building solution in Release configuration..." -ForegroundColor Cyan
+        msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /p:DebugType=None /t:Build /v:minimal /m
+        
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "? Production build failed!"
+          exit 1
+        }
+        Write-Host "? Production build succeeded" -ForegroundColor Green
     
     - name: Copy files for deployment
       shell: pwsh
@@ -74,7 +90,7 @@ jobs:
         $gamesPath = Join-Path $destDir "Content\games\Build"
         if (Test-Path $gamesPath) {
           $fileCount = (Get-ChildItem -Path $gamesPath -File).Count
-          Write-Host "✓ Found $fileCount Unity WebGL files in Content/games/Build" -ForegroundColor Green
+          Write-Host "? Found $fileCount Unity WebGL files in Content/games/Build" -ForegroundColor Green
           Get-ChildItem -Path $gamesPath -File | ForEach-Object {
             Write-Host "  - $($_.Name) ($([math]::Round($_.Length / 1MB, 2)) MB)" -ForegroundColor Gray
           }
@@ -98,18 +114,18 @@ jobs:
         if (Test-Path $binSource) {
           robocopy $binSource $binDest /E /NFL /NDL /NJH /NJS /nc /ns /np
           if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
-          Write-Host "✓ Files copied successfully" -ForegroundColor Green
+          Write-Host "? Files copied successfully" -ForegroundColor Green
         } else {
           Write-Error "Bin folder not found"
           exit 1
         }
     
-    - name: Verify and prepare deployment
-      id: find-publish
+    - name: Verify build artifacts
+      id: verify-build
       shell: pwsh
       run: |
         $publishPath = "publish-output"
-        Write-Host "Verifying deployment files..." -ForegroundColor Cyan
+        Write-Host "Verifying build artifacts..." -ForegroundColor Cyan
         
         # Check critical files
         $criticalFiles = @(
@@ -119,11 +135,18 @@ jobs:
           "$publishPath\bin\EntityFramework.dll"
         )
         
+        $allFilesExist = $true
         foreach ($file in $criticalFiles) {
           if (-not (Test-Path $file)) {
-            Write-Error "Missing critical file: $file"
-            exit 1
+            Write-Error "? Missing critical file: $file"
+            $allFilesExist = $false
+          } else {
+            Write-Host "? Found: $file" -ForegroundColor Green
           }
+        }
+        
+        if (-not $allFilesExist) {
+          exit 1
         }
         
         # Verify Unity WebGL files
@@ -138,16 +161,141 @@ jobs:
             Write-Warning "Unity file not found: $file"
           } else {
             $size = (Get-Item $file).Length
-            Write-Host "✓ Found: $file ($([math]::Round($size / 1MB, 2)) MB)" -ForegroundColor Green
+            Write-Host "? Found: $file ($([math]::Round($size / 1MB, 2)) MB)" -ForegroundColor Green
           }
         }
         
-        # Output paths
+        Write-Host "? All critical files verified" -ForegroundColor Green
+        
+        # Store paths for next job
         $fullPath = (Resolve-Path $publishPath).Path
         echo "PUBLISH_PATH=$fullPath" >> $env:GITHUB_OUTPUT
         echo "PUBLISH_PATH_RELATIVE=$publishPath" >> $env:GITHUB_OUTPUT
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-build
+        path: publish-output/
+        retention-days: 7
+  
+  # Step 2: Test the production build
+  test:
+    name: ?? Test Production Build
+    needs: build
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: production-build
+        path: publish-output
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Run unit tests on production build
+      shell: pwsh
+      run: |
+        Write-Host "Running tests against production build..." -ForegroundColor Cyan
         
-        Write-Host "✓ All critical files verified" -ForegroundColor Green
+        # Find vstest.console.exe
+        $vstest = "${env:VSINSTALLDIR}Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+        if (-not (Test-Path $vstest)) {
+          $vstest = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+        }
+        if (-not (Test-Path $vstest)) {
+          $vstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+        }
+        
+        Write-Host "Using test runner: $vstest" -ForegroundColor Gray
+        
+        # Find test assemblies from the build output
+        $testAssemblies = Get-ChildItem -Path "publish-output\bin" -Recurse -Filter "*Test.dll" | Where-Object { $_.FullName -notlike "*\ref\*" }
+        
+        if ($testAssemblies.Count -eq 0) {
+          Write-Error "No test assemblies found in build output"
+          exit 1
+        }
+        
+        Write-Host "Found $($testAssemblies.Count) test assemblies:" -ForegroundColor Green
+        $testAssemblies | ForEach-Object { Write-Host "  - $($_.Name)" -ForegroundColor Gray }
+        
+        # Run tests
+        New-Item -ItemType Directory -Force -Path "TestResults" | Out-Null
+        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults
+        
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "Tests failed with exit code $LASTEXITCODE"
+          exit $LASTEXITCODE
+        }
+        
+        Write-Host "? All tests passed!" -ForegroundColor Green
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: TestResults/*.trx
+    
+    - name: Publish test results
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      with:
+        files: TestResults/**/*.trx
+        check_name: Production Build Test Results
+  
+  # Step 3: Deploy to HostGator (only if build succeeds AND tests pass)
+  deploy:
+    name: ?? Deploy to HostGator
+    needs: [build, test]
+    runs-on: windows-latest
+    environment:
+      name: production
+      url: https://jcarrollonline.com
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: production-build
+        path: publish-output
+    
+    - name: Verify downloaded artifacts
+      id: find-publish
+      shell: pwsh
+      run: |
+        $publishPath = "publish-output"
+        Write-Host "Verifying downloaded artifacts..." -ForegroundColor Cyan
+        
+        # Check critical files exist
+        $criticalFiles = @(
+          "$publishPath\Web.config",
+          "$publishPath\Global.asax",
+          "$publishPath\bin\JCarrollOnlineV2.dll"
+        )
+        
+        foreach ($file in $criticalFiles) {
+          if (-not (Test-Path $file)) {
+            Write-Error "? Missing critical file after download: $file"
+            exit 1
+          }
+        }
+        
+        Write-Host "? All artifacts verified" -ForegroundColor Green
+        
+        # Store paths for deployment
+        $fullPath = (Resolve-Path $publishPath).Path
+        echo "PUBLISH_PATH=$fullPath" >> $env:GITHUB_OUTPUT
+        echo "PUBLISH_PATH_RELATIVE=$publishPath" >> $env:GITHUB_OUTPUT
     
     - name: Replace secrets in Web.config
       shell: pwsh
@@ -161,10 +309,11 @@ jobs:
         $webConfigPath = Join-Path "${{ steps.find-publish.outputs.PUBLISH_PATH }}" "Web.config"
         
         if (-not (Test-Path $webConfigPath)) {
-          Write-Error "Web.config not found"
+          Write-Error "Web.config not found at: $webConfigPath"
           exit 1
         }
         
+        Write-Host "Updating Web.config..." -ForegroundColor Cyan
         [xml]$xml = Get-Content $webConfigPath
         
         # Remove configBuilders from connectionStrings
@@ -177,11 +326,11 @@ jobs:
         foreach ($add in $connStrings.add) {
           if ($add.connectionString -eq "__DEV_CONNECTION_STRING__") {
             $add.connectionString = $env:DEV_CONN
-            Write-Host "✓ Replaced __DEV_CONNECTION_STRING__" -ForegroundColor Green
+            Write-Host "? Replaced __DEV_CONNECTION_STRING__" -ForegroundColor Green
           }
           if ($add.connectionString -eq "__PROD_CONNECTION_STRING__") {
             $add.connectionString = $env:PROD_CONN
-            Write-Host "✓ Replaced __PROD_CONNECTION_STRING__" -ForegroundColor Green
+            Write-Host "? Replaced __PROD_CONNECTION_STRING__" -ForegroundColor Green
           }
         }
         
@@ -190,13 +339,13 @@ jobs:
         if ($appSettings) {
           if ($appSettings.HasAttribute("configBuilders")) {
             $appSettings.RemoveAttribute("configBuilders")
-            Write-Host "✓ Removed configBuilders from appSettings" -ForegroundColor Green
+            Write-Host "? Removed configBuilders from appSettings" -ForegroundColor Green
           }
           
           foreach ($add in $appSettings.add) {
             if ($add.value -eq "__SMTP_PASSWORD__") {
               $add.value = $env:SMTP_PWD
-              Write-Host "✓ Replaced __SMTP_PASSWORD__" -ForegroundColor Green
+              Write-Host "? Replaced __SMTP_PASSWORD__" -ForegroundColor Green
             }
           }
         }
@@ -208,11 +357,11 @@ jobs:
           if ($machineKey) {
             if ($machineKey.validationKey -eq "__MACHINEKEY_VALIDATION__") {
               $machineKey.validationKey = $env:MACH_VAL
-              Write-Host "✓ Replaced __MACHINEKEY_VALIDATION__" -ForegroundColor Green
+              Write-Host "? Replaced __MACHINEKEY_VALIDATION__" -ForegroundColor Green
             }
             if ($machineKey.decryptionKey -eq "__MACHINEKEY_DECRYPTION__") {
               $machineKey.decryptionKey = $env:MACH_DEC
-              Write-Host "✓ Replaced __MACHINEKEY_DECRYPTION__" -ForegroundColor Green
+              Write-Host "? Replaced __MACHINEKEY_DECRYPTION__" -ForegroundColor Green
             }
           }
           
@@ -220,7 +369,7 @@ jobs:
           $compilation = $systemWeb.compilation
           if ($compilation -and $compilation.debug -eq "true") {
             $compilation.debug = "false"
-            Write-Host "✓ Set debug=false" -ForegroundColor Green
+            Write-Host "? Set debug=false" -ForegroundColor Green
           }
         }
         
@@ -230,7 +379,7 @@ jobs:
           $network = $systemNet.mailSettings.smtp.network
           if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
             $network.password = $env:SMTP_PWD
-            Write-Host "✓ Replaced legacy __SMTP_PASSWORD__" -ForegroundColor Green
+            Write-Host "? Replaced legacy __SMTP_PASSWORD__" -ForegroundColor Green
           }
         }
         
@@ -262,7 +411,7 @@ jobs:
           }
         }
         
-        Write-Host "✓ Web.config successfully updated and verified" -ForegroundColor Green
+        Write-Host "? Web.config successfully updated and verified" -ForegroundColor Green
     
     - name: Deploy to HostGator via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -284,3 +433,28 @@ jobs:
           **/.vs/**
           **/Web.Release.config
           **/Web.Debug.config
+    
+    - name: Deployment summary
+      if: success()
+      shell: pwsh
+      run: |
+        Write-Host "================================" -ForegroundColor Green
+        Write-Host "  DEPLOYMENT SUCCESSFUL! ??" -ForegroundColor Green
+        Write-Host "================================" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "Environment: Production (HostGator)" -ForegroundColor Cyan
+        Write-Host "Branch: $env:GITHUB_REF_NAME" -ForegroundColor Cyan
+        Write-Host "Commit: $env:GITHUB_SHA" -ForegroundColor Cyan
+        Write-Host "Deployed by: $env:GITHUB_ACTOR" -ForegroundColor Cyan
+        Write-Host ""
+        
+        # Add to GitHub step summary
+        Add-Content $env:GITHUB_STEP_SUMMARY "### Deployment Complete! :rocket:"
+        Add-Content $env:GITHUB_STEP_SUMMARY ""
+        Add-Content $env:GITHUB_STEP_SUMMARY "| Property | Value |"
+        Add-Content $env:GITHUB_STEP_SUMMARY "|----------|-------|"
+        Add-Content $env:GITHUB_STEP_SUMMARY "| **Environment** | Production (HostGator) |"
+        Add-Content $env:GITHUB_STEP_SUMMARY "| **Branch** | $env:GITHUB_REF_NAME |"
+        Add-Content $env:GITHUB_STEP_SUMMARY "| **Commit** | $env:GITHUB_SHA |"
+        Add-Content $env:GITHUB_STEP_SUMMARY "| **Deployed by** | $env:GITHUB_ACTOR |"
+        Add-Content $env:GITHUB_STEP_SUMMARY "| **URL** | https://jcarrollonline.com |"

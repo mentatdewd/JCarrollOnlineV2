@@ -1,0 +1,87 @@
+name: Unit Tests
+
+on:
+  workflow_call:
+    outputs:
+      test-result:
+        description: "Result of unit tests"
+        value: ${{ jobs.test.outputs.result }}
+  workflow_dispatch:
+  pull_request:
+    branches: [ master, main ]
+  push:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    outputs:
+      result: ${{ steps.test.outcome }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET Framework
+      uses: microsoft/setup-msbuild@v1.3
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+      
+    - name: Restore NuGet packages
+      run: nuget restore JCarrollOnlineV2.sln
+      
+    - name: Build solution
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU"
+      
+    - name: Run unit tests
+      id: test
+      run: |
+        # Install VSTest if not available
+        dotnet tool install --global dotnet-coverage
+        
+        # Run tests using vstest.console.exe
+        $vstest = "${env:VSINSTALLDIR}Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+        if (-not (Test-Path $vstest)) {
+          # Fallback to MSTest
+          $vstest = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+        }
+        if (-not (Test-Path $vstest)) {
+          $vstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+        }
+        
+        Write-Host "Using test runner: $vstest"
+        
+        # Find test assemblies
+        $testAssemblies = Get-ChildItem -Path . -Recurse -Filter "*Test.dll" | Where-Object { $_.FullName -like "*\bin\Release\*" -and $_.FullName -notlike "*\ref\*" }
+        
+        if ($testAssemblies.Count -eq 0) {
+          Write-Error "No test assemblies found"
+          exit 1
+        }
+        
+        Write-Host "Found $($testAssemblies.Count) test assemblies:"
+        $testAssemblies | ForEach-Object { Write-Host "  - $($_.FullName)" }
+        
+        # Run tests
+        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults
+        
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "Tests failed with exit code $LASTEXITCODE"
+          exit $LASTEXITCODE
+        }
+      shell: pwsh
+      
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: TestResults/*.trx
+        
+    - name: Publish test results
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      with:
+        files: TestResults/**/*.trx
+        check_name: Unit Test Results
