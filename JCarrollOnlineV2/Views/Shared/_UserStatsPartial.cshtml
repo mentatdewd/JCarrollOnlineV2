@@ -3,6 +3,6 @@
 @model UserStatsViewModel
 
 <div class="stats">
-    @Html.MultilineActionLink(Model.UsersFollowing.Users.Count() + "<br/>following", "Following", "Users", new { userId = Model.User.Id }, null)
-    @Html.MultilineActionLink(Model.UserFollowers.Users.Count() + "<br/>followers", "Followed", "Users", new { userId = Model.User.Id }, null)
+    @Html.MultilineActionLink(Model.UsersFollowing.Users.Count() + "<br/>following", "Details", "Users", new { userId = Model.User.Id }, null)
+    @Html.MultilineActionLink(Model.UserFollowers.Users.Count() + "<br/>followers", "Details", "Users", new { userId = Model.User.Id }, null)
 </div>
