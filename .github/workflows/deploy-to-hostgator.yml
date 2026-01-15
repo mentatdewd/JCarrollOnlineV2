@@ -179,9 +179,9 @@ jobs:
         path: publish-output/
         retention-days: 7
   
-  # Step 2: Test the production build
+  # Step 2: Run unit tests
   test:
-    name: ?? Test Production Build
+    name: ?? Run Unit Tests
     needs: build
     runs-on: windows-latest
     
@@ -189,19 +189,39 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: production-build
-        path: publish-output
-    
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
     
-    - name: Run unit tests on production build
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2.0.0
+    
+    - name: Restore NuGet packages
       shell: pwsh
       run: |
-        Write-Host "Running tests against production build..." -ForegroundColor Cyan
+        Write-Host "Restoring NuGet packages for tests..." -ForegroundColor Cyan
+        nuget restore JCarrollOnlineV2.sln
+        
+        if (Test-Path "packages") {
+          $count = (Get-ChildItem -Path "packages" -Directory).Count
+          Write-Host "? Restored $count packages" -ForegroundColor Green
+        }
+    
+    - name: Build test project
+      shell: pwsh
+      run: |
+        Write-Host "Building test project..." -ForegroundColor Cyan
+        msbuild JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
+        
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "? Test project build failed!"
+          exit 1
+        }
+        Write-Host "? Test project built successfully" -ForegroundColor Green
+    
+    - name: Run unit tests
+      shell: pwsh
+      run: |
+        Write-Host "Running unit tests..." -ForegroundColor Cyan
         
         # Find vstest.console.exe
         $vstest = "${env:VSINSTALLDIR}Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
@@ -214,11 +234,11 @@ jobs:
         
         Write-Host "Using test runner: $vstest" -ForegroundColor Gray
         
-        # Find test assemblies from the build output
-        $testAssemblies = Get-ChildItem -Path "publish-output\bin" -Recurse -Filter "*Test.dll" | Where-Object { $_.FullName -notlike "*\ref\*" }
+        # Find test assemblies
+        $testAssemblies = Get-ChildItem -Path "JCarrollOnlineV2.Test\bin\Release" -Filter "*Test.dll" | Where-Object { $_.FullName -notlike "*\ref\*" }
         
         if ($testAssemblies.Count -eq 0) {
-          Write-Error "No test assemblies found in build output"
+          Write-Error "No test assemblies found"
           exit 1
         }
         
@@ -248,7 +268,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action/composite@v2
       with:
         files: TestResults/**/*.trx
-        check_name: Production Build Test Results
+        check_name: Unit Test Results
   
   # Step 3: Deploy to HostGator (only if build succeeds AND tests pass)
   deploy:
