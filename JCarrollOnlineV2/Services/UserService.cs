@@ -21,19 +21,39 @@ namespace JCarrollOnlineV2.Services
             _logger = logger;
         }
 
-        public async Task<List<UserItemViewModel>> GetAllUsersAsync(string excludeUserId = null)
+        public async Task<List<UserItemViewModel>> GetAllUsersAsync(string currentUserId = null)
         {
             IQueryable<ApplicationUser> query = _context.ApplicationUser
                 .Include(u => u.Following)
                 .Include(u => u.Followers)
                 .Include(u => u.MicroPosts);
 
-            if (!string.IsNullOrEmpty(excludeUserId))
+            if (!string.IsNullOrEmpty(currentUserId))
             {
-                query = query.Where(u => u.Id != excludeUserId);
+                query = query.Where(u => u.Id != currentUserId);
             }
 
             List<ApplicationUser> users = await query.ToListAsync().ConfigureAwait(false);
+
+            // Get current user's following and followers for status checks
+            HashSet<string> currentUserFollowingIds = new HashSet<string>();
+            HashSet<string> currentUserFollowerIds = new HashSet<string>();
+
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                var currentUser = await _context.ApplicationUser
+                    .Include(u => u.Following)
+                    .Include(u => u.Followers)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == currentUserId)
+                    .ConfigureAwait(false);
+
+                if (currentUser != null)
+                {
+                    currentUserFollowingIds = new HashSet<string>(currentUser.Following.Select(u => u.Id));
+                    currentUserFollowerIds = new HashSet<string>(currentUser.Followers.Select(u => u.Id));
+                }
+            }
 
             List<UserItemViewModel> viewModels = new List<UserItemViewModel>();
             foreach (ApplicationUser user in users)
@@ -42,6 +62,11 @@ namespace JCarrollOnlineV2.Services
                 vm.User.InjectFrom(user);
                 vm.UserId = user.Id;
                 vm.MicroPostsAuthored = user.MicroPosts.Count;
+                
+                // Set follower/following status
+                vm.IsFollowing = currentUserFollowingIds.Contains(user.Id);
+                vm.IsFollower = currentUserFollowerIds.Contains(user.Id);
+                
                 viewModels.Add(vm);
             }
 
@@ -50,10 +75,12 @@ namespace JCarrollOnlineV2.Services
 
         public async Task<UserDetailViewModel> GetUserDetailsAsync(string userId, string currentUserId)
         {
+            // Load the user with all relationships
             ApplicationUser user = await _context.ApplicationUser
                 .Include(u => u.Following)
                 .Include(u => u.Followers)
                 .Include(u => u.MicroPosts)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userId)
                 .ConfigureAwait(false);
 
@@ -75,8 +102,44 @@ namespace JCarrollOnlineV2.Services
             viewModel.User.InjectFrom(user);
             viewModel.UserInfoViewModel.User.InjectFrom(user);
             viewModel.UserInfoViewModel.MicroPostEmailNotifications = user.MicroPostEmailNotifications;
-            viewModel.UserInfoViewModel.UserId = currentUserId;
+            viewModel.UserInfoViewModel.MicroPostSmsNotifications = user.MicroPostSmsNotifications;
+            viewModel.UserInfoViewModel.UserId = user.Id;
+            viewModel.UserInfoViewModel.MicroPostsAuthored = user.MicroPosts.Count;
             viewModel.UserStatsViewModel.User.InjectFrom(user);
+
+            // Get all user IDs we need micropost counts for
+            List<string> allUserIds = new List<string>();
+            allUserIds.AddRange(user.Following.Select(u => u.Id));
+            allUserIds.AddRange(user.Followers.Select(u => u.Id));
+
+            // Get micropost counts for all users in ONE query
+            var microPostCounts = await _context.MicroPost
+                .AsNoTracking()
+                .Where(mp => allUserIds.Contains(mp.Author.Id))
+                .GroupBy(mp => mp.Author.Id)
+                .Select(g => new { UserId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.UserId, x => x.Count)
+                .ConfigureAwait(false);
+
+            // Get current user's following/followers for badge indicators
+            HashSet<string> currentUserFollowingIds = new HashSet<string>();
+            HashSet<string> currentUserFollowerIds = new HashSet<string>();
+
+            if (!string.IsNullOrEmpty(currentUserId) && currentUserId != userId)
+            {
+                var currentUser = await _context.ApplicationUser
+                    .Include(u => u.Following)
+                    .Include(u => u.Followers)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == currentUserId)
+                    .ConfigureAwait(false);
+
+                if (currentUser != null)
+                {
+                    currentUserFollowingIds = new HashSet<string>(currentUser.Following.Select(u => u.Id));
+                    currentUserFollowerIds = new HashSet<string>(currentUser.Followers.Select(u => u.Id));
+                }
+            }
 
             // Map following users
             foreach (ApplicationUser following in user.Following)
@@ -84,7 +147,14 @@ namespace JCarrollOnlineV2.Services
                 UserItemViewModel vm = new UserItemViewModel(_logger);
                 vm.User.InjectFrom(following);
                 vm.UserId = following.Id;
-                vm.MicroPostsAuthored = following.MicroPosts.Count;
+                vm.MicroPostsAuthored = microPostCounts.ContainsKey(following.Id) 
+                    ? microPostCounts[following.Id] 
+                    : 0;
+                
+                // Set follower/following status for badges
+                vm.IsFollowing = currentUserFollowingIds.Contains(following.Id);
+                vm.IsFollower = currentUserFollowerIds.Contains(following.Id);
+                
                 viewModel.UserStatsViewModel.UsersFollowing.Users.Add(vm);
             }
 
@@ -94,7 +164,14 @@ namespace JCarrollOnlineV2.Services
                 UserItemViewModel vm = new UserItemViewModel(_logger);
                 vm.User.InjectFrom(follower);
                 vm.UserId = follower.Id;
-                vm.MicroPostsAuthored = follower.MicroPosts.Count;
+                vm.MicroPostsAuthored = microPostCounts.ContainsKey(follower.Id) 
+                    ? microPostCounts[follower.Id] 
+                    : 0;
+                
+                // Set follower/following status for badges
+                vm.IsFollowing = currentUserFollowingIds.Contains(follower.Id);
+                vm.IsFollower = currentUserFollowerIds.Contains(follower.Id);
+                
                 viewModel.UserStatsViewModel.UserFollowers.Users.Add(vm);
             }
 

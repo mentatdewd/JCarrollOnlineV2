@@ -11,6 +11,24 @@
         <span>
             <span class="sr-only">User: </span>
             @Html.ActionLink(Model.User.UserName, "Details", new { userId = Model.User.Id })
+            
+            @* Follower/Following indicators as clickable badges *@
+            @if (Model.IsFollowing)
+            {
+                <a href="@Url.Action("Details", "Users", new { userId = Model.User.Id })" 
+                   style="background-color: #337ab7; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 5px; display: inline-block; text-decoration: none;" 
+                   title="Click to view profile - You are following this user">
+                    ✓ Following
+                </a>
+            }
+            @if (Model.IsFollower)
+            {
+                <a href="@Url.Action("Details", "Users", new { userId = Model.User.Id })" 
+                   style="background-color: #5bc0de; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 5px; display: inline-block; text-decoration: none;" 
+                   title="Click to view profile - This user follows you">
+                    ↑ Follower
+                </a>
+            }
         </span>
 
         @if (User.IsInRole("Administrator"))
