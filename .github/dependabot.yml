@@ -1,0 +1,42 @@
+version: 2
+updates:
+  # Enable version updates for NuGet packages
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Limit the number of open PRs to avoid overwhelming conflicts
+    open-pull-requests-limit: 5
+    # Group updates to reduce PR count
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Assign reviewers (optional)
+    reviewers:
+      - "mentatdewd"
+    # Add labels
+    labels:
+      - "dependencies"
+      - "nuget"
+    # Allow Dependabot to rebase PRs automatically
+    rebase-strategy: "auto"
+    
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
