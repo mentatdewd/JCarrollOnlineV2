@@ -173,112 +173,11 @@ jobs:
         path: publish-output/
         retention-days: 7
   
-  # Step 2: Run unit tests
+  # Step 2: Run unit tests (calls reusable workflow)
   test:
     name: 🧪 Run Unit Tests
     needs: build
-    runs-on: windows-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
-    
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v2.0.0
-    
-    - name: Restore NuGet packages
-      shell: pwsh
-      run: |
-        Write-Host "Restoring NuGet packages for tests..." -ForegroundColor Cyan
-        nuget restore JCarrollOnlineV2.sln
-        
-        # Remove System.Threading.Tasks.Extensions from packages (use framework version)
-        if (Test-Path "packages\System.Threading.Tasks.Extensions.4.6.3") {
-          Write-Host "Removing System.Threading.Tasks.Extensions NuGet package (using framework version)..." -ForegroundColor Yellow
-          Remove-Item -Path "packages\System.Threading.Tasks.Extensions.4.6.3" -Recurse -Force -ErrorAction SilentlyContinue
-        }
-        
-        if (Test-Path "packages") {
-          $count = (Get-ChildItem -Path "packages" -Directory).Count
-          Write-Host "✓ Restored $count packages" -ForegroundColor Green
-        }
-
-    
-    - name: Build test project
-      shell: pwsh
-      run: |
-        Write-Host "Building test project..." -ForegroundColor Cyan
-        msbuild JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj /p:Configuration=Release /p:Platform=AnyCPU /t:Build /v:minimal
-        
-        if ($LASTEXITCODE -ne 0) {
-          Write-Error "❌ Test project build failed!"
-          exit 1
-        }
-        Write-Host "✓ Test project built successfully" -ForegroundColor Green
-    
-    - name: Run unit tests
-      shell: pwsh
-      run: |
-        Write-Host "Running unit tests..." -ForegroundColor Cyan
-        
-        # Find vstest.console.exe
-        $vstest = "${env:VSINSTALLDIR}Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-        if (-not (Test-Path $vstest)) {
-          $vstest = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-        }
-        if (-not (Test-Path $vstest)) {
-          $vstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-        }
-        
-        Write-Host "Using test runner: $vstest" -ForegroundColor Gray
-        
-        # Find test assemblies
-        $testAssemblies = Get-ChildItem -Path "JCarrollOnlineV2.Test\bin\Release" -Filter "*Test.dll" | Where-Object { $_.FullName -notlike "*\ref\*" }
-        
-        if ($testAssemblies.Count -eq 0) {
-          Write-Error "No test assemblies found"
-          exit 1
-        }
-        
-        Write-Host "Found $($testAssemblies.Count) test assemblies:" -ForegroundColor Green
-        $testAssemblies | ForEach-Object { Write-Host "  - $($_.Name)" -ForegroundColor Gray }
-        
-        # List dependencies to verify they're present
-        Write-Host "`nChecking for System.Threading.Tasks.Extensions..." -ForegroundColor Cyan
-        $taskExtensions = Get-ChildItem -Path "JCarrollOnlineV2.Test\bin\Release" -Recurse -Filter "System.Threading.Tasks.Extensions.dll"
-        if ($taskExtensions) {
-          Write-Host "✓ Found: $($taskExtensions.FullName)" -ForegroundColor Green
-        } else {
-          Write-Warning "System.Threading.Tasks.Extensions.dll not found in output directory"
-        }
-        
-        # Run tests with InIsolation for better dependency resolution
-        New-Item -ItemType Directory -Force -Path "TestResults" | Out-Null
-        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults /InIsolation
-        
-        if ($LASTEXITCODE -ne 0) {
-          Write-Error "Tests failed with exit code $LASTEXITCODE"
-          exit $LASTEXITCODE
-        }
-        
-        Write-Host "✓ All tests passed!" -ForegroundColor Green
-    
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: TestResults/*.trx
-    
-    - name: Publish test results
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action/windows@v2
-      with:
-        files: TestResults/**/*.trx
-        check_name: Unit Test Results
+    uses: ./.github/workflows/unit-tests.yml
   
   # Step 3: Deploy to HostGator (only if build succeeds AND tests pass)
   deploy:

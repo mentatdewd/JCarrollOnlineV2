@@ -7,70 +7,121 @@ on:
         description: "Result of unit tests"
         value: ${{ jobs.test.outputs.result }}
   workflow_dispatch:
-  pull_request:
-    branches: [ master, main ]
-  push:
-    branches: [ master, main ]
+    inputs:
+      use-last-build:
+        description: 'Use artifacts from last successful deployment build'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 jobs:
-  test:
-    runs-on: windows-latest
-    outputs:
-      result: ${{ steps.test.outcome }}
+test:
+  runs-on: windows-latest
+  outputs:
+    result: ${{ steps.test.outcome }}
     
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+  steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
+    
+  # Download artifacts from last successful build if manual run with use-last-build=true
+  - name: Download last successful build artifacts
+    if: github.event_name == 'workflow_dispatch' && inputs.use-last-build == 'true'
+    uses: dawidd6/action-download-artifact@v3
+    with:
+      workflow: deploy-to-hostgator.yml
+      workflow_conclusion: success
+      name: production-build
+      path: downloaded-build
+      search_artifacts: true
       
-    - name: Setup .NET Framework
-      uses: microsoft/setup-msbuild@v1.3
+  - name: Copy downloaded artifacts to expected location
+    if: github.event_name == 'workflow_dispatch' && inputs.use-last-build == 'true'
+    shell: pwsh
+    run: |
+      Write-Host "Using artifacts from last successful build..." -ForegroundColor Cyan
+        
+      # Copy the bin folder from downloaded artifacts
+      if (Test-Path "downloaded-build\bin") {
+        Copy-Item -Path "downloaded-build\bin" -Destination "JCarrollOnlineV2\bin" -Recurse -Force
+        Write-Host "? Copied production build artifacts" -ForegroundColor Green
+      } else {
+        Write-Error "? Downloaded artifacts don't contain bin folder"
+        exit 1
+      }
+        
+      # Verify test DLL exists
+      $testDll = "JCarrollOnlineV2.Test\bin\Release\JCarrollOnlineV2.Test.dll"
+      if (Test-Path $testDll) {
+        Write-Host "? Test assembly found at: $testDll" -ForegroundColor Green
+      } else {
+        Write-Warning "Test assembly not found in downloaded artifacts, will build from source..."
+        Remove-Item -Path "JCarrollOnlineV2\bin" -Recurse -Force -ErrorAction SilentlyContinue
+        echo "BUILD_FROM_SOURCE=true" >> $env:GITHUB_ENV
+      }
       
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1
+  # Build from source if not using downloaded artifacts
+  - name: Setup .NET Framework
+    if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
+    uses: microsoft/setup-msbuild@v1.3
       
-    - name: Restore NuGet packages
-      run: nuget restore JCarrollOnlineV2.sln
+  - name: Setup NuGet
+    if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
+    uses: NuGet/setup-nuget@v1
       
-    - name: Build solution
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU"
+  - name: Restore NuGet packages
+    if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
+    run: nuget restore JCarrollOnlineV2.sln
       
-    - name: Run unit tests
-      id: test
-      run: |
-        # Install VSTest if not available
-        dotnet tool install --global dotnet-coverage
+  - name: Build solution
+    if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
+    run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform=AnyCPU
+      
+  - name: Run unit tests
+    id: test
+    run: |
+      Write-Host "Running unit tests..." -ForegroundColor Cyan
         
-        # Run tests using vstest.console.exe
-        $vstest = "${env:VSINSTALLDIR}Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-        if (-not (Test-Path $vstest)) {
-          # Fallback to MSTest
-          $vstest = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-        }
-        if (-not (Test-Path $vstest)) {
-          $vstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-        }
+      # Install VSTest if not available
+      dotnet tool install --global dotnet-coverage 2>$null
         
-        Write-Host "Using test runner: $vstest"
+      # Run tests using vstest.console.exe
+      $vstest = "${env:VSINSTALLDIR}Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+      if (-not (Test-Path $vstest)) {
+        # Fallback to MSTest
+        $vstest = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+      }
+      if (-not (Test-Path $vstest)) {
+        $vstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+      }
         
-        # Find test assemblies
-        $testAssemblies = Get-ChildItem -Path . -Recurse -Filter "*Test.dll" | Where-Object { $_.FullName -like "*\bin\Release\*" -and $_.FullName -notlike "*\ref\*" }
+      Write-Host "Using test runner: $vstest" -ForegroundColor Gray
         
-        if ($testAssemblies.Count -eq 0) {
-          Write-Error "No test assemblies found"
-          exit 1
-        }
+      # Find test assemblies
+      $testAssemblies = Get-ChildItem -Path . -Recurse -Filter "*Test.dll" | Where-Object { $_.FullName -like "*\bin\Release\*" -and $_.FullName -notlike "*\ref\*" }
         
-        Write-Host "Found $($testAssemblies.Count) test assemblies:"
-        $testAssemblies | ForEach-Object { Write-Host "  - $($_.FullName)" }
+      if ($testAssemblies.Count -eq 0) {
+        Write-Error "No test assemblies found"
+        exit 1
+      }
         
-        # Run tests with InIsolation for better dependency resolution
-        & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults /InIsolation
+      Write-Host "Found $($testAssemblies.Count) test assemblies:" -ForegroundColor Green
+      $testAssemblies | ForEach-Object { Write-Host "  - $($_.FullName)" -ForegroundColor Gray }
         
-        if ($LASTEXITCODE -ne 0) {
-          Write-Error "Tests failed with exit code $LASTEXITCODE"
-          exit $LASTEXITCODE
-        }
-      shell: pwsh
+      # Run tests with InIsolation for better dependency resolution
+      New-Item -ItemType Directory -Force -Path "TestResults" | Out-Null
+      & $vstest $testAssemblies.FullName /Logger:trx /ResultsDirectory:TestResults /InIsolation
+        
+      if ($LASTEXITCODE -ne 0) {
+        Write-Error "Tests failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+      }
+        
+      Write-Host "? All tests passed!" -ForegroundColor Green
+    shell: pwsh
       
     - name: Upload test results
       if: always()
@@ -85,3 +136,30 @@ jobs:
       with:
         files: TestResults/**/*.trx
         check_name: Unit Test Results
+    
+    - name: Test run summary
+      if: success()
+      shell: pwsh
+      run: |
+        Write-Host "================================" -ForegroundColor Green
+        Write-Host "  TESTS PASSED! ?" -ForegroundColor Green
+        Write-Host "================================" -ForegroundColor Green
+        
+        if ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.use-last-build }}" -eq "true") {
+          Write-Host "Mode: Manual run using last successful build" -ForegroundColor Cyan
+        } elseif ("${{ github.event_name }}" -eq "workflow_call") {
+          Write-Host "Mode: Called by deployment workflow" -ForegroundColor Cyan
+        } else {
+          Write-Host "Mode: Built from source" -ForegroundColor Cyan
+        }
+        
+        # Add to GitHub step summary
+        Add-Content $env:GITHUB_STEP_SUMMARY "### Unit Tests Passed! :white_check_mark:"
+        Add-Content $env:GITHUB_STEP_SUMMARY ""
+        if ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.use-last-build }}" -eq "true") {
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Mode**: Manual run using artifacts from last successful deployment build"
+        } elseif ("${{ github.event_name }}" -eq "workflow_call") {
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Mode**: Called by deployment workflow (built from source)"
+        } else {
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Mode**: Manual run (built from source)"
+        }
