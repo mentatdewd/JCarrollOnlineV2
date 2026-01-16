@@ -1,20 +1,14 @@
-name: Deploy to HostGator
+﻿name: Deploy to HostGator
 
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
 
-jobs:
-  # Step 1: Run unit tests
-  test:
-    name: ?? Run Unit Tests
-    uses: ./.github/workflows/unit-tests.yml
-  
+jobs:  
   # Step 2: Build for production (only if tests pass)
   build:
-    name: ?? Build for Production
-    needs: test
+    name: 🔨 Build for Production
     runs-on: windows-latest
     
     steps:
@@ -45,7 +39,7 @@ jobs:
         
         if (Test-Path "packages") {
           $count = (Get-ChildItem -Path "packages" -Directory).Count
-          Write-Host "? Restored $count packages" -ForegroundColor Green
+          Write-Host "✓ Restored $count packages" -ForegroundColor Green
         }
     
     - name: Clean and prepare output
@@ -60,7 +54,7 @@ jobs:
         }
         
         New-Item -ItemType Directory -Path "publish-output" -Force | Out-Null
-        Write-Host "? Cleaned and created publish directory" -ForegroundColor Green
+        Write-Host "✓ Cleaned and created publish directory" -ForegroundColor Green
     
     - name: Build solution for production
       shell: pwsh
@@ -69,10 +63,10 @@ jobs:
         msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /p:DebugType=None /t:Build /v:minimal /m
         
         if ($LASTEXITCODE -ne 0) {
-          Write-Error "? Production build failed!"
+          Write-Error "❌ Production build failed!"
           exit 1
         }
-        Write-Host "? Production build succeeded" -ForegroundColor Green
+        Write-Host "✓ Production build succeeded" -ForegroundColor Green
     
     - name: Copy files for deployment
       shell: pwsh
@@ -90,7 +84,7 @@ jobs:
         $gamesPath = Join-Path $destDir "Content\games\Build"
         if (Test-Path $gamesPath) {
           $fileCount = (Get-ChildItem -Path $gamesPath -File).Count
-          Write-Host "? Found $fileCount Unity WebGL files in Content/games/Build" -ForegroundColor Green
+          Write-Host "✓ Found $fileCount Unity WebGL files in Content/games/Build" -ForegroundColor Green
           Get-ChildItem -Path $gamesPath -File | ForEach-Object {
             Write-Host "  - $($_.Name) ($([math]::Round($_.Length / 1MB, 2)) MB)" -ForegroundColor Gray
           }
@@ -114,7 +108,7 @@ jobs:
         if (Test-Path $binSource) {
           robocopy $binSource $binDest /E /NFL /NDL /NJH /NJS /nc /ns /np
           if ($LASTEXITCODE -lt 8) { $global:LASTEXITCODE = 0 }
-          Write-Host "? Files copied successfully" -ForegroundColor Green
+          Write-Host "✓ Files copied successfully" -ForegroundColor Green
         } else {
           Write-Error "Bin folder not found"
           exit 1
@@ -138,10 +132,10 @@ jobs:
         $allFilesExist = $true
         foreach ($file in $criticalFiles) {
           if (-not (Test-Path $file)) {
-            Write-Error "? Missing critical file: $file"
+            Write-Error "❌ Missing critical file: $file"
             $allFilesExist = $false
           } else {
-            Write-Host "? Found: $file" -ForegroundColor Green
+            Write-Host "✓ Found: $file" -ForegroundColor Green
           }
         }
         
@@ -161,11 +155,11 @@ jobs:
             Write-Warning "Unity file not found: $file"
           } else {
             $size = (Get-Item $file).Length
-            Write-Host "? Found: $file ($([math]::Round($size / 1MB, 2)) MB)" -ForegroundColor Green
+            Write-Host "✓ Found: $file ($([math]::Round($size / 1MB, 2)) MB)" -ForegroundColor Green
           }
         }
         
-        Write-Host "? All critical files verified" -ForegroundColor Green
+        Write-Host "✓ All critical files verified" -ForegroundColor Green
         
         # Store paths for next job
         $fullPath = (Resolve-Path $publishPath).Path
@@ -181,7 +175,7 @@ jobs:
   
   # Step 2: Run unit tests
   test:
-    name: ?? Run Unit Tests
+    name: 🧪 Run Unit Tests
     needs: build
     runs-on: windows-latest
     
@@ -201,10 +195,17 @@ jobs:
         Write-Host "Restoring NuGet packages for tests..." -ForegroundColor Cyan
         nuget restore JCarrollOnlineV2.sln
         
+        # Remove System.Threading.Tasks.Extensions from packages (use framework version)
+        if (Test-Path "packages\System.Threading.Tasks.Extensions.4.6.3") {
+          Write-Host "Removing System.Threading.Tasks.Extensions NuGet package (using framework version)..." -ForegroundColor Yellow
+          Remove-Item -Path "packages\System.Threading.Tasks.Extensions.4.6.3" -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        
         if (Test-Path "packages") {
           $count = (Get-ChildItem -Path "packages" -Directory).Count
-          Write-Host "? Restored $count packages" -ForegroundColor Green
+          Write-Host "✓ Restored $count packages" -ForegroundColor Green
         }
+
     
     - name: Build test project
       shell: pwsh
@@ -213,10 +214,10 @@ jobs:
         msbuild JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
         
         if ($LASTEXITCODE -ne 0) {
-          Write-Error "? Test project build failed!"
+          Write-Error "❌ Test project build failed!"
           exit 1
         }
-        Write-Host "? Test project built successfully" -ForegroundColor Green
+        Write-Host "✓ Test project built successfully" -ForegroundColor Green
     
     - name: Run unit tests
       shell: pwsh
@@ -249,7 +250,7 @@ jobs:
         Write-Host "`nChecking for System.Threading.Tasks.Extensions..." -ForegroundColor Cyan
         $taskExtensions = Get-ChildItem -Path "JCarrollOnlineV2.Test\bin\Release" -Recurse -Filter "System.Threading.Tasks.Extensions.dll"
         if ($taskExtensions) {
-          Write-Host "? Found: $($taskExtensions.FullName)" -ForegroundColor Green
+          Write-Host "✓ Found: $($taskExtensions.FullName)" -ForegroundColor Green
         } else {
           Write-Warning "System.Threading.Tasks.Extensions.dll not found in output directory"
         }
@@ -263,7 +264,7 @@ jobs:
           exit $LASTEXITCODE
         }
         
-        Write-Host "? All tests passed!" -ForegroundColor Green
+        Write-Host "✓ All tests passed!" -ForegroundColor Green
     
     - name: Upload test results
       if: always()
@@ -281,7 +282,7 @@ jobs:
   
   # Step 3: Deploy to HostGator (only if build succeeds AND tests pass)
   deploy:
-    name: ?? Deploy to HostGator
+    name: 🚀 Deploy to HostGator
     needs: [build, test]
     runs-on: windows-latest
     environment:
@@ -314,12 +315,12 @@ jobs:
         
         foreach ($file in $criticalFiles) {
           if (-not (Test-Path $file)) {
-            Write-Error "? Missing critical file after download: $file"
+            Write-Error "❌ Missing critical file after download: $file"
             exit 1
           }
         }
         
-        Write-Host "? All artifacts verified" -ForegroundColor Green
+        Write-Host "✓ All artifacts verified" -ForegroundColor Green
         
         # Store paths for deployment
         $fullPath = (Resolve-Path $publishPath).Path
@@ -355,11 +356,11 @@ jobs:
         foreach ($add in $connStrings.add) {
           if ($add.connectionString -eq "__DEV_CONNECTION_STRING__") {
             $add.connectionString = $env:DEV_CONN
-            Write-Host "? Replaced __DEV_CONNECTION_STRING__" -ForegroundColor Green
+            Write-Host "✓ Replaced __DEV_CONNECTION_STRING__" -ForegroundColor Green
           }
           if ($add.connectionString -eq "__PROD_CONNECTION_STRING__") {
             $add.connectionString = $env:PROD_CONN
-            Write-Host "? Replaced __PROD_CONNECTION_STRING__" -ForegroundColor Green
+            Write-Host "✓ Replaced __PROD_CONNECTION_STRING__" -ForegroundColor Green
           }
         }
         
@@ -368,13 +369,13 @@ jobs:
         if ($appSettings) {
           if ($appSettings.HasAttribute("configBuilders")) {
             $appSettings.RemoveAttribute("configBuilders")
-            Write-Host "? Removed configBuilders from appSettings" -ForegroundColor Green
+            Write-Host "✓ Removed configBuilders from appSettings" -ForegroundColor Green
           }
           
           foreach ($add in $appSettings.add) {
             if ($add.value -eq "__SMTP_PASSWORD__") {
               $add.value = $env:SMTP_PWD
-              Write-Host "? Replaced __SMTP_PASSWORD__" -ForegroundColor Green
+              Write-Host "✓ Replaced __SMTP_PASSWORD__" -ForegroundColor Green
             }
           }
         }
@@ -386,11 +387,11 @@ jobs:
           if ($machineKey) {
             if ($machineKey.validationKey -eq "__MACHINEKEY_VALIDATION__") {
               $machineKey.validationKey = $env:MACH_VAL
-              Write-Host "? Replaced __MACHINEKEY_VALIDATION__" -ForegroundColor Green
+              Write-Host "✓ Replaced __MACHINEKEY_VALIDATION__" -ForegroundColor Green
             }
             if ($machineKey.decryptionKey -eq "__MACHINEKEY_DECRYPTION__") {
               $machineKey.decryptionKey = $env:MACH_DEC
-              Write-Host "? Replaced __MACHINEKEY_DECRYPTION__" -ForegroundColor Green
+              Write-Host "✓ Replaced __MACHINEKEY_DECRYPTION__" -ForegroundColor Green
             }
           }
           
@@ -398,7 +399,7 @@ jobs:
           $compilation = $systemWeb.compilation
           if ($compilation -and $compilation.debug -eq "true") {
             $compilation.debug = "false"
-            Write-Host "? Set debug=false" -ForegroundColor Green
+            Write-Host "✓ Set debug=false" -ForegroundColor Green
           }
         }
         
@@ -408,7 +409,7 @@ jobs:
           $network = $systemNet.mailSettings.smtp.network
           if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
             $network.password = $env:SMTP_PWD
-            Write-Host "? Replaced legacy __SMTP_PASSWORD__" -ForegroundColor Green
+            Write-Host "✓ Replaced legacy __SMTP_PASSWORD__" -ForegroundColor Green
           }
         }
         
@@ -440,7 +441,7 @@ jobs:
           }
         }
         
-        Write-Host "? Web.config successfully updated and verified" -ForegroundColor Green
+        Write-Host "✓ Web.config successfully updated and verified" -ForegroundColor Green
     
     - name: Deploy to HostGator via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -468,7 +469,7 @@ jobs:
       shell: pwsh
       run: |
         Write-Host "================================" -ForegroundColor Green
-        Write-Host "  DEPLOYMENT SUCCESSFUL! ??" -ForegroundColor Green
+        Write-Host "  DEPLOYMENT SUCCESSFUL! 🚀" -ForegroundColor Green
         Write-Host "================================" -ForegroundColor Green
         Write-Host ""
         Write-Host "Environment: Production (HostGator)" -ForegroundColor Cyan
