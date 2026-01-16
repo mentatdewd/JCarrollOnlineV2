@@ -78,7 +78,7 @@ jobs:
       
     - name: Build solution
       if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform='Any CPU'
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU"
       
     - name: Run unit tests
       id: test
