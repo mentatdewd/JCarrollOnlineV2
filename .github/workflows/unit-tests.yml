@@ -81,7 +81,7 @@ jobs:
         
     - name: Publish test results
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      uses: EnricoMi/publish-unit-test-result-action/windows@v2
       with:
         files: TestResults/**/*.trx
         check_name: Unit Test Results
