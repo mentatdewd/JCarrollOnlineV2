@@ -60,7 +60,7 @@ jobs:
       shell: pwsh
       run: |
         Write-Host "Building solution in Release configuration..." -ForegroundColor Cyan
-        msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU" /p:DebugType=None /t:Build /v:minimal /m
+        msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="AnyCPU" /p:DebugType=None /t:Build /v:minimal /m
         
         if ($LASTEXITCODE -ne 0) {
           Write-Error "❌ Production build failed!"
@@ -211,7 +211,7 @@ jobs:
       shell: pwsh
       run: |
         Write-Host "Building test project..." -ForegroundColor Cyan
-        msbuild JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj /p:Configuration=Release /p:Platform="Any CPU" /t:Build /v:minimal
+        msbuild JCarrollOnlineV2.Test\JCarrollOnlineV2.Test.csproj /p:Configuration=Release /p:Platform="AnyCPU" /t:Build /v:minimal
         
         if ($LASTEXITCODE -ne 0) {
           Write-Error "❌ Test project build failed!"
