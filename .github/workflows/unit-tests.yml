@@ -1,4 +1,4 @@
-name: Unit Tests
+﻿name: Unit Tests
 
 on:
   workflow_call:
@@ -27,7 +27,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    
     # Download artifacts from last successful build if manual run with use-last-build=true
     - name: Download last successful build artifacts
       if: github.event_name == 'workflow_dispatch' && inputs.use-last-build == 'true'
@@ -48,16 +47,16 @@ jobs:
         # Copy the bin folder from downloaded artifacts
         if (Test-Path "downloaded-build\bin") {
           Copy-Item -Path "downloaded-build\bin" -Destination "JCarrollOnlineV2\bin" -Recurse -Force
-          Write-Host "? Copied production build artifacts" -ForegroundColor Green
+          Write-Host "✓ Copied production build artifacts" -ForegroundColor Green
         } else {
-          Write-Error "? Downloaded artifacts don't contain bin folder"
+          Write-Error "❌ Downloaded artifacts don't contain bin folder"
           exit 1
         }
         
         # Verify test DLL exists
         $testDll = "JCarrollOnlineV2.Test\bin\Release\JCarrollOnlineV2.Test.dll"
         if (Test-Path $testDll) {
-          Write-Host "? Test assembly found at: $testDll" -ForegroundColor Green
+          Write-Host "✓ Test assembly found at: $testDll" -ForegroundColor Green
         } else {
           Write-Warning "Test assembly not found in downloaded artifacts, will build from source..."
           Remove-Item -Path "JCarrollOnlineV2\bin" -Recurse -Force -ErrorAction SilentlyContinue
@@ -79,7 +78,7 @@ jobs:
       
     - name: Build solution
       if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform=AnyCPU
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform='Any CPU'
       
     - name: Run unit tests
       id: test
@@ -122,7 +121,7 @@ jobs:
           exit $LASTEXITCODE
         }
         
-        Write-Host "? All tests passed!" -ForegroundColor Green
+        Write-Host "✓ All tests passed!" -ForegroundColor Green
       
     - name: Upload test results
       if: always()
