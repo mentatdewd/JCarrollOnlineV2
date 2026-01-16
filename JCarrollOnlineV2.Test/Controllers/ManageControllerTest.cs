@@ -1,5 +1,6 @@
 using JCarrollOnlineV2.Controllers;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.Interfaces;
 using JCarrollOnlineV2.ViewModels.Manage;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;

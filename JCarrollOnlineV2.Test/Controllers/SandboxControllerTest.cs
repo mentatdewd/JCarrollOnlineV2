@@ -154,8 +154,8 @@ namespace JCarrollOnlineV2.Test.Controllers
             if (model.ImageFiles.Any())
             {
                 ImageFileMetadata firstImage = model.ImageFiles.First();
-                Assert.IsTrue(firstImage.Path.Contains("http://"));
-                Assert.IsTrue(firstImage.Path.Contains("/content/images/yellowstone/"));
+                Assert.Contains("http://", firstImage.Path);
+                Assert.Contains("/content/images/yellowstone/", firstImage.Path);
             }
         }
 

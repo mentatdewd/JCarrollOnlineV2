@@ -510,6 +510,16 @@
     <Compile Include="CustomLinqExtensions\EnumerableExtensions.cs" />
     <Compile Include="CustomLinqExtensions\LinqToSqlExtensionMethods.cs" />
     <Compile Include="Filters\CustomHandleErrorAttribute.cs" />
+    <Compile Include="Infrastructure\AuthenticationManagerWrapper.cs" />
+    <Compile Include="Infrastructure\HttpContextWrapper.cs" />
+    <Compile Include="Infrastructure\SignInManagerWrapper.cs" />
+    <Compile Include="Infrastructure\UrlHelperWrapper.cs" />
+    <Compile Include="Infrastructure\UserManagerWrapper.cs" />
+    <Compile Include="Interfaces\IAuthenticationManagerWrapper.cs" />
+    <Compile Include="Interfaces\IHttpContextWrapper.cs" />
+    <Compile Include="Interfaces\ISignInManagerWrapper.cs" />
+    <Compile Include="Interfaces\IUrlHelperWrapper.cs" />
+    <Compile Include="Interfaces\IUserManagerWrapper.cs" />
     <Compile Include="Services\BlogViewModelService.cs" />
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\HomeViewModelService.cs" />

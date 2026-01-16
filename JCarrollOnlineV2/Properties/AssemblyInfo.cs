@@ -36,3 +36,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguage("en-US")]
 
+// Make internal members visible to the test project
+[assembly: InternalsVisibleTo("JCarrollOnlineV2.Test")]
+
+

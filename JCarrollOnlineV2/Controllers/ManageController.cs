@@ -1,8 +1,11 @@
-﻿using JCarrollOnlineV2.ViewModels;
+﻿using JCarrollOnlineV2.Infrastructure;
+using JCarrollOnlineV2.Interfaces;
+using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Manage;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -15,22 +18,78 @@ namespace JCarrollOnlineV2.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ISignInManagerWrapper _signInManagerWrapper;
+        private IUserManagerWrapper _userManagerWrapper;
+        private IHttpContextWrapper _httpContextWrapper;
+        private IAuthenticationManagerWrapper _authenticationManagerWrapper;
+        private IUrlHelperWrapper _urlHelperWrapper;
         private readonly IAuthenticationManager _authenticationManager;
 
         public ManageController()
         {
         }
 
+        /// <summary>
+        /// Constructor for production use with Identity managers (automatically wraps them)
+        /// </summary>
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
             : this(userManager, signInManager, null)
         {
         }
 
+        /// <summary>
+        /// Constructor for production use with Identity managers and authentication manager
+        /// </summary>
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, IAuthenticationManager authenticationManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             _authenticationManager = authenticationManager;
+            
+            // Wrap the managers for consistent interface usage
+            if (userManager != null)
+            {
+                _userManagerWrapper = new UserManagerWrapper(userManager);
+            }
+            if (signInManager != null)
+            {
+                _signInManagerWrapper = new SignInManagerWrapper(signInManager);
+            }
+        }
+
+        /// <summary>
+        /// Constructor for testing with wrapper interfaces (allows full mocking)
+        /// </summary>
+        internal ManageController(IUserManagerWrapper userManagerWrapper, ISignInManagerWrapper signInManagerWrapper)
+            : this(userManagerWrapper, signInManagerWrapper, null)
+        {
+        }
+
+        /// <summary>
+        /// Constructor for testing with wrapper interfaces and authentication manager
+        /// </summary>
+        internal ManageController(IUserManagerWrapper userManagerWrapper, ISignInManagerWrapper signInManagerWrapper, IAuthenticationManager authenticationManager)
+        {
+            _userManagerWrapper = userManagerWrapper ?? throw new ArgumentNullException(nameof(userManagerWrapper));
+            _signInManagerWrapper = signInManagerWrapper ?? throw new ArgumentNullException(nameof(signInManagerWrapper));
+            _authenticationManager = authenticationManager;
+        }
+
+        /// <summary>
+        /// Constructor for testing with all wrapper interfaces (maximum testability)
+        /// </summary>
+        internal ManageController(
+            IUserManagerWrapper userManagerWrapper,
+            ISignInManagerWrapper signInManagerWrapper,
+            IHttpContextWrapper httpContextWrapper,
+            IAuthenticationManagerWrapper authenticationManagerWrapper,
+            IUrlHelperWrapper urlHelperWrapper)
+        {
+            _userManagerWrapper = userManagerWrapper ?? throw new ArgumentNullException(nameof(userManagerWrapper));
+            _signInManagerWrapper = signInManagerWrapper ?? throw new ArgumentNullException(nameof(signInManagerWrapper));
+            _httpContextWrapper = httpContextWrapper;
+            _authenticationManagerWrapper = authenticationManagerWrapper;
+            _urlHelperWrapper = urlHelperWrapper;
         }
 
         public ApplicationSignInManager SignInManager
@@ -43,6 +102,85 @@ namespace JCarrollOnlineV2.Controllers
         {
             get => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
             private set => _userManager = value;
+        }
+
+        /// <summary>
+        /// Gets the SignInManager wrapper for operations (supports both direct managers and injected wrappers)
+        /// </summary>
+        protected ISignInManagerWrapper SignInManagerWrapper
+        {
+            get
+            {
+                if (_signInManagerWrapper == null && SignInManager != null)
+                {
+                    _signInManagerWrapper = new SignInManagerWrapper(SignInManager);
+                }
+                return _signInManagerWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the UserManager wrapper for operations (supports both direct managers and injected wrappers)
+        /// </summary>
+        protected IUserManagerWrapper UserManagerWrapper
+        {
+            get
+            {
+                if (_userManagerWrapper == null && UserManager != null)
+                {
+                    _userManagerWrapper = new UserManagerWrapper(UserManager);
+                }
+                return _userManagerWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the HttpContext wrapper for operations
+        /// </summary>
+        protected IHttpContextWrapper HttpContextWrapper
+        {
+            get
+            {
+                if (_httpContextWrapper == null && HttpContext != null)
+                {
+                    _httpContextWrapper = new HttpContextWrapperImpl(HttpContext);
+                }
+                return _httpContextWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the AuthenticationManager wrapper for operations
+        /// </summary>
+        protected IAuthenticationManagerWrapper AuthenticationManagerWrapper
+        {
+            get
+            {
+                if (_authenticationManagerWrapper == null)
+                {
+                    IAuthenticationManager authManager = _authenticationManager ?? HttpContext?.GetOwinContext()?.Authentication;
+                    if (authManager != null)
+                    {
+                        _authenticationManagerWrapper = new AuthenticationManagerWrapper(authManager);
+                    }
+                }
+                return _authenticationManagerWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the UrlHelper wrapper for operations
+        /// </summary>
+        protected IUrlHelperWrapper UrlHelperWrapper
+        {
+            get
+            {
+                if (_urlHelperWrapper == null && Url != null)
+                {
+                    _urlHelperWrapper = new UrlHelperWrapper(Url);
+                }
+                return _urlHelperWrapper;
+            }
         }
 
         //

@@ -1,6 +1,8 @@
 ﻿using JCarrollOnlineV2.EmailViewModels;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.Helpers;
+using JCarrollOnlineV2.Infrastructure;
+using JCarrollOnlineV2.Interfaces;
 using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Account;
 using JCarrollOnlineV2.ViewModels.Users;
@@ -24,16 +26,54 @@ namespace JCarrollOnlineV2.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ISignInManagerWrapper _signInManagerWrapper;
+        private IUserManagerWrapper _userManagerWrapper;
+        private IHttpContextWrapper _httpContextWrapper;
+        private IAuthenticationManagerWrapper _authenticationManagerWrapper;
+        private IUrlHelperWrapper _urlHelperWrapper;
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public AccountController()
         {
         }
 
+        /// <summary>
+        /// Constructor for production use with Identity managers (automatically wraps them)
+        /// </summary>
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            
+            // Wrap the managers for consistent interface usage
+            _userManagerWrapper = new UserManagerWrapper(userManager);
+            _signInManagerWrapper = new SignInManagerWrapper(signInManager);
+        }
+
+        /// <summary>
+        /// Constructor for testing with wrapper interfaces (allows full mocking)
+        /// </summary>
+        internal AccountController(IUserManagerWrapper userManagerWrapper, ISignInManagerWrapper signInManagerWrapper)
+        {
+            _userManagerWrapper = userManagerWrapper ?? throw new ArgumentNullException(nameof(userManagerWrapper));
+            _signInManagerWrapper = signInManagerWrapper ?? throw new ArgumentNullException(nameof(signInManagerWrapper));
+        }
+
+        /// <summary>
+        /// Constructor for testing with all wrapper interfaces (maximum testability)
+        /// </summary>
+        internal AccountController(
+            IUserManagerWrapper userManagerWrapper, 
+            ISignInManagerWrapper signInManagerWrapper,
+            IHttpContextWrapper httpContextWrapper,
+            IAuthenticationManagerWrapper authenticationManagerWrapper,
+            IUrlHelperWrapper urlHelperWrapper)
+        {
+            _userManagerWrapper = userManagerWrapper ?? throw new ArgumentNullException(nameof(userManagerWrapper));
+            _signInManagerWrapper = signInManagerWrapper ?? throw new ArgumentNullException(nameof(signInManagerWrapper));
+            _httpContextWrapper = httpContextWrapper;
+            _authenticationManagerWrapper = authenticationManagerWrapper;
+            _urlHelperWrapper = urlHelperWrapper;
         }
 
         public ApplicationSignInManager SignInManager
@@ -48,13 +88,92 @@ namespace JCarrollOnlineV2.Controllers
             private set => _userManager = value;
         }
 
+        /// <summary>
+        /// Gets the SignInManager wrapper for operations (supports both direct managers and injected wrappers)
+        /// </summary>
+        protected ISignInManagerWrapper SignInManagerWrapper
+        {
+            get
+            {
+                if (_signInManagerWrapper == null && SignInManager != null)
+                {
+                    _signInManagerWrapper = new SignInManagerWrapper(SignInManager);
+                }
+                return _signInManagerWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the UserManager wrapper for operations (supports both direct managers and injected wrappers)
+        /// </summary>
+        protected IUserManagerWrapper UserManagerWrapper
+        {
+            get
+            {
+                if (_userManagerWrapper == null && UserManager != null)
+                {
+                    _userManagerWrapper = new UserManagerWrapper(UserManager);
+                }
+                return _userManagerWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the HttpContext wrapper for operations
+        /// </summary>
+        protected IHttpContextWrapper HttpContextWrapper
+        {
+            get
+            {
+                if (_httpContextWrapper == null && HttpContext != null)
+                {
+                    _httpContextWrapper = new HttpContextWrapperImpl(HttpContext);
+                }
+                return _httpContextWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the AuthenticationManager wrapper for operations
+        /// </summary>
+        protected IAuthenticationManagerWrapper AuthenticationManagerWrapper
+        {
+            get
+            {
+                if (_authenticationManagerWrapper == null)
+                {
+                    IAuthenticationManager authManager = HttpContext?.GetOwinContext()?.Authentication;
+                    if (authManager != null)
+                    {
+                        _authenticationManagerWrapper = new AuthenticationManagerWrapper(authManager);
+                    }
+                }
+                return _authenticationManagerWrapper;
+            }
+        }
+
+        /// <summary>
+        /// Gets the UrlHelper wrapper for operations
+        /// </summary>
+        protected IUrlHelperWrapper UrlHelperWrapper
+        {
+            get
+            {
+                if (_urlHelperWrapper == null && Url != null)
+                {
+                    _urlHelperWrapper = new UrlHelperWrapper(Url);
+                }
+                return _urlHelperWrapper;
+            }
+        }
+
         // GET: /Account/DeleteUser
         [Authorize(Roles = "Administrator")]
         [HttpGet]
         public async Task<ActionResult> DeleteUser(string userId)
         {
             DeleteUserViewModel deleteUserViewModel = new DeleteUserViewModel();
-            ApplicationUser user = await UserManager.FindByIdAsync(userId).ConfigureAwait(false);
+            ApplicationUser user = await UserManagerWrapper.FindByIdAsync(userId).ConfigureAwait(false);
 
             if (user == null)
             {
@@ -77,14 +196,14 @@ namespace JCarrollOnlineV2.Controllers
                 return HttpNotFound();
             }
 
-            ApplicationUser user = await UserManager.FindByIdAsync(id).ConfigureAwait(false);
+            ApplicationUser user = await UserManagerWrapper.FindByIdAsync(id).ConfigureAwait(false);
 
             if (user == null)
             {
                 return HttpNotFound();
             }
 
-            IdentityResult result = UserManager.Delete(user);
+            IdentityResult result = await UserManagerWrapper.DeleteAsync(user).ConfigureAwait(false);
 
             if (result.Succeeded)
             {
@@ -141,16 +260,16 @@ namespace JCarrollOnlineV2.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            SignInStatus result = await SignInManager.PasswordSignInAsync(model?.UserName, model.Password, model.RememberMe, shouldLockout: false).ConfigureAwait(false);
+            SignInStatus result = await SignInManagerWrapper.PasswordSignInAsync(model?.UserName, model.Password, model.RememberMe, shouldLockout: false).ConfigureAwait(false);
 
             _logger.Info(string.Format(CultureInfo.InvariantCulture, "PasswordSignInAsync with UserName {0}, Password {1}, returned {2}", model.UserName, model.Password, result));
 
             switch (result)
             {
                 case SignInStatus.Success:
-                    if (!await UserManager.IsEmailConfirmedAsync((await UserManager.FindByNameAsync(model.UserName).ConfigureAwait(false)).Id).ConfigureAwait(false))
+                if (!await UserManagerWrapper.IsEmailConfirmedAsync((await UserManagerWrapper.FindByNameAsync(model.UserName).ConfigureAwait(false)).Id).ConfigureAwait(false))
                     {
-                        AuthenticationManager.SignOut();
+                        AuthenticationManagerWrapper.SignOut();
                         ModelState.AddModelError("", "You need to confirm your email");
                         return View(model);
                     }
@@ -176,7 +295,7 @@ namespace JCarrollOnlineV2.Controllers
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
             // Require that the user has already logged in via username/password or external login
-            return !await SignInManager.HasBeenVerifiedAsync().ConfigureAwait(false)
+            return !await SignInManagerWrapper.HasBeenVerifiedAsync().ConfigureAwait(false)
                 ? View("Error")
                 : View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
@@ -197,7 +316,7 @@ namespace JCarrollOnlineV2.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            SignInStatus result = await SignInManager.TwoFactorSignInAsync(model?.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser).ConfigureAwait(false);
+            SignInStatus result = await SignInManagerWrapper.TwoFactorSignInAsync(model?.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser).ConfigureAwait(false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -232,14 +351,14 @@ namespace JCarrollOnlineV2.Controllers
             if (ModelState.IsValid)
             {
                 ApplicationUser user = new ApplicationUser { UserName = model?.UserName, Email = model.Email };
-                IdentityResult result = await UserManager.CreateAsync(user, model.Password).ConfigureAwait(false);
+                IdentityResult result = await UserManagerWrapper.CreateAsync(user, model.Password).ConfigureAwait(false);
 
                 if (result.Succeeded)
                 {
                     try
                     {
                         // Generate email confirmation token
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id).ConfigureAwait(false);
+                        string code = await UserManagerWrapper.GenerateEmailConfirmationTokenAsync(user.Id).ConfigureAwait(false);
 
                         // URL encode the code to handle special characters
                         string encodedCode = System.Web.HttpUtility.UrlEncode(code);
@@ -284,6 +403,397 @@ namespace JCarrollOnlineV2.Controllers
             RegistrationNotificationViewModel registrationNotificationViewModel = new RegistrationNotificationViewModel();
 
             return View(registrationNotificationViewModel);
+        }
+
+        //
+        // GET: /Account/ConfirmEmail
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                    "ConfirmEmail called with null parameters. UserId: {0}, Code: {1}",
+                    userId ?? "null", code ?? "null"));
+                return View("Error");
+            }
+
+            try
+            {
+                // URL decode the code if it's not already decoded (handles + signs and %20)
+                string decodedCode = System.Web.HttpUtility.UrlDecode(code);
+
+                _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                    "Attempting to confirm email for userId: {0}", userId));
+
+                IdentityResult result = await UserManagerWrapper.ConfirmEmailAsync(userId, decodedCode).ConfigureAwait(false);
+
+                if (result.Succeeded)
+                {
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                        "Email confirmed successfully for userId: {0}", userId));
+
+                    LoginConfirmationViewModel loginConfirmationViewModel = new LoginConfirmationViewModel();
+                    return View("ConfirmEmail", loginConfirmationViewModel);
+                }
+                else
+                {
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Email confirmation failed for userId: {0}. Errors: {1}",
+                        userId, string.Join(", ", result.Errors)));
+                    return View("Error");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                    "Exception during email confirmation for userId: {0}", userId));
+                return View("Error");
+            }
+        }
+
+        //
+        // GET: /Account/ForgotPassword
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult ForgotPassword()
+        {
+            ForgotPasswordViewModel forgotPasswordViewModel = new ForgotPasswordViewModel();
+
+            return View(forgotPasswordViewModel);
+        }
+
+        //
+        // POST: /Account/ForgotPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser user = await UserManagerWrapper.FindByEmailAsync(model?.Email).ConfigureAwait(false);
+
+                if (user == null || !await UserManagerWrapper.IsEmailConfirmedAsync(user.Id).ConfigureAwait(false))
+                {
+                    ForgotPasswordConfirmationViewModel forgotPasswordConfirmationViewModel = new ForgotPasswordConfirmationViewModel();
+
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return View("ForgotPasswordConfirmation", forgotPasswordConfirmationViewModel);
+                }
+
+                try
+                {
+                    // Generate password reset token
+                    string code = await UserManagerWrapper.GeneratePasswordResetTokenAsync(user.Id).ConfigureAwait(false);
+
+                    // URL encode the code
+                    string encodedCode = System.Web.HttpUtility.UrlEncode(code);
+
+                    // Generate callback URL
+                    string callbackUrl = Url.Action("ResetPassword", "Account",
+                        routeValues: new { userId = user.Id, code = encodedCode },
+                        protocol: Request.Url.Scheme);
+
+                    // Send password reset email using your custom method
+                    await SendPasswordResetEmail(user, callbackUrl).ConfigureAwait(false);
+
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                        "Password reset email sent successfully to {0}", user.Email));
+
+                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                        "Failed to send password reset email to {0}", user.Email));
+
+                    // Still redirect to confirmation page (don't reveal if user exists)
+                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        //
+        // GET: /Account/ForgotPasswordConfirmation
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult ForgotPasswordConfirmation()
+        {
+            ForgotPasswordConfirmationViewModel forgotPasswordConfirmationViewModel = new ForgotPasswordConfirmationViewModel();
+
+            return View(forgotPasswordConfirmationViewModel);
+        }
+
+        //
+        // GET: /Account/ResetPassword
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult ResetPassword(string code)
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+                _logger.Error("ResetPassword called with null or empty code");
+                return View("Error");
+            }
+
+            ResetPasswordViewModel resetPasswordViewModel = new ResetPasswordViewModel
+            {
+                Code = code,
+                PageTitle = "Reset password"  // ← Set PageTitle here
+            };
+
+            return View(resetPasswordViewModel);
+        }
+
+        //
+        // POST: /Account/ResetPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (string.IsNullOrEmpty(model?.Code))
+            {
+                _logger.Error("ResetPassword POST called with null or empty code");
+                ModelState.AddModelError("", "Invalid password reset link.");
+                return View(model);
+            }
+
+            ApplicationUser user = await UserManagerWrapper.FindByEmailAsync(model.Email).ConfigureAwait(false);
+
+            if (user == null)
+            {
+                _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                    "Password reset attempted for non-existent email: {0}", model.Email));
+                // Don't reveal that the user does not exist
+                return RedirectToAction("ResetPasswordConfirmation", "Account");
+            }
+
+            try
+            {
+                // URL decode the code
+                string decodedCode = System.Web.HttpUtility.UrlDecode(model.Code);
+
+                _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                    "Attempting password reset for user: {0}", user.Email));
+
+                IdentityResult result = await UserManagerWrapper.ResetPasswordAsync(user.Id, decodedCode, model.Password).ConfigureAwait(false);
+
+                if (result.Succeeded)
+                {
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                        "Password reset successful for user: {0}", user.Email));
+                    return RedirectToAction("ResetPasswordConfirmation", "Account");
+                }
+
+                _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                    "Password reset failed for user {0}. Errors: {1}",
+                    user.Email, string.Join(", ", result.Errors)));
+
+                AddErrors(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
+                    "Exception during password reset for user: {0}", user.Email));
+                ModelState.AddModelError("", "An error occurred while resetting your password. Please try again.");
+            }
+
+            return View(model);
+        }
+
+        //
+        // GET: /Account/ResetPasswordConfirmation
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult ResetPasswordConfirmation()
+        {
+            ResetPasswordConfirmationViewModel resetPasswordConfirmationViewModel = new ResetPasswordConfirmationViewModel();
+
+            return View(resetPasswordConfirmationViewModel);
+        }
+
+        //
+        // POST: /Account/ExternalLogin
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            // Request a redirect to the external login provider
+            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
+        }
+
+        //
+        // GET: /Account/SendCode
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
+        {
+            string userId = await SignInManagerWrapper.GetVerifiedUserIdAsync().ConfigureAwait(false);
+            if (userId == null)
+            {
+                return View("Error");
+            }
+            System.Collections.Generic.IList<string> userFactors = await UserManagerWrapper.GetValidTwoFactorProvidersAsync(userId).ConfigureAwait(false);
+            System.Collections.Generic.List<SelectListItem> factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
+            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
+        }
+
+        //
+        // POST: /Account/SendCode
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SendCode(SendCodeViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            // Generate the token and send it
+            return !await SignInManagerWrapper.SendTwoFactorCodeAsync(model?.SelectedProvider).ConfigureAwait(false)
+                ? View("Error")
+                : (ActionResult)RedirectToAction("VerifyCode", routeValues: new { Provider = model.SelectedProvider,  model.ReturnUrl,  model.RememberMe });
+        }
+
+        //
+        // GET: /Account/ExternalLoginCallback
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
+        {
+            ExternalLoginInfo loginInfo = await AuthenticationManagerWrapper.GetExternalLoginInfoAsync().ConfigureAwait(false);
+            if (loginInfo == null)
+            {
+                return RedirectToAction("JCarrollOnlineV2Service");
+            }
+
+            // Sign in the user with this external login provider if the user already has a login
+            SignInStatus result = await SignInManagerWrapper.ExternalSignInAsync(loginInfo, isPersistent: false).ConfigureAwait(false);
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    return RedirectToLocal(returnUrl);
+                case SignInStatus.LockedOut:
+                    return View("Lockout");
+                case SignInStatus.RequiresVerification:
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+                case SignInStatus.Failure:
+                default:
+                    // If the user does not have an account, then prompt the user to create an account
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+            }
+        }
+
+        //
+        // POST: /Account/ExternalLoginConfirmation
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
+        {
+            if (HttpContextWrapper.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Manage");
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Get the information about the user from the external login provider
+                ExternalLoginInfo info = await AuthenticationManagerWrapper.GetExternalLoginInfoAsync().ConfigureAwait(false);
+                if (info == null)
+                {
+                    return View("ExternalLoginFailure");
+                }
+                ApplicationUser user = new ApplicationUser { UserName = model?.SiteUserName, Email = model.Email };
+                // Generate a random password for external login users (they won't use it)
+                string randomPassword = System.Guid.NewGuid().ToString();
+                IdentityResult result = await UserManagerWrapper.CreateAsync(user, randomPassword).ConfigureAwait(false);
+                if (result.Succeeded)
+                {
+                    result = await UserManagerWrapper.AddLoginAsync(user.Id, info.Login).ConfigureAwait(false);
+                    if (result.Succeeded)
+                    {
+                        await SignInManagerWrapper.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
+                        return RedirectToLocal(returnUrl);
+                    }
+                }
+                AddErrors(result);
+            }
+
+            if (model != null)
+            {
+                model.ReturnUrl = returnUrl;
+            }
+            return View(model);
+        }
+
+        //
+        // POST: /Account/LogOff
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult LogOff()
+        {
+            AuthenticationManagerWrapper.SignOut();
+            return RedirectToAction("Index", "Home");
+        }
+
+        //
+        // GET: /Account/ExternalLoginFailure
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult ExternalLoginFailure()
+        {
+            return View();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_userManager != null)
+                {
+                    _userManager.Dispose();
+                    _userManager = null;
+                }
+
+                if (_signInManager != null)
+                {
+                    _signInManager.Dispose();
+                    _signInManager = null;
+                }
+            }
+
+            base.Dispose(disposing);
+        }
+
+        #region Helpers
+        // Used for XSRF protection when adding external logins
+        private const string _xsrfKey = "XsrfId";
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (string error in result.Errors)
+            {
+                ModelState.AddModelError("", error);
+            }
+        }
+
+        private ActionResult RedirectToLocal(string returnUrl)
+        {
+            return UrlHelperWrapper.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : (ActionResult)RedirectToAction("Index", "Home");
         }
 
         private async Task SendWelcomeEmail(ApplicationUser user, Uri callbackUri)
@@ -410,120 +920,6 @@ namespace JCarrollOnlineV2.Controllers
             }
         }
 
-        //
-        // GET: /Account/ConfirmEmail
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult> ConfirmEmail(string userId, string code)
-        {
-            if (userId == null || code == null)
-            {
-                _logger.Error(string.Format(CultureInfo.InvariantCulture,
-                    "ConfirmEmail called with null parameters. UserId: {0}, Code: {1}",
-                    userId ?? "null", code ?? "null"));
-                return View("Error");
-            }
-
-            try
-            {
-                // URL decode the code if it's not already decoded (handles + signs and %20)
-                string decodedCode = System.Web.HttpUtility.UrlDecode(code);
-
-                _logger.Info(string.Format(CultureInfo.InvariantCulture,
-                    "Attempting to confirm email for userId: {0}", userId));
-
-                IdentityResult result = await UserManager.ConfirmEmailAsync(userId, decodedCode).ConfigureAwait(false);
-
-                if (result.Succeeded)
-                {
-                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
-                        "Email confirmed successfully for userId: {0}", userId));
-
-                    LoginConfirmationViewModel loginConfirmationViewModel = new LoginConfirmationViewModel();
-                    return View("ConfirmEmail", loginConfirmationViewModel);
-                }
-                else
-                {
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Email confirmation failed for userId: {0}. Errors: {1}",
-                        userId, string.Join(", ", result.Errors)));
-                    return View("Error");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
-                    "Exception during email confirmation for userId: {0}", userId));
-                return View("Error");
-            }
-        }
-
-        //
-        // GET: /Account/ForgotPassword
-        [AllowAnonymous]
-        [HttpGet]
-        public ActionResult ForgotPassword()
-        {
-            ForgotPasswordViewModel forgotPasswordViewModel = new ForgotPasswordViewModel();
-
-            return View(forgotPasswordViewModel);
-        }
-
-        //
-        // POST: /Account/ForgotPassword
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                ApplicationUser user = await UserManager.FindByEmailAsync(model?.Email).ConfigureAwait(false);
-
-                if (user == null || !await UserManager.IsEmailConfirmedAsync(user.Id).ConfigureAwait(false))
-                {
-                    ForgotPasswordConfirmationViewModel forgotPasswordConfirmationViewModel = new ForgotPasswordConfirmationViewModel();
-
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation", forgotPasswordConfirmationViewModel);
-                }
-
-                try
-                {
-                    // Generate password reset token
-                    string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id).ConfigureAwait(false);
-
-                    // URL encode the code
-                    string encodedCode = System.Web.HttpUtility.UrlEncode(code);
-
-                    // Generate callback URL
-                    string callbackUrl = Url.Action("ResetPassword", "Account",
-                        routeValues: new { userId = user.Id, code = encodedCode },
-                        protocol: Request.Url.Scheme);
-
-                    // Send password reset email using your custom method
-                    await SendPasswordResetEmail(user, callbackUrl).ConfigureAwait(false);
-
-                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
-                        "Password reset email sent successfully to {0}", user.Email));
-
-                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
-                        "Failed to send password reset email to {0}", user.Email));
-
-                    // Still redirect to confirmation page (don't reveal if user exists)
-                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
-                }
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        // Add this new helper method
         private async Task SendPasswordResetEmail(ApplicationUser user, string callbackUrl)
         {
             // Create email content (you can create a Handlebars template for this too)
@@ -555,7 +951,6 @@ namespace JCarrollOnlineV2.Controllers
             await SendPasswordResetEmailViaHostGatorAsync(passwordResetViewModel).ConfigureAwait(false);
         }
 
-        // Add this method (similar to SendEmailViaHostGatorAsync but for password reset)
         private async Task SendPasswordResetEmailViaHostGatorAsync(UserWelcomeViewModel viewModel)
         {
             // Read SMTP settings from web.config/appSettings
@@ -634,284 +1029,6 @@ namespace JCarrollOnlineV2.Controllers
                 // Reset certificate validation to default for security
                 System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
             }
-        }
-
-        //
-        // GET: /Account/ForgotPasswordConfirmation
-        [AllowAnonymous]
-        [HttpGet]
-        public ActionResult ForgotPasswordConfirmation()
-        {
-            ForgotPasswordConfirmationViewModel forgotPasswordConfirmationViewModel = new ForgotPasswordConfirmationViewModel();
-
-            return View(forgotPasswordConfirmationViewModel);
-        }
-
-        //
-        // GET: /Account/ResetPassword
-        [AllowAnonymous]
-        [HttpGet]
-        public ActionResult ResetPassword(string code)
-        {
-            if (string.IsNullOrEmpty(code))
-            {
-                _logger.Error("ResetPassword called with null or empty code");
-                return View("Error");
-            }
-
-            ResetPasswordViewModel resetPasswordViewModel = new ResetPasswordViewModel
-            {
-                Code = code,
-                PageTitle = "Reset password"  // ← Set PageTitle here
-            };
-
-            return View(resetPasswordViewModel);
-        }
-
-        //
-        // POST: /Account/ResetPassword
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            if (string.IsNullOrEmpty(model?.Code))
-            {
-                _logger.Error("ResetPassword POST called with null or empty code");
-                ModelState.AddModelError("", "Invalid password reset link.");
-                return View(model);
-            }
-
-            ApplicationUser user = await UserManager.FindByEmailAsync(model.Email).ConfigureAwait(false);
-
-            if (user == null)
-            {
-                _logger.Warn(string.Format(CultureInfo.InvariantCulture,
-                    "Password reset attempted for non-existent email: {0}", model.Email));
-                // Don't reveal that the user does not exist
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
-
-            try
-            {
-                // URL decode the code
-                string decodedCode = System.Web.HttpUtility.UrlDecode(model.Code);
-
-                _logger.Info(string.Format(CultureInfo.InvariantCulture,
-                    "Attempting password reset for user: {0}", user.Email));
-
-                IdentityResult result = await UserManager.ResetPasswordAsync(user.Id, decodedCode, model.Password).ConfigureAwait(false);
-
-                if (result.Succeeded)
-                {
-                    _logger.Info(string.Format(CultureInfo.InvariantCulture,
-                        "Password reset successful for user: {0}", user.Email));
-                    return RedirectToAction("ResetPasswordConfirmation", "Account");
-                }
-
-                _logger.Error(string.Format(CultureInfo.InvariantCulture,
-                    "Password reset failed for user {0}. Errors: {1}",
-                    user.Email, string.Join(", ", result.Errors)));
-
-                AddErrors(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
-                    "Exception during password reset for user: {0}", user.Email));
-                ModelState.AddModelError("", "An error occurred while resetting your password. Please try again.");
-            }
-
-            return View(model);
-        }
-
-        //
-        // GET: /Account/ResetPasswordConfirmation
-        [AllowAnonymous]
-        [HttpGet]
-        public ActionResult ResetPasswordConfirmation()
-        {
-            ResetPasswordConfirmationViewModel resetPasswordConfirmationViewModel = new ResetPasswordConfirmationViewModel();
-
-            return View(resetPasswordConfirmationViewModel);
-        }
-
-        //
-        // POST: /Account/ExternalLogin
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public ActionResult ExternalLogin(string provider, string returnUrl)
-        {
-            // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
-        }
-
-        //
-        // GET: /Account/SendCode
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
-        {
-            string userId = await SignInManager.GetVerifiedUserIdAsync().ConfigureAwait(false);
-            if (userId == null)
-            {
-                return View("Error");
-            }
-            System.Collections.Generic.IList<string> userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId).ConfigureAwait(false);
-            System.Collections.Generic.List<SelectListItem> factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
-        }
-
-        //
-        // POST: /Account/SendCode
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SendCode(SendCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-
-            // Generate the token and send it
-            return !await SignInManager.SendTwoFactorCodeAsync(model?.SelectedProvider).ConfigureAwait(false)
-                ? View("Error")
-                : (ActionResult)RedirectToAction("VerifyCode", routeValues: new { Provider = model.SelectedProvider,  model.ReturnUrl,  model.RememberMe });
-        }
-
-        //
-        // GET: /Account/ExternalLoginCallback
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-        {
-            ExternalLoginInfo loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync().ConfigureAwait(false);
-            if (loginInfo == null)
-            {
-                return RedirectToAction("JCarrollOnlineV2Service");
-            }
-
-            // Sign in the user with this external login provider if the user already has a login
-            SignInStatus result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false).ConfigureAwait(false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
-                case SignInStatus.Failure:
-                default:
-                    // If the user does not have an account, then prompt the user to create an account
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
-            }
-        }
-
-        //
-        // POST: /Account/ExternalLoginConfirmation
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Manage");
-            }
-
-            if (ModelState.IsValid)
-            {
-                // Get the information about the user from the external login provider
-                ExternalLoginInfo info = await AuthenticationManager.GetExternalLoginInfoAsync().ConfigureAwait(false);
-                if (info == null)
-                {
-                    return View("ExternalLoginFailure");
-                }
-                ApplicationUser user = new ApplicationUser { UserName = model?.SiteUserName, Email = model.Email };
-                IdentityResult result = await UserManager.CreateAsync(user).ConfigureAwait(false);
-                if (result.Succeeded)
-                {
-                    result = await UserManager.AddLoginAsync(user.Id, info.Login).ConfigureAwait(false);
-                    if (result.Succeeded)
-                    {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
-                        return RedirectToLocal(returnUrl);
-                    }
-                }
-                AddErrors(result);
-            }
-
-            if (model != null)
-            {
-                model.ReturnUrl = returnUrl;
-            }
-            return View(model);
-        }
-
-        //
-        // POST: /Account/LogOff
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult LogOff()
-        {
-            AuthenticationManager.SignOut();
-            return RedirectToAction("Index", "Home");
-        }
-
-        //
-        // GET: /Account/ExternalLoginFailure
-        [AllowAnonymous]
-        [HttpGet]
-        public ActionResult ExternalLoginFailure()
-        {
-            return View();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_userManager != null)
-                {
-                    _userManager.Dispose();
-                    _userManager = null;
-                }
-
-                if (_signInManager != null)
-                {
-                    _signInManager.Dispose();
-                    _signInManager = null;
-                }
-            }
-
-            base.Dispose(disposing);
-        }
-
-        #region Helpers
-        // Used for XSRF protection when adding external logins
-        private const string _xsrfKey = "XsrfId";
-
-        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (string error in result.Errors)
-            {
-                ModelState.AddModelError("", error);
-            }
-        }
-
-        private ActionResult RedirectToLocal(string returnUrl)
-        {
-            return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : (ActionResult)RedirectToAction("Index", "Home");
         }
 
 
