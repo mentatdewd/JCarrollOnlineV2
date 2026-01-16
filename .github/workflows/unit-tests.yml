@@ -32,7 +32,7 @@ jobs:
       run: nuget restore JCarrollOnlineV2.sln
       
     - name: Build solution
-      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="AnyCPU"
+      run: msbuild JCarrollOnlineV2.sln /p:Configuration=Release /p:Platform="Any CPU"
       
     - name: Run unit tests
       id: test
