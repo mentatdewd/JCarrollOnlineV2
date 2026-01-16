@@ -1,4 +1,4 @@
-﻿name: Unit Tests
+name: Unit Tests
 
 on:
   workflow_call:
@@ -25,7 +25,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     
     # Download artifacts from last successful build if manual run with use-last-build=true
     - name: Download last successful build artifacts
