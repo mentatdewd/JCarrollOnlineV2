@@ -21,9 +21,7 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    # Assign reviewers (optional)
-    reviewers:
-      - "mentatdewd"
+    # Remove reviewers property (not supported)
     # Add labels
     labels:
       - "dependencies"

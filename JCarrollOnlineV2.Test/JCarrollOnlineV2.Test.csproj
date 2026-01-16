@@ -196,6 +196,7 @@
     <Compile Include="Controllers\ForaControllerIntegrationTest.cs" />
     <Compile Include="Controllers\ForaControllerTest.cs" />
     <Compile Include="Controllers\HomeControllerTest.cs" />
+    <Compile Include="Controllers\ManageControllerTest.cs" />
     <Compile Include="Controllers\MicroPostsControllerTest.cs" />
     <Compile Include="Controllers\TestableForaController.cs" />
     <Compile Include="Controllers\TestableHomeController.cs" />

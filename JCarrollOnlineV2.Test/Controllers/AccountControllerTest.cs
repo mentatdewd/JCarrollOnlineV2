@@ -396,7 +396,6 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // ApplicationSignInManager requires ApplicationUserManager and IAuthenticationManager
             Mock<IAuthenticationManager> mockAuthManager = new Mock<IAuthenticationManager>();
-            Mock<HttpContextBase> mockHttpContext = new Mock<HttpContextBase>();
 
             // This is a placeholder showing the approach
             Mock<ApplicationSignInManager> mockSignInManager = new Mock<ApplicationSignInManager>(

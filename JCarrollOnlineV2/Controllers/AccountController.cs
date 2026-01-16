@@ -352,7 +352,9 @@ namespace JCarrollOnlineV2.Controllers
                 {
                     // If there are no SSL policy errors, accept the certificate
                     if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
+                    {
                         return true;
+                    }
 
                     // Only bypass validation for our specific SMTP server
                     if (sender is System.Net.Mail.SmtpClient)
@@ -579,7 +581,9 @@ namespace JCarrollOnlineV2.Controllers
                 (sender, certificate, chain, sslPolicyErrors) =>
                 {
                     if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
+                    {
                         return true;
+                    }
 
                     if (sender is System.Net.Mail.SmtpClient)
                     {
@@ -739,7 +743,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Account/ExternalLogin
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -751,7 +754,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/SendCode
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#")]
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
@@ -786,8 +788,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/ExternalLoginCallback
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#")]
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
@@ -817,8 +817,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Account/ExternalLoginConfirmation
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -870,7 +868,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // GET: /Account/ExternalLoginFailure
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         [AllowAnonymous]
         [HttpGet]
         public ActionResult ExternalLoginFailure()
@@ -917,7 +914,8 @@ namespace JCarrollOnlineV2.Controllers
             return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : (ActionResult)RedirectToAction("Index", "Home");
         }
 
-        internal class ChallengeResult : HttpUnauthorizedResult
+
+        public class ChallengeResult : HttpUnauthorizedResult
         {
             public ChallengeResult(string provider, string redirectUri)
                 : this(provider, redirectUri, null)

@@ -15,15 +15,22 @@ namespace JCarrollOnlineV2.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private readonly IAuthenticationManager _authenticationManager;
 
         public ManageController()
         {
         }
 
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+            : this(userManager, signInManager, null)
+        {
+        }
+
+        public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, IAuthenticationManager authenticationManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            _authenticationManager = authenticationManager;
         }
 
         public ApplicationSignInManager SignInManager
@@ -66,8 +73,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Manage/RemoveLogin
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RemoveLogin(string loginProvider, string providerKey)
@@ -320,7 +325,6 @@ namespace JCarrollOnlineV2.Controllers
 
         //
         // POST: /Manage/LinkLogin
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LinkLogin(string provider)
@@ -332,7 +336,6 @@ namespace JCarrollOnlineV2.Controllers
         //
         // GET: /Manage/LinkLoginCallback
         [HttpGet]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
         public async Task<ActionResult> LinkLoginCallback()
         {
             ExternalLoginInfo loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(_xsrfKey, User.Identity.GetUserId()).ConfigureAwait(false);
@@ -356,10 +359,10 @@ namespace JCarrollOnlineV2.Controllers
         }
 
 #region Helpers
-        // Used for XSRF protection when adding external logins
-        private const string _xsrfKey = "XsrfId";
+// Used for XSRF protection when adding external logins
+private const string _xsrfKey = "XsrfId";
 
-        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
+private IAuthenticationManager AuthenticationManager => _authenticationManager ?? HttpContext.GetOwinContext().Authentication;
 
         private void AddErrors(IdentityResult result)
         {
@@ -387,7 +390,6 @@ namespace JCarrollOnlineV2.Controllers
             ChangePasswordSuccess,
             SetTwoFactorSuccess,
             SetPasswordSuccess,
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login")]
             RemoveLoginSuccess,
             RemovePhoneSuccess,
             Error
