@@ -184,6 +184,9 @@ UpgradeLog*.htm
 *.bim.layout
 *.bim_*.settings
 
+# Unity build
+!Content/games/Build/**/*
+
 # Microsoft Fakes
 FakesAssemblies/
 
