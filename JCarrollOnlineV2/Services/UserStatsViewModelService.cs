@@ -30,7 +30,7 @@ namespace JCarrollOnlineV2.Services
 
             _logger.Info($"Building user stats for user {userId}");
 
-            var userStatsViewModel = new UserStatsViewModel
+            UserStatsViewModel userStatsViewModel = new UserStatsViewModel
             {
                 UserFollowers = new UserFollowersViewModel(),
                 UsersFollowing = new UserFollowingViewModel()
@@ -39,7 +39,7 @@ namespace JCarrollOnlineV2.Services
             try
             {
                 // Load user with followers and following
-                var user = await _context.ApplicationUser
+                ApplicationUser user = await _context.ApplicationUser
                     .Include(u => u.Followers)
                     .Include(u => u.Following)
                     .AsNoTracking()
@@ -61,7 +61,7 @@ namespace JCarrollOnlineV2.Services
 
                 // Get micropost counts for all users in ONE query to avoid multiple database calls
                 _logger.Info($"Loading micropost counts for {allUserIds.Distinct().Count()} users");
-                var microPostCounts = await _context.MicroPost
+                Dictionary<string, int> microPostCounts = await _context.MicroPost
                     .AsNoTracking()
                     .Where(mp => allUserIds.Contains(mp.Author.Id))
                     .GroupBy(mp => mp.Author.Id)
@@ -73,7 +73,7 @@ namespace JCarrollOnlineV2.Services
                 _logger.Info($"Processing {user.Followers.Count} followers");
                 foreach (ApplicationUser follower in user.Followers)
                 {
-                    var userItemViewModel = new UserItemViewModel(_logger);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel();
                     userItemViewModel.InjectFrom(follower);
                     
                     // Get micro post count from the dictionary
@@ -88,7 +88,7 @@ namespace JCarrollOnlineV2.Services
                 _logger.Info($"Processing {user.Following.Count} following");
                 foreach (ApplicationUser followedUser in user.Following)
                 {
-                    var userItemViewModel = new UserItemViewModel(_logger);
+                    UserItemViewModel userItemViewModel = new UserItemViewModel();
                     userItemViewModel.InjectFrom(followedUser);
                     
                     // Get micro post count from the dictionary

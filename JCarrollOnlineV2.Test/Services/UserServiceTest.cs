@@ -4,12 +4,12 @@ using JCarrollOnlineV2.Services;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +21,6 @@ namespace JCarrollOnlineV2.Test.Services
         private Mock<JCarrollOnlineV2DbContext> _mockContext;
         private Mock<DbSet<ApplicationUser>> _mockUserSet;
         private Mock<DbSet<MicroPost>> _mockMicroPostSet;
-        private Mock<ILogger> _mockLogger;
         private UserService _userService;
         private List<ApplicationUser> _testUsers;
         private List<MicroPost> _testMicroPosts;
@@ -30,7 +29,6 @@ namespace JCarrollOnlineV2.Test.Services
         public void TestInitialize()
         {
             _mockContext = new Mock<JCarrollOnlineV2DbContext>();
-            _mockLogger = new Mock<ILogger>();
             
             // Setup test data
             SetupTestData();
@@ -42,7 +40,7 @@ namespace JCarrollOnlineV2.Test.Services
             _mockContext.Setup(c => c.ApplicationUser).Returns(_mockUserSet.Object);
             _mockContext.Setup(c => c.MicroPost).Returns(_mockMicroPostSet.Object);
             
-            _userService = new UserService(_mockContext.Object, _mockLogger.Object);
+            _userService = new UserService(_mockContext.Object);
         }
 
         #region Constructor Tests
@@ -52,28 +50,17 @@ namespace JCarrollOnlineV2.Test.Services
         {
             // Act & Assert
             ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() =>
-                new UserService(null, _mockLogger.Object)
+                new UserService(null)
             );
             
             Assert.AreEqual("context", ex.ParamName);
         }
 
         [TestMethod]
-        public void Constructor_WithNullLogger_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() =>
-                new UserService(_mockContext.Object, null)
-            );
-            
-            Assert.AreEqual("logger", ex.ParamName);
-        }
-
-        [TestMethod]
         public void Constructor_WithValidParameters_CreatesInstance()
         {
             // Act
-            UserService service = new UserService(_mockContext.Object, _mockLogger.Object);
+            UserService service = new UserService(_mockContext.Object);
 
             // Assert
             Assert.IsNotNull(service);
@@ -514,7 +501,7 @@ namespace JCarrollOnlineV2.Test.Services
 
         private void SetupTestData()
         {
-            var user1 = new ApplicationUser
+            ApplicationUser user1 = new ApplicationUser
             {
                 Id = "user1",
                 UserName = "User One",
@@ -522,8 +509,8 @@ namespace JCarrollOnlineV2.Test.Services
                 MicroPostEmailNotifications = true,
                 MicroPostSmsNotifications = false
             };
-            
-            var user2 = new ApplicationUser
+
+            ApplicationUser user2 = new ApplicationUser
             {
                 Id = "user2",
                 UserName = "User Two",
@@ -531,8 +518,8 @@ namespace JCarrollOnlineV2.Test.Services
                 MicroPostEmailNotifications = false,
                 MicroPostSmsNotifications = true
             };
-            
-            var user3 = new ApplicationUser
+
+            ApplicationUser user3 = new ApplicationUser
             {
                 Id = "user3",
                 UserName = "User Three",
@@ -563,9 +550,9 @@ namespace JCarrollOnlineV2.Test.Services
         
         private void InitializeNavigationProperties(ApplicationUser user)
         {
-            var followingProperty = typeof(ApplicationUser).GetProperty("Following");
-            var followersProperty = typeof(ApplicationUser).GetProperty("Followers");
-            var microPostsProperty = typeof(ApplicationUser).GetProperty("MicroPosts");
+            PropertyInfo followingProperty = typeof(ApplicationUser).GetProperty("Following");
+            PropertyInfo followersProperty = typeof(ApplicationUser).GetProperty("Followers");
+            PropertyInfo microPostsProperty = typeof(ApplicationUser).GetProperty("MicroPosts");
             
             followingProperty?.SetValue(user, new List<ApplicationUser>());
             followersProperty?.SetValue(user, new List<ApplicationUser>());

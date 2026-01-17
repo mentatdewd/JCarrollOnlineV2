@@ -4,11 +4,9 @@ namespace JCarrollOnlineV2.ViewModels.Users
 {
     public class UserDetailViewModel : UserViewModelBase
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         public UserDetailViewModel()
         {
-            UserInfoViewModel = new UserItemViewModel(logger);
+            UserInfoViewModel = new UserItemViewModel();
             UserStatsViewModel = new UserStatsViewModel();
         }
         public UserItemViewModel UserInfoViewModel { get; set; }

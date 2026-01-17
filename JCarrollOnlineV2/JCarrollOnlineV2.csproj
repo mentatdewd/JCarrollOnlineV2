@@ -1019,7 +1019,6 @@
     <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="gulpfile.js" />
     <None Include="EmailTemplates\UserWelcomePage.hbs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

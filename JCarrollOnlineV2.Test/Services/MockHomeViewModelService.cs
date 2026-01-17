@@ -44,7 +44,7 @@ namespace JCarrollOnlineV2.Test.Services
                     UserFollowers = new UserFollowersViewModel(),
                     UsersFollowing = new UserFollowingViewModel()
                 },
-                UserInfoViewModel = new UserItemViewModel(NLog.LogManager.GetCurrentClassLogger()),
+                UserInfoViewModel = new UserItemViewModel(),
                 BlogFeed = new BlogFeedViewModel(),
                 LatestForumThreadsViewModel = new LatestForumThreadsViewModel(),
                 ChatViewModel = new ChatViewModel(),

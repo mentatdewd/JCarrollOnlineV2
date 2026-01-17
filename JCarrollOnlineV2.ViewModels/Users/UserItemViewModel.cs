@@ -1,5 +1,4 @@
 ﻿using JCarrollOnlineV2.ViewModels.MicroPosts;
-using NLog;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,12 +6,6 @@ namespace JCarrollOnlineV2.ViewModels.Users
 {
     public class UserItemViewModel : UserViewModelBase
     {
-        public UserItemViewModel() { }
-        public UserItemViewModel(ILogger logger)
-        {
-            Logger = logger;
-        }
-
         public string UserId { get; set; }
 
         [Display(Name = "MicroPost Email Notifications")]
@@ -23,7 +16,6 @@ namespace JCarrollOnlineV2.ViewModels.Users
 
         public int? MicroPostsAuthored { get; set; }
         public ICollection<MicroPostFeedItemViewModel> MicroPosts { get; set; }
-        public ILogger Logger { get; set; }
 
         /// <summary>
         /// True if this user follows the current user

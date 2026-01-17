@@ -18,7 +18,6 @@ namespace JCarrollOnlineV2.ViewModels.Home
         public LatestForumThreadsViewModel LatestForumThreadsViewModel { get; set; }
         public ChatViewModel ChatViewModel { get; set; }
         public int? MicroPostPage { get; set; }
- //       public List<MicroPostFeedItemViewModel> OnePageOfMicroPosts { get; private set; }
         public int? PageNumber { get; set; }
     }
 }

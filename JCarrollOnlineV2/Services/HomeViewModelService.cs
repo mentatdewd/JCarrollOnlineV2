@@ -72,7 +72,7 @@ namespace JCarrollOnlineV2.Services
                 MicroPostCreateViewModel = new MicroPostCreateViewModel(),
                 MicroPostFeedViewModel = new MicroPostFeedViewModel(),
                 UserStatsViewModel = new UserStatsViewModel(),
-                UserInfoViewModel = new UserItemViewModel(_logger),
+                UserInfoViewModel = new UserItemViewModel(),
                 BlogFeed = new BlogFeedViewModel(),
                 PageContainer = "Home"
             };

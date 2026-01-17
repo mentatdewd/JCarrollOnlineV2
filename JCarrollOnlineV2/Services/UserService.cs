@@ -14,12 +14,10 @@ namespace JCarrollOnlineV2.Services
     public class UserService : IUserService
     {
         private readonly JCarrollOnlineV2DbContext _context;
-        private readonly ILogger _logger;
 
-        public UserService(JCarrollOnlineV2DbContext context, ILogger logger)
+        public UserService(JCarrollOnlineV2DbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<List<UserItemViewModel>> GetAllUsersAsync(string currentUserId = null)
@@ -42,7 +40,7 @@ namespace JCarrollOnlineV2.Services
 
             if (!string.IsNullOrEmpty(currentUserId))
             {
-                var currentUser = await _context.ApplicationUser
+                ApplicationUser currentUser = await _context.ApplicationUser
                     .Include(u => u.Following)
                     .Include(u => u.Followers)
                     .AsNoTracking()
@@ -59,7 +57,7 @@ namespace JCarrollOnlineV2.Services
             List<UserItemViewModel> viewModels = new List<UserItemViewModel>();
             foreach (ApplicationUser user in users)
             {
-                UserItemViewModel vm = new UserItemViewModel(_logger);
+                UserItemViewModel vm = new UserItemViewModel();
                 vm.User.InjectFrom(user);
                 vm.UserId = user.Id;
                 vm.MicroPostsAuthored = user.MicroPosts.Count;
@@ -92,7 +90,7 @@ namespace JCarrollOnlineV2.Services
 
             UserDetailViewModel viewModel = new UserDetailViewModel
             {
-                UserInfoViewModel = new UserItemViewModel(_logger),
+                UserInfoViewModel = new UserItemViewModel(),
                 UserStatsViewModel = new UserStatsViewModel
                 {
                     UsersFollowing = new UserFollowingViewModel(),
@@ -114,7 +112,7 @@ namespace JCarrollOnlineV2.Services
             allUserIds.AddRange(user.Followers.Select(u => u.Id));
 
             // Get micropost counts for all users in ONE query
-            var microPostCounts = await _context.MicroPost
+            Dictionary<string, int> microPostCounts = await _context.MicroPost
                 .AsNoTracking()
                 .Where(mp => allUserIds.Contains(mp.Author.Id))
                 .GroupBy(mp => mp.Author.Id)
@@ -128,7 +126,7 @@ namespace JCarrollOnlineV2.Services
 
             if (!string.IsNullOrEmpty(currentUserId) && currentUserId != userId)
             {
-                var currentUser = await _context.ApplicationUser
+                ApplicationUser currentUser = await _context.ApplicationUser
                     .Include(u => u.Following)
                     .Include(u => u.Followers)
                     .AsNoTracking()
@@ -145,7 +143,7 @@ namespace JCarrollOnlineV2.Services
             // Map following users
             foreach (ApplicationUser following in user.Following)
             {
-                UserItemViewModel vm = new UserItemViewModel(_logger);
+                UserItemViewModel vm = new UserItemViewModel();
                 vm.User.InjectFrom(following);
                 vm.UserId = following.Id;
                 vm.MicroPostsAuthored = microPostCounts.ContainsKey(following.Id) 
@@ -162,7 +160,7 @@ namespace JCarrollOnlineV2.Services
             // Map followers
             foreach (ApplicationUser follower in user.Followers)
             {
-                UserItemViewModel vm = new UserItemViewModel(_logger);
+                UserItemViewModel vm = new UserItemViewModel();
                 vm.User.InjectFrom(follower);
                 vm.UserId = follower.Id;
                 vm.MicroPostsAuthored = microPostCounts.ContainsKey(follower.Id) 
