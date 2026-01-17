@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:  
-  # Step 2: Build for production (only if tests pass)
+  # Step 1: Build for production
   build:
     name: 🔨 Build for Production
     runs-on: windows-latest
@@ -233,7 +233,14 @@ jobs:
         PROD_CONN: ${{ secrets.__PROD_CONNECTION_STRING__ }}
         MACH_VAL: ${{ secrets.__MACHINEKEY_VALIDATION__ }}
         MACH_DEC: ${{ secrets.__MACHINEKEY_DECRYPTION__ }}
-        SMTP_PWD: ${{ secrets.__SMTP_PASSWORD__ }}
+        
+        # SMTP settings - FIXED: No __ prefix/suffix in env variable names
+        SMTP_HOST: ${{ secrets.SMTP_HOST }}
+        SMTP_PORT: ${{ secrets.SMTP_PORT }}
+        SMTP_USER_NAME: ${{ secrets.SMTP_USER_NAME }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
+        SMTP_ENABLE_SSL: ${{ secrets.SMTP_ENABLE_SSL }}
       run: |
         $webConfigPath = Join-Path "${{ steps.find-publish.outputs.PUBLISH_PATH }}" "Web.config"
         
@@ -263,7 +270,7 @@ jobs:
           }
         }
         
-        # Remove configBuilders from appSettings and replace SMTP password
+        # Remove configBuilders from appSettings and replace ALL SMTP settings
         $appSettings = $xml.configuration.appSettings
         if ($appSettings) {
           if ($appSettings.HasAttribute("configBuilders")) {
@@ -271,10 +278,33 @@ jobs:
             Write-Host "✓ Removed configBuilders from appSettings" -ForegroundColor Green
           }
           
+          # FIXED: Replace ALL SMTP placeholders
           foreach ($add in $appSettings.add) {
-            if ($add.value -eq "__SMTP_PASSWORD__") {
-              $add.value = $env:SMTP_PWD
-              Write-Host "✓ Replaced __SMTP_PASSWORD__" -ForegroundColor Green
+            switch ($add.value) {
+              "__SMTP_HOST__" {
+                $add.value = $env:SMTP_HOST
+                Write-Host "✓ Replaced __SMTP_HOST__" -ForegroundColor Green
+              }
+              "__SMTP_PORT__" {
+                $add.value = $env:SMTP_PORT
+                Write-Host "✓ Replaced __SMTP_PORT__" -ForegroundColor Green
+              }
+              "__SMTP_USER_NAME__" {
+                $add.value = $env:SMTP_USER_NAME
+                Write-Host "✓ Replaced __SMTP_USER_NAME__" -ForegroundColor Green
+              }
+              "__SMTP_PASSWORD__" {
+                $add.value = $env:SMTP_PASSWORD
+                Write-Host "✓ Replaced __SMTP_PASSWORD__" -ForegroundColor Green
+              }
+              "__SMTP_FROM_EMAIL__" {
+                $add.value = $env:SMTP_FROM_EMAIL
+                Write-Host "✓ Replaced __SMTP_FROM_EMAIL__" -ForegroundColor Green
+              }
+              "__SMTP_ENABLE_SSL__" {
+                $add.value = $env:SMTP_ENABLE_SSL
+                Write-Host "✓ Replaced __SMTP_ENABLE_SSL__" -ForegroundColor Green
+              }
             }
           }
         }
@@ -307,7 +337,7 @@ jobs:
         if ($systemNet -and $systemNet.mailSettings -and $systemNet.mailSettings.smtp -and $systemNet.mailSettings.smtp.network) {
           $network = $systemNet.mailSettings.smtp.network
           if ([string]::IsNullOrEmpty($network.password) -or $network.password -eq "__SMTP_PASSWORD__") {
-            $network.password = $env:SMTP_PWD
+            $network.password = $env:SMTP_PASSWORD
             Write-Host "✓ Replaced legacy __SMTP_PASSWORD__" -ForegroundColor Green
           }
         }
