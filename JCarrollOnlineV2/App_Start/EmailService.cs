@@ -54,8 +54,20 @@ namespace JCarrollOnlineV2
 
                     using (SmtpClient smtp = CreateSmtpClient())
                     {
-                        await smtp.SendMailAsync(msg).ConfigureAwait(false);
-                        _logger.Info($"Email sent successfully to {toString}");
+                        _logger.Info($"SMTP client created, attempting to send...");
+
+                        // Add a timeout wrapper
+                        Task sendTask = smtp.SendMailAsync(msg);
+                        if (await Task.WhenAny(sendTask, Task.Delay(35000)) == sendTask)
+                        {
+                            await sendTask; // Propagate any exceptions
+                            _logger.Info($"Email sent successfully to {toString}");
+                        }
+                        else
+                        {
+                            _logger.Error($"Email send timed out after 35 seconds to {toString}");
+                            throw new TimeoutException("Email sending operation timed out");
+                        }
                     }
                 }
             }
