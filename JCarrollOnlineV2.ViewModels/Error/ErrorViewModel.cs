@@ -1,10 +1,10 @@
 using System.Web.Mvc;
 
-namespace JCarrollOnlineV2.ViewModels
+namespace JCarrollOnlineV2.ViewModels.Error
 {
     public class ErrorViewModel : ViewModelBase
     {
-        public HandleErrorInfo HandleErrorInfo { get; set; }
+        public ErrorInfo HandleErrorInfo { get; set; }
 
         public ErrorViewModel()
         {
@@ -12,7 +12,7 @@ namespace JCarrollOnlineV2.ViewModels
             PageContainer = "container-fluid";
         }
 
-        public ErrorViewModel(HandleErrorInfo handleErrorInfo) : this()
+        public ErrorViewModel(ErrorInfo handleErrorInfo) : this()
         {
             HandleErrorInfo = handleErrorInfo;
         }

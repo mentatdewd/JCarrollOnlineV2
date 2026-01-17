@@ -1,7 +1,7 @@
-﻿using JCarrollOnlineV2.EmailViewModels;
-using JCarrollOnlineV2.Entities;
+﻿using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.Helpers;
+using JCarrollOnlineV2.ViewModels.Email;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;

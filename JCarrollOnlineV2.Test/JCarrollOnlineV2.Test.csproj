@@ -215,10 +215,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JCarrollOnlineV2.EmailViewModels\JCarrollOnlineV2.EmailViewModels.csproj">
-      <Project>{a5845c0d-2b3e-4109-9a02-04125cd49b08}</Project>
-      <Name>JCarrollOnlineV2.EmailViewModels</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JCarrollOnlineV2.Entities\JCarrollOnlineV2.Entities.csproj">
       <Project>{5d0cbbda-1f49-4c1b-a508-fdab11b4d72f}</Project>
       <Name>JCarrollOnlineV2.Entities</Name>

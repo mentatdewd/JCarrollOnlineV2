@@ -1,5 +1,5 @@
+using JCarrollOnlineV2.ViewModels.Error;
 using System.Web.Mvc;
-using JCarrollOnlineV2.ViewModels;
 
 namespace JCarrollOnlineV2.Controllers
 {

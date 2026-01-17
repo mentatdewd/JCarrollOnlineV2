@@ -125,6 +125,11 @@
     <Compile Include="Blog\BlogFeedViewModelBase.cs" />
     <Compile Include="Blog\BlogIndexViewModel.cs" />
     <Compile Include="Chat\ChatViewModel.cs" />
+    <Compile Include="Email\EmailViewModelBase.cs" />
+    <Compile Include="Email\MicropostNotificationViewModel.cs" />
+    <Compile Include="Email\WelcomeUserViewModel.cs" />
+    <Compile Include="Error\ErrorInfo.cs" />
+    <Compile Include="Error\ErrorViewModel.cs" />
     <Compile Include="ForumModerators\ForumModeratorsDeleteViewModel.cs" />
     <Compile Include="ForumModerators\ForumModeratorsDetailsViewModel.cs" />
     <Compile Include="ForumModerators\ForumModeratorsEditViewModel.cs" />
@@ -141,7 +146,7 @@
     <Compile Include="ForumThreadEntries\ThreadEntryIndexViewModel.cs" />
     <Compile Include="ForumThreadEntries\ThreadEntryViewModel.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HomeViewModel.cs" />
+    <Compile Include="Home\HomeViewModel.cs" />
     <Compile Include="Home\AboutViewModel.cs" />
     <Compile Include="Account\RegistrationNotificationViewModel.cs" />
     <Compile Include="Home\AnonHomePageViewModel.cs" />
@@ -181,7 +186,6 @@
     <Compile Include="ForumModerators\ForumModeratorsIndexViewModels.cs" />
     <Compile Include="ForumThreadEntries\ThreadEntriesEditViewModel.cs" />
     <Compile Include="HierarchyNodeViewModel\HierarchyNodeViewModel.cs" />
-    <Compile Include="Home\HomeViewModel.cs" />
     <Compile Include="Users\ApplicationUserViewModelBase.cs" />
     <Compile Include="Users\UserDetailViewModel.cs" />
     <Compile Include="Users\UserFollowingViewModel.cs" />

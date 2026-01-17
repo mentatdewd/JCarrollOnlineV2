@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JCarrollOnlineV2.EmailViewModels
+namespace JCarrollOnlineV2.ViewModels.Email
 {
     public class UserWelcomeViewModel : EmailViewModelBase
     {

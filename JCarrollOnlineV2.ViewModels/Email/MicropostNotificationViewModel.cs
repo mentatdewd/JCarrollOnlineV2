@@ -1,6 +1,6 @@
 ﻿using JCarrollOnlineV2.Entities;
 
-namespace JCarrollOnlineV2.EmailViewModels
+namespace JCarrollOnlineV2.ViewModels.Email
 {
     public class MicroPostNotificationViewModel : EmailViewModelBase
     {

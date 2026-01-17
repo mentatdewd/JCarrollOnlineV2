@@ -1,5 +1,5 @@
+using JCarrollOnlineV2.ViewModels.Error;
 using System.Web.Mvc;
-using JCarrollOnlineV2.ViewModels;
 
 namespace JCarrollOnlineV2.Filters
 {
@@ -19,8 +19,17 @@ namespace JCarrollOnlineV2.Filters
 
             string controllerName = (string)filterContext.RouteData.Values["controller"];
             string actionName = (string)filterContext.RouteData.Values["action"];
-            HandleErrorInfo handleErrorInfo = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
-            ErrorViewModel model = new ErrorViewModel(handleErrorInfo);
+            
+            // Map MVC HandleErrorInfo to our POCO
+            var errorInfo = new ErrorInfo
+            {
+                ControllerName = controllerName,
+                ActionName = actionName,
+                ExceptionType = filterContext.Exception?.GetType().Name,
+                Message = filterContext.Exception?.Message
+            };
+            
+            ErrorViewModel model = new ErrorViewModel(errorInfo);
 
             filterContext.Result = new ViewResult
             {

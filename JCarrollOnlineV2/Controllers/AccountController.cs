@@ -1,10 +1,10 @@
-﻿using JCarrollOnlineV2.EmailViewModels;
-using JCarrollOnlineV2.Entities;
+﻿using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.Helpers;
 using JCarrollOnlineV2.Infrastructure;
 using JCarrollOnlineV2.Interfaces;
 using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Account;
+using JCarrollOnlineV2.ViewModels.Email;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
