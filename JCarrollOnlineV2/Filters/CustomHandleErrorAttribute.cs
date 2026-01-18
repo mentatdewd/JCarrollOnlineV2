@@ -19,9 +19,9 @@ namespace JCarrollOnlineV2.Filters
 
             string controllerName = (string)filterContext.RouteData.Values["controller"];
             string actionName = (string)filterContext.RouteData.Values["action"];
-            
+
             // Map MVC HandleErrorInfo to our POCO
-            var errorInfo = new ErrorInfo
+            ErrorInfo errorInfo = new ErrorInfo
             {
                 ControllerName = controllerName,
                 ActionName = actionName,

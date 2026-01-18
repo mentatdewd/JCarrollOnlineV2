@@ -308,7 +308,7 @@ namespace JCarrollOnlineV2.Test.Services
             // Assert
             Assert.IsTrue(result);
             Assert.IsTrue(_testUsers[0].Following.Any(u => u.Id == targetUserId));
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Once);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Once);
         }
 
         [TestMethod]
@@ -323,7 +323,7 @@ namespace JCarrollOnlineV2.Test.Services
 
             // Assert
             Assert.IsFalse(result);
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Never);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Never);
         }
 
         [TestMethod]
@@ -338,7 +338,7 @@ namespace JCarrollOnlineV2.Test.Services
 
             // Assert
             Assert.IsFalse(result);
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Never);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Never);
         }
 
         [TestMethod]
@@ -354,7 +354,7 @@ namespace JCarrollOnlineV2.Test.Services
 
             // Assert
             Assert.IsFalse(result);
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Never);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Never);
         }
 
         [TestMethod]
@@ -391,7 +391,7 @@ namespace JCarrollOnlineV2.Test.Services
             // Assert
             Assert.IsTrue(result);
             Assert.IsFalse(_testUsers[0].Following.Any(u => u.Id == targetUserId));
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Once);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Once);
         }
 
         [TestMethod]
@@ -406,7 +406,7 @@ namespace JCarrollOnlineV2.Test.Services
 
             // Assert
             Assert.IsFalse(result);
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Never);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Never);
         }
 
         [TestMethod]
@@ -422,7 +422,7 @@ namespace JCarrollOnlineV2.Test.Services
 
             // Assert
             Assert.IsFalse(result);
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Never);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Never);
         }
 
         [TestMethod]
@@ -461,7 +461,7 @@ namespace JCarrollOnlineV2.Test.Services
             Assert.IsTrue(result);
             Assert.AreEqual(emailNotifications, _testUsers[0].MicroPostEmailNotifications);
             Assert.AreEqual(smsNotifications, _testUsers[0].MicroPostSmsNotifications);
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Once);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Once);
         }
 
         [TestMethod]
@@ -475,7 +475,7 @@ namespace JCarrollOnlineV2.Test.Services
 
             // Assert
             Assert.IsFalse(result);
-            _mockContext.Verify(c => c.SaveChangesAsync(), Times.Never);
+            _mockContext.Verify(c => c.SaveChangesAsync(TestContext.CancellationToken), Times.Never);
         }
 
         [TestMethod]
@@ -584,6 +584,8 @@ namespace JCarrollOnlineV2.Test.Services
 
             return mockSet;
         }
+
+        public TestContext TestContext { get; set; }
 
         #endregion
     }

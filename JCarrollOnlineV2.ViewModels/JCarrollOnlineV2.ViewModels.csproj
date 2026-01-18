@@ -126,6 +126,7 @@
     <Compile Include="Blog\BlogIndexViewModel.cs" />
     <Compile Include="Chat\ChatViewModel.cs" />
     <Compile Include="Email\EmailViewModelBase.cs" />
+    <Compile Include="Email\IEmailViewModel.cs" />
     <Compile Include="Email\MicropostNotificationViewModel.cs" />
     <Compile Include="Email\WelcomeUserViewModel.cs" />
     <Compile Include="Error\ErrorInfo.cs" />

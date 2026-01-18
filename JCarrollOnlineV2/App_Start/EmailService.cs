@@ -94,22 +94,13 @@ namespace JCarrollOnlineV2
             string password = ConfigurationManager.AppSettings["SmtpPassword"];
             string enableSsl = ConfigurationManager.AppSettings["SmtpEnableSsl"];
 
-            if (string.IsNullOrWhiteSpace(host))
-            {
-                throw new ConfigurationErrorsException("SmtpHost configuration is missing");
-            }
-
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new ConfigurationErrorsException("SmtpUsername configuration is missing");
-            }
-
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                throw new ConfigurationErrorsException("SmtpPassword configuration is missing");
-            }
-
-            return new SmtpClient(host, int.Parse(port))
+            return string.IsNullOrWhiteSpace(host)
+                ? throw new ConfigurationErrorsException("SmtpHost configuration is missing")
+                : string.IsNullOrWhiteSpace(username)
+                ? throw new ConfigurationErrorsException("SmtpUsername configuration is missing")
+                : string.IsNullOrWhiteSpace(password)
+                ? throw new ConfigurationErrorsException("SmtpPassword configuration is missing")
+                : new SmtpClient(host, int.Parse(port))
             {
                 Credentials = new NetworkCredential(username, password),
                 UseDefaultCredentials = false,

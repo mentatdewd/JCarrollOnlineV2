@@ -42,16 +42,15 @@ namespace JCarrollOnlineV2.Services
         {
             _logger.Info("Building anonymous home view model");
 
-            var homeViewModel = new HomeViewModel
+            HomeViewModel homeViewModel = new HomeViewModel
             {
                 Message = "JCarrollOnlineV2 Home - Index",
-                PageContainer = "Home"
+                PageContainer = "Home",
+                // Run database operations sequentially to avoid DbContext concurrency issues
+                BlogFeed = await _blogViewModelService.BuildBlogFeedViewModelAsync().ConfigureAwait(false),
+                LatestForumThreadsViewModel = await BuildLatestForumThreadsViewModelAsync().ConfigureAwait(false),
+                ChatViewModel = await BuildChatViewModelAsync().ConfigureAwait(false)
             };
-
-            // Run database operations sequentially to avoid DbContext concurrency issues
-            homeViewModel.BlogFeed = await _blogViewModelService.BuildBlogFeedViewModelAsync().ConfigureAwait(false);
-            homeViewModel.LatestForumThreadsViewModel = await BuildLatestForumThreadsViewModelAsync().ConfigureAwait(false);
-            homeViewModel.ChatViewModel = await BuildChatViewModelAsync().ConfigureAwait(false);
 
             return homeViewModel;
         }
@@ -66,7 +65,7 @@ namespace JCarrollOnlineV2.Services
             _logger.Info($"Building authenticated home view model for user {userId}");
 
             // Initialize base view model
-            var homeViewModel = new HomeViewModel
+            HomeViewModel homeViewModel = new HomeViewModel
             {
                 Message = "JCarrollOnlineV2 Home - Index",
                 MicroPostCreateViewModel = new MicroPostCreateViewModel(),
@@ -80,7 +79,7 @@ namespace JCarrollOnlineV2.Services
             try
             {
                 // Load user information first
-                var user = await _context.ApplicationUser
+                ApplicationUser user = await _context.ApplicationUser
                     .Include(u => u.MicroPosts)
                     .AsNoTracking()
                     .SingleOrDefaultAsync(u => u.Id == userId)
@@ -129,7 +128,7 @@ namespace JCarrollOnlineV2.Services
 
         private async Task<LatestForumThreadsViewModel> BuildLatestForumThreadsViewModelAsync()
         {
-            var latestForumThreadsViewModel = new LatestForumThreadsViewModel();
+            LatestForumThreadsViewModel latestForumThreadsViewModel = new LatestForumThreadsViewModel();
 
             try
             {
@@ -143,7 +142,7 @@ namespace JCarrollOnlineV2.Services
 
                 foreach (ThreadEntry thread in threads)
                 {
-                    var latestForumThreadItemViewModel = new LatestForumThreadItemViewModel
+                    LatestForumThreadItemViewModel latestForumThreadItemViewModel = new LatestForumThreadItemViewModel
                     {
                         ThreadTitle = thread.Title,
                         ForumTitle = thread.Forum.Title,
@@ -164,7 +163,7 @@ namespace JCarrollOnlineV2.Services
 
         private async Task<ChatViewModel> BuildChatViewModelAsync()
         {
-            var chatViewModel = new ChatViewModel();
+            ChatViewModel chatViewModel = new ChatViewModel();
 
             try
             {

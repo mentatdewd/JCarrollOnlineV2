@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Sms")]
     public class SmsService : IIdentityMessageService
     {
         public Task SendAsync(IdentityMessage message)

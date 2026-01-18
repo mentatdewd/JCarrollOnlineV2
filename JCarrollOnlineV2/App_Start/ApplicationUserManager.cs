@@ -5,6 +5,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using NLog;
 using System;
 
 namespace JCarrollOnlineV2
@@ -25,10 +26,7 @@ namespace JCarrollOnlineV2
                 throw new ArgumentNullException(nameof(options));
             }
 
-#pragma warning disable CA2000 // Dispose objects before losing scope If this is closed when leaving then the logged in user is lost
             UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context.Get<JCarrollOnlineV2DbContext>());
-#pragma warning restore CA2000 // Dispose objects before losing scope
-
             ApplicationUserManager manager = new ApplicationUserManager(userStore);
 
             // Configure validation logic for usernames
@@ -64,7 +62,11 @@ namespace JCarrollOnlineV2
             //    Subject = "Security Code",
             //    BodyFormat = "Your security code is {0}"
             //});
-            manager.EmailService = new MailService();
+
+            // FIX: Pass required parameters to EmailService constructor
+            JCarrollOnlineV2DbContext dbContext = context.Get<JCarrollOnlineV2DbContext>();
+            ILogger logger = context.Get<ILogger>();
+            manager.EmailService = new Services.EmailService(dbContext, logger);
 
             manager.SmsService = new SmsService();
             Microsoft.Owin.Security.DataProtection.IDataProtectionProvider dataProtectionProvider = options.DataProtectionProvider;
