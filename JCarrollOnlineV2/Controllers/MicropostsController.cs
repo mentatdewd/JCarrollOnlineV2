@@ -156,7 +156,7 @@ namespace JCarrollOnlineV2.Controllers
                 IdentityMessage email = new IdentityMessage()
                 {
                     Body = microPostNotificationEmailViewModel.Body,
-                    Destination = microPostNotificationEmailViewModel.TargetUser.UserName + " " + microPostNotificationEmailViewModel.TargetUser.Email,
+                    Destination = microPostNotificationEmailViewModel.TargetUser.Email,
                     Subject = microPostNotificationEmailViewModel.MicroPostAuthor.UserName + " has added a new micropost"
                 };
 
