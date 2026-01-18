@@ -1,5 +1,6 @@
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
+using Microsoft.AspNet.Identity;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -151,6 +152,11 @@ namespace JCarrollOnlineV2.Services
             sb.AppendLine("</body>");
             sb.AppendLine("</html>");
             return sb.ToString();
+        }
+
+        public async Task SendAsync(IdentityMessage message)
+        {
+            await SendEmailAsync(message.Destination, message.Subject, message.Body, true);
         }
 
         private class SmtpSettings

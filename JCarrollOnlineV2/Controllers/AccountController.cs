@@ -422,7 +422,7 @@ namespace JCarrollOnlineV2.Controllers
             try
             {
                 // URL decode the code if it's not already decoded (handles + signs and %20)
-                string decodedCode = System.Web.HttpUtility.UrlDecode(code);
+                string decodedCode = HttpUtility.UrlDecode(code);
 
                 _logger.Info(string.Format(CultureInfo.InvariantCulture,
                     "Attempting to confirm email for userId: {0}", userId));

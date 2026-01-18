@@ -137,7 +137,7 @@ namespace JCarrollOnlineV2.Controllers
                 {
                     microPostNotificationEmailViewModel.MicroPostAuthor.UserName
                 },
-                MicroPostContent = microPostNotificationEmailViewModel.MicroPostContent
+                microPostNotificationEmailViewModel.MicroPostContent
             };
 
             // Use Handlebars instead of RazorEngine
@@ -156,7 +156,7 @@ namespace JCarrollOnlineV2.Controllers
                 IdentityMessage email = new IdentityMessage()
                 {
                     Body = microPostNotificationEmailViewModel.Content,
-                    Destination = microPostNotificationEmailViewModel.TargetUser.UserName + " " + microPostNotificationEmailViewModel.TargetUser.Email,
+                    Destination = microPostNotificationEmailViewModel.TargetUser.Email,
                     Subject = microPostNotificationEmailViewModel.MicroPostAuthor.UserName + " has added a new micropost"
                 };
 
