@@ -1,5 +1,4 @@
-﻿.github/workflows/deploy-dev-to-hostgator.yml
-name: Deploy Dev to HostGator (Production Environment)
+﻿name: Deploy Dev to HostGator (Production Environment)
 
 on:
   push:
