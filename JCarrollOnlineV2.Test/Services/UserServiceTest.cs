@@ -303,7 +303,7 @@ namespace JCarrollOnlineV2.Test.Services
             string targetUserId = "user2";
 
             // Act
-            bool result = await _userService.FollowUserAsync(currentUserId, targetUserId);
+            bool result = await _userService.FollowUserAsync(currentUserId, targetUserId, TestContext.CancellationToken);
 
             // Assert
             Assert.IsTrue(result);
@@ -386,7 +386,7 @@ namespace JCarrollOnlineV2.Test.Services
             _testUsers[0].Following.Add(_testUsers[1]); // Setup: user1 follows user2
 
             // Act
-            bool result = await _userService.UnfollowUserAsync(currentUserId, targetUserId);
+            bool result = await _userService.UnfollowUserAsync(currentUserId, targetUserId, TestContext.CancellationToken);
 
             // Assert
             Assert.IsTrue(result);
@@ -455,7 +455,7 @@ namespace JCarrollOnlineV2.Test.Services
             bool smsNotifications = true;
 
             // Act
-            bool result = await _userService.UpdateUserSettingsAsync(userId, emailNotifications, smsNotifications);
+            bool result = await _userService.UpdateUserSettingsAsync(userId, emailNotifications, smsNotifications, TestContext.CancellationToken);
 
             // Assert
             Assert.IsTrue(result);
@@ -471,7 +471,7 @@ namespace JCarrollOnlineV2.Test.Services
             string userId = "nonexistent";
 
             // Act
-            bool result = await _userService.UpdateUserSettingsAsync(userId, true, true);
+            bool result = await _userService.UpdateUserSettingsAsync(userId, true, true, TestContext.CancellationToken);
 
             // Assert
             Assert.IsFalse(result);
@@ -487,7 +487,7 @@ namespace JCarrollOnlineV2.Test.Services
             _testUsers[0].MicroPostSmsNotifications = false;
 
             // Act
-            bool result = await _userService.UpdateUserSettingsAsync(userId, false, true);
+            bool result = await _userService.UpdateUserSettingsAsync(userId, false, true, TestContext.CancellationToken);
 
             // Assert
             Assert.IsTrue(result);

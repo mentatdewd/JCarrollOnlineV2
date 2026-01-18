@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JCarrollOnlineV2.Services
@@ -177,7 +178,7 @@ namespace JCarrollOnlineV2.Services
             return viewModel;
         }
 
-        public async Task<bool> FollowUserAsync(string currentUserId, string targetUserId)
+        public async Task<bool> FollowUserAsync(string currentUserId, string targetUserId, CancellationToken cancellationToken = default)
         {
             ApplicationUser currentUser = await _context.ApplicationUser
                 .Include(u => u.Following)
@@ -194,11 +195,11 @@ namespace JCarrollOnlineV2.Services
             }
 
             currentUser.Following.Add(targetUser);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return true;
         }
 
-        public async Task<bool> UnfollowUserAsync(string currentUserId, string targetUserId)
+        public async Task<bool> UnfollowUserAsync(string currentUserId, string targetUserId, CancellationToken cancellationToken = default)
         {
             ApplicationUser currentUser = await _context.ApplicationUser
                 .Include(u => u.Following)
@@ -213,11 +214,11 @@ namespace JCarrollOnlineV2.Services
             }
 
             currentUser.Following.Remove(targetUser);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return true;
         }
 
-        public async Task<bool> UpdateUserSettingsAsync(string userId, bool emailNotifications, bool smsNotifications)
+        public async Task<bool> UpdateUserSettingsAsync(string userId, bool emailNotifications, bool smsNotifications, CancellationToken cancellationToken = default)
         {
             ApplicationUser user = await _context.ApplicationUser
                 .FirstOrDefaultAsync(u => u.Id == userId)
@@ -230,7 +231,7 @@ namespace JCarrollOnlineV2.Services
 
             user.MicroPostEmailNotifications = emailNotifications;
             user.MicroPostSmsNotifications = smsNotifications;
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return true;
         }
     }
