@@ -2,9 +2,9 @@
 using JCarrollOnlineV2.Helpers;
 using JCarrollOnlineV2.Infrastructure;
 using JCarrollOnlineV2.Interfaces;
+using JCarrollOnlineV2.Services;
 using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Account;
-using JCarrollOnlineV2.ViewModels.Email;
 using JCarrollOnlineV2.ViewModels.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -31,32 +31,36 @@ namespace JCarrollOnlineV2.Controllers
         private IHttpContextWrapper _httpContextWrapper;
         private IAuthenticationManagerWrapper _authenticationManagerWrapper;
         private IUrlHelperWrapper _urlHelperWrapper;
+        private IEmailService1Wrapper _emailServiceWrapper;
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public AccountController()
+        public AccountController(IEmailService1 emailService)
         {
+            _emailServiceWrapper = new EmailService1Wrapper(emailService as EmailService1);
         }
 
         /// <summary>
         /// Constructor for production use with Identity managers (automatically wraps them)
         /// </summary>
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, EmailService1 emailService)
         {
             UserManager = userManager;
             SignInManager = signInManager;
-            
+            EmailService = emailService;
             // Wrap the managers for consistent interface usage
             _userManagerWrapper = new UserManagerWrapper(userManager);
             _signInManagerWrapper = new SignInManagerWrapper(signInManager);
+            _emailServiceWrapper = new EmailService1Wrapper(emailService);
         }
 
         /// <summary>
         /// Constructor for testing with wrapper interfaces (allows full mocking)
         /// </summary>
-        internal AccountController(IUserManagerWrapper userManagerWrapper, ISignInManagerWrapper signInManagerWrapper)
+        internal AccountController(IUserManagerWrapper userManagerWrapper, ISignInManagerWrapper signInManagerWrapper, IEmailService1Wrapper emailServiceWrapper)
         {
             _userManagerWrapper = userManagerWrapper ?? throw new ArgumentNullException(nameof(userManagerWrapper));
             _signInManagerWrapper = signInManagerWrapper ?? throw new ArgumentNullException(nameof(signInManagerWrapper));
+            _emailServiceWrapper = emailServiceWrapper ?? throw new ArgumentNullException(nameof(emailServiceWrapper));
         }
 
         /// <summary>
@@ -67,13 +71,15 @@ namespace JCarrollOnlineV2.Controllers
             ISignInManagerWrapper signInManagerWrapper,
             IHttpContextWrapper httpContextWrapper,
             IAuthenticationManagerWrapper authenticationManagerWrapper,
-            IUrlHelperWrapper urlHelperWrapper)
+            IUrlHelperWrapper urlHelperWrapper,
+            IEmailService1Wrapper emailServiceWrapper)
         {
             _userManagerWrapper = userManagerWrapper ?? throw new ArgumentNullException(nameof(userManagerWrapper));
             _signInManagerWrapper = signInManagerWrapper ?? throw new ArgumentNullException(nameof(signInManagerWrapper));
             _httpContextWrapper = httpContextWrapper;
             _authenticationManagerWrapper = authenticationManagerWrapper;
             _urlHelperWrapper = urlHelperWrapper;
+            _emailServiceWrapper = emailServiceWrapper;
         }
 
         public ApplicationSignInManager SignInManager
@@ -87,6 +93,8 @@ namespace JCarrollOnlineV2.Controllers
             get => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
             private set => _userManager = value;
         }
+
+        protected EmailService1 EmailService { get; private set; }
 
         /// <summary>
         /// Gets the SignInManager wrapper for operations (supports both direct managers and injected wrappers)
@@ -133,6 +141,18 @@ namespace JCarrollOnlineV2.Controllers
             }
         }
 
+        protected IEmailService1Wrapper EmailService1Wrapper
+        {
+            get
+            {
+                if(_emailServiceWrapper == null && EmailService != null)
+                {
+                    _emailServiceWrapper = new EmailService1Wrapper(EmailService);
+                }
+                return _emailServiceWrapper;
+            }
+        }
+
         /// <summary>
         /// Gets the AuthenticationManager wrapper for operations
         /// </summary>
@@ -167,6 +187,17 @@ namespace JCarrollOnlineV2.Controllers
             }
         }
 
+        protected IEmailService1Wrapper EmailServiceWrapper
+        {
+            get
+            {
+                if(_emailServiceWrapper == null)
+                {
+                    _emailServiceWrapper = new EmailService1Wrapper(EmailService);
+                }
+                return _emailServiceWrapper;
+            }
+        }
         // GET: /Account/DeleteUser
         [Authorize(Roles = "Administrator")]
         [HttpGet]
@@ -798,239 +829,51 @@ namespace JCarrollOnlineV2.Controllers
 
         private async Task SendWelcomeEmail(ApplicationUser user, Uri callbackUri)
         {
-            UserWelcomeViewModel userWelcomeViewModel = GenerateViewModel(user, callbackUri);
-
-            await SendEmail(userWelcomeViewModel).ConfigureAwait(false);
+            await SendEmail(user.UserName, user.Email, callbackUri?.ToString()).ConfigureAwait(false);
         }
 
-        private static UserWelcomeViewModel GenerateViewModel(ApplicationUser user, Uri callbackUrl)
-        {
-            UserWelcomeViewModel userWelcomeViewModel = new UserWelcomeViewModel
-            {
-                TargetUser = user,
-                CallbackUrl = callbackUrl
-            };
-
-            return userWelcomeViewModel;
-        }
-
-        private async Task SendEmail(UserWelcomeViewModel userWelcomeViewModel)
+        private async Task SendEmail(string user, string email, string callbackUrl)
         {
             // Convert the view model to an anonymous object for Handlebars
             var templateData = new
             {
                 TargetUser = new
                 {
-                    userWelcomeViewModel.TargetUser.UserName,
-                    userWelcomeViewModel.TargetUser.Email
+                    user,
+                    email
                 },
-                CallbackUrl = userWelcomeViewModel.CallbackUrl?.ToString()
+                CallbackUrl = callbackUrl?.ToString()
             };
 
             // Use Handlebars instead of RazorEngine
-            userWelcomeViewModel.Content = HandlebarsEmailHelper.RenderTemplate(
+            string content = HandlebarsEmailHelper.RenderTemplate(
                 "UserWelcomePage",
                 templateData
             );
 
-            await SendEmailViaHostGatorAsync(userWelcomeViewModel).ConfigureAwait(false);
-        }
-
-        private async Task SendEmailViaHostGatorAsync(UserWelcomeViewModel userWelcomeViewModel)
-        {
-            // Read SMTP settings from web.config/appSettings
-            string smtpHost = System.Configuration.ConfigurationManager.AppSettings["SmtpHost"];
-            string smtpPortStr = System.Configuration.ConfigurationManager.AppSettings["SmtpPort"];
-            string smtpUsername = System.Configuration.ConfigurationManager.AppSettings["SmtpUsername"];
-            string smtpPassword = System.Configuration.ConfigurationManager.AppSettings["SmtpPassword"];
-            string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SmtpFromEmail"];
-            string enableSslStr = System.Configuration.ConfigurationManager.AppSettings["SmtpEnableSsl"];
-
-            // Validate configuration
-            if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpPassword))
-            {
-                _logger.Error("SMTP configuration is incomplete. Check Web.config appSettings.");
-                throw new InvalidOperationException("SMTP configuration is missing required values.");
-            }
-
-            int smtpPort = int.Parse(smtpPortStr);
-            bool enableSsl = bool.Parse(enableSslStr);
-
-            // Configure certificate validation callback before creating SMTP client
-            System.Net.ServicePointManager.ServerCertificateValidationCallback =
-                (sender, certificate, chain, sslPolicyErrors) =>
-                {
-                    // If there are no SSL policy errors, accept the certificate
-                    if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
-                    {
-                        return true;
-                    }
-
-                    // Only bypass validation for our specific SMTP server
-                    if (sender is System.Net.Mail.SmtpClient)
-                    {
-                        // Accept certificate from our known HostGator mail server despite errors
-                        _logger.Warn(string.Format(CultureInfo.InvariantCulture,
-                            "Accepting certificate from {0} despite SSL errors: {1}",
-                            smtpHost, sslPolicyErrors));
-                        return true;
-                    }
-
-                    // Reject all other certificates with errors
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Certificate validation failed for unknown sender. SSL errors: {0}",
-                        sslPolicyErrors));
-                    return false;
-                };
-
-            try
-            {
-                using (System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage())
-                {
-                    mailMessage.From = new System.Net.Mail.MailAddress(fromEmail, "JCarrollOnline");
-                    mailMessage.To.Add(new System.Net.Mail.MailAddress(userWelcomeViewModel?.TargetUser.Email));
-                    mailMessage.Subject = "Welcome to JCarrollOnline";
-                    mailMessage.Body = userWelcomeViewModel.Content;
-                    mailMessage.IsBodyHtml = true;
-
-                    using (System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
-                    {
-                        smtpClient.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
-                        smtpClient.EnableSsl = enableSsl;
-                        smtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
-
-                        await smtpClient.SendMailAsync(mailMessage).ConfigureAwait(false);
-                        _logger.Info(string.Format(CultureInfo.InvariantCulture,
-                            "Welcome email sent successfully to {0}",
-                            userWelcomeViewModel.TargetUser.Email));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
-                    "Failed to send welcome email to {0}",
-                    userWelcomeViewModel.TargetUser.Email));
-                throw;
-            }
-            finally
-            {
-                // Reset certificate validation to default for security
-                System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
-            }
+            await _emailServiceWrapper.SendEmailViaHostGatorAsync(email, content).ConfigureAwait(false);
         }
 
         private async Task SendPasswordResetEmail(ApplicationUser user, string callbackUrl)
         {
-            // Create email content (you can create a Handlebars template for this too)
-            string emailBody = string.Format(
-                @"<html>
-        <body>
-            <h2>Reset Your Password</h2>
-            <p>Hello {0},</p>
-            <p>You recently requested to reset your password for your JCarrollOnline account.</p>
-            <p>Please click the button below to reset your password:</p>
-            <p><a href=""{1}"" style=""background-color: #4CAF50; color: white; padding: 14px 20px; text-decoration: none; display: inline-block; border-radius: 4px;"">Reset Password</a></p>
-            <p>If the button doesn't work, copy and paste this link into your browser:</p>
-            <p>{1}</p>
-            <p>If you didn't request a password reset, please ignore this email.</p>
-            <p>Thanks,<br/>The JCarrollOnline Team</p>
-        </body>
-        </html>",
-                user.UserName,
-                callbackUrl
-            );
-
-            // Create a simple view model for password reset
-            UserWelcomeViewModel passwordResetViewModel = new UserWelcomeViewModel
+            var templateData = new
             {
-                TargetUser = user,
-                Content = emailBody
+                TargetUser = new
+                {
+                    user.UserName,
+                    user.Email
+                },
+                CallbackUrl = callbackUrl?.ToString()
             };
 
-            await SendPasswordResetEmailViaHostGatorAsync(passwordResetViewModel).ConfigureAwait(false);
+            // Use Handlebars instead of RazorEngine
+            string content = HandlebarsEmailHelper.RenderTemplate(
+                "UserWelcomePage",
+                templateData
+            );
+
+            await _emailServiceWrapper.SendEmailViaHostGatorAsync(user.Email, content).ConfigureAwait(false);
         }
-
-        private async Task SendPasswordResetEmailViaHostGatorAsync(UserWelcomeViewModel viewModel)
-        {
-            // Read SMTP settings from web.config/appSettings
-            string smtpHost = System.Configuration.ConfigurationManager.AppSettings["SmtpHost"];
-            string smtpPortStr = System.Configuration.ConfigurationManager.AppSettings["SmtpPort"];
-            string smtpUsername = System.Configuration.ConfigurationManager.AppSettings["SmtpUsername"];
-            string smtpPassword = System.Configuration.ConfigurationManager.AppSettings["SmtpPassword"];
-            string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SmtpFromEmail"];
-            string enableSslStr = System.Configuration.ConfigurationManager.AppSettings["SmtpEnableSsl"];
-
-            // Validate configuration
-            if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpPassword))
-            {
-                _logger.Error("SMTP configuration is incomplete. Check Web.config appSettings.");
-                throw new InvalidOperationException("SMTP configuration is missing required values.");
-            }
-
-            int smtpPort = int.Parse(smtpPortStr);
-            bool enableSsl = bool.Parse(enableSslStr);
-
-            // Configure certificate validation callback
-            System.Net.ServicePointManager.ServerCertificateValidationCallback =
-                (sender, certificate, chain, sslPolicyErrors) =>
-                {
-                    if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
-                    {
-                        return true;
-                    }
-
-                    if (sender is System.Net.Mail.SmtpClient)
-                    {
-                        _logger.Warn(string.Format(CultureInfo.InvariantCulture,
-                            "Accepting certificate from {0} despite SSL errors: {1}",
-                            smtpHost, sslPolicyErrors));
-                        return true;
-                    }
-
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Certificate validation failed for unknown sender. SSL errors: {0}",
-                        sslPolicyErrors));
-                    return false;
-                };
-
-            try
-            {
-                using (System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage())
-                {
-                    mailMessage.From = new System.Net.Mail.MailAddress(fromEmail, "JCarrollOnline");
-                    mailMessage.To.Add(new System.Net.Mail.MailAddress(viewModel?.TargetUser.Email));
-                    mailMessage.Subject = "Reset Your JCarrollOnline Password";
-                    mailMessage.Body = viewModel.Content;
-                    mailMessage.IsBodyHtml = true;
-
-                    using (System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
-                    {
-                        smtpClient.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
-                        smtpClient.EnableSsl = enableSsl;
-                        smtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
-
-                        await smtpClient.SendMailAsync(mailMessage).ConfigureAwait(false);
-                        _logger.Info(string.Format(CultureInfo.InvariantCulture,
-                            "Password reset email sent successfully to {0}",
-                            viewModel.TargetUser.Email));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, string.Format(CultureInfo.InvariantCulture,
-                    "Failed to send password reset email to {0}",
-                    viewModel.TargetUser.Email));
-                throw;
-            }
-            finally
-            {
-                // Reset certificate validation to default for security
-                System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
-            }
-        }
-
 
         public class ChallengeResult : HttpUnauthorizedResult
         {

@@ -2,6 +2,7 @@ using JCarrollOnlineV2.Controllers;
 using JCarrollOnlineV2.DataContexts;
 using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
+using JCarrollOnlineV2.Services;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -39,9 +40,11 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Constructor_WithNullContext_ThrowsArgumentNullException()
         {
             // Act & Assert
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+
             try
             {
-                MicroPostsController controller = new MicroPostsController(null);
+                MicroPostsController controller = new MicroPostsController(null, mockEmailService.Object);
                 Assert.Fail("Expected ArgumentNullException was not thrown.");
             }
             catch (ArgumentNullException ex)
@@ -56,9 +59,10 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // Arrange
             Mock<JCarrollOnlineV2DbContext> mockContext = new Mock<JCarrollOnlineV2DbContext>();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
 
             // Act
-            MicroPostsController controller = new MicroPostsController(mockContext.Object);
+            MicroPostsController controller = new MicroPostsController(mockContext.Object, mockEmailService.Object);
 
             // Assert
             Assert.IsNotNull(controller);
@@ -73,7 +77,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // Arrange
             Mock<JCarrollOnlineV2DbContext> mockContext = new Mock<JCarrollOnlineV2DbContext>();
-            MicroPostsController controller = new MicroPostsController(mockContext.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            MicroPostsController controller = new MicroPostsController(mockContext.Object, mockEmailService.Object);
 
             // Act
             ActionResult result = controller.Create();
@@ -88,7 +93,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // Arrange
             Mock<JCarrollOnlineV2DbContext> mockContext = new Mock<JCarrollOnlineV2DbContext>();
-            MicroPostsController controller = new MicroPostsController(mockContext.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            MicroPostsController controller = new MicroPostsController(mockContext.Object, mockEmailService.Object);
 
             // Act
             ViewResult result = controller.Create() as ViewResult;
@@ -107,7 +113,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // Arrange
             Mock<JCarrollOnlineV2DbContext> mockContext = new Mock<JCarrollOnlineV2DbContext>();
-            MicroPostsController controller = new MicroPostsController(mockContext.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            MicroPostsController controller = new MicroPostsController(mockContext.Object, mockEmailService.Object);
 
             // Act
             Task<ActionResult> resultTask = controller.Details(null);
@@ -129,7 +136,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // Arrange
             Mock<JCarrollOnlineV2DbContext> mockContext = new Mock<JCarrollOnlineV2DbContext>();
-            MicroPostsController controller = new MicroPostsController(mockContext.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            MicroPostsController controller = new MicroPostsController(mockContext.Object, mockEmailService.Object);
 
             // Act - Cast null to int? to specify the GET overload
             Task<ActionResult> resultTask = controller.Edit((int?)null);
@@ -151,7 +159,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // Arrange
             Mock<JCarrollOnlineV2DbContext> mockContext = new Mock<JCarrollOnlineV2DbContext>();
-            MicroPostsController controller = new MicroPostsController(mockContext.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            MicroPostsController controller = new MicroPostsController(mockContext.Object, mockEmailService.Object);
 
             // Act
             Task<ActionResult> resultTask = controller.Delete(null);
@@ -173,7 +182,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         {
             // Arrange
             Mock<JCarrollOnlineV2DbContext> mockContext = new Mock<JCarrollOnlineV2DbContext>();
-            MicroPostsController controller = new MicroPostsController(mockContext.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            MicroPostsController controller = new MicroPostsController(mockContext.Object, mockEmailService.Object);
 
             // Act & Assert - Should not throw
             controller.Dispose();

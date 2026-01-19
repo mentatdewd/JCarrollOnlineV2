@@ -1,6 +1,7 @@
 ﻿using JCarrollOnlineV2.Entities;
 using JCarrollOnlineV2.EntityFramework;
 using JCarrollOnlineV2.Helpers;
+using JCarrollOnlineV2.Services;
 using JCarrollOnlineV2.ViewModels.Email;
 using JCarrollOnlineV2.ViewModels.MicroPosts;
 using Microsoft.AspNet.Identity;
@@ -19,6 +20,7 @@ namespace JCarrollOnlineV2.Controllers
     public class MicroPostsController : Controller
     {
         private ApplicationUserManager _userManager;
+        private readonly IEmailService1 _emailService;
 
         public ApplicationUserManager UserManager
         {
@@ -28,9 +30,10 @@ namespace JCarrollOnlineV2.Controllers
 
         private readonly JCarrollOnlineV2DbContext _context;
 
-        public MicroPostsController(JCarrollOnlineV2DbContext context)
+        public MicroPostsController(JCarrollOnlineV2DbContext context, IEmailService1 emailService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         }
 
         // GET: MicroPosts
@@ -97,56 +100,25 @@ namespace JCarrollOnlineV2.Controllers
             {
                 if (user.MicroPostEmailNotifications == true)
                 {
-                    MicroPostNotificationViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, user);
-                    
-                    await SendEmail(microPostNotificationEmailViewModel).ConfigureAwait(false);
+                    var templateData = new
+                    {
+                        TargetUser = new
+                        {
+                            user.UserName,
+                            user.Email
+                        },
+                        MicropostContent = micropost.Content,
+                        MicropostAuthor = micropost.Author.UserName,
+                        CallbackUrl = "https://JCarrollOnline.com"
+                    };
+
+                    string content = HandlebarsEmailHelper.RenderTemplate(
+                        "MicropostNotificationPage",
+                        templateData);
+
+                    await _emailService.SendEmailViaHostGatorAsync(user.Email, content).ConfigureAwait(false);
                 }
             }
-
-            if (currentUser.MicroPostEmailNotifications == true)
-            {
-                MicroPostNotificationViewModel microPostNotificationEmailViewModel = GenerateViewModel(micropost, currentUser, currentUser);
-
-                await SendEmail(microPostNotificationEmailViewModel).ConfigureAwait(false);
-            }
-        }
-
-        private static MicroPostNotificationViewModel GenerateViewModel(MicroPost micropost, ApplicationUser currentUser, ApplicationUser user)
-        {
-            MicroPostNotificationViewModel microPostNotificationEmailViewModel = new MicroPostNotificationViewModel
-            {
-                TargetUser = user,
-                MicroPostAuthor = currentUser,
-                MicroPostContent = micropost.Content
-            };
-
-            return microPostNotificationEmailViewModel;
-        }
-
-        private async Task SendEmail(MicroPostNotificationViewModel microPostNotificationEmailViewModel)
-        {
-            // Convert to anonymous object for Handlebars
-            var templateData = new
-            {
-                TargetUser = new
-                {
-                    microPostNotificationEmailViewModel.TargetUser.UserName,
-                    microPostNotificationEmailViewModel.TargetUser.Email
-                },
-                MicroPostAuthor = new
-                {
-                    microPostNotificationEmailViewModel.MicroPostAuthor.UserName
-                },
-                microPostNotificationEmailViewModel.MicroPostContent
-            };
-
-            // Use Handlebars instead of RazorEngine
-            microPostNotificationEmailViewModel.Content = HandlebarsEmailHelper.RenderTemplate(
-                "MicropostNotificationPage", 
-                templateData
-            );
-
-            await SendEmailAsync(microPostNotificationEmailViewModel).ConfigureAwait(false);
         }
 
         public async Task SendEmailAsync(MicroPostNotificationViewModel microPostNotificationEmailViewModel)

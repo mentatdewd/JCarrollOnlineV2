@@ -1,6 +1,8 @@
 using JCarrollOnlineV2.Controllers;
 using JCarrollOnlineV2.Entities;
+using JCarrollOnlineV2.Infrastructure;
 using JCarrollOnlineV2.Interfaces;
+using JCarrollOnlineV2.Services;
 using JCarrollOnlineV2.ViewModels;
 using JCarrollOnlineV2.ViewModels.Account;
 using Microsoft.AspNet.Identity;
@@ -30,7 +32,7 @@ namespace JCarrollOnlineV2.Test.Controllers
         // 1. Creating mock/fake implementations of Identity stores
         // 2. Mocking OWIN context and HttpContext
         // 3. Or using integration tests with a test database
-        
+
         #region Constructor Tests
 
         [TestMethod]
@@ -49,9 +51,10 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<ApplicationUserManager> mockUserManager = CreateFullyMockedUserManager();
             Mock<ApplicationSignInManager> mockSignInManager = CreateFullyMockedSignInManager(mockUserManager.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
 
             // Act
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, mockEmailService.Object);
 
             // Assert
             Assert.IsNotNull(controller);
@@ -411,7 +414,8 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<ApplicationUserManager> mockUserManager = CreateFullyMockedUserManager();
             Mock<ApplicationSignInManager> mockSignInManager = CreateFullyMockedSignInManager(mockUserManager.Object);
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, mockEmailService.Object);
             controller.ModelState.AddModelError("UserName", "Required");
             LoginViewModel model = new LoginViewModel { Password = "Test123!" };
 
@@ -430,7 +434,7 @@ namespace JCarrollOnlineV2.Test.Controllers
 
         // NOTE: The following tests demonstrate how to use the wrapper interfaces
         // for testing scenarios that require mocking non-virtual methods.
-        
+
         /// <summary>
         /// Example test showing how to use wrapper interfaces with the controller.
         /// This allows mocking of non-virtual methods like ExternalSignInAsync.
@@ -441,11 +445,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManagerWrapper = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManagerWrapper = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailServiceWrapper = new Mock<IEmailService1Wrapper>();
 
             // Act - Use the internal constructor that accepts wrapper interfaces
             AccountController controller = new AccountController(
-                mockUserManagerWrapper.Object, 
-                mockSignInManagerWrapper.Object);
+                mockUserManagerWrapper.Object,
+                mockSignInManagerWrapper.Object,
+                mockEmailServiceWrapper.Object);
 
             // Assert
             Assert.IsNotNull(controller);
@@ -464,6 +470,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IHttpContextWrapper> mockHttpContext = CreateMockedHttpContextWrapper();
             Mock<IAuthenticationManagerWrapper> mockAuthManager = CreateMockedAuthenticationManagerWrapper();
             Mock<IUrlHelperWrapper> mockUrlHelper = CreateMockedUrlHelperWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             // Act - Use the comprehensive constructor
             AccountController controller = new AccountController(
@@ -471,11 +478,12 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 mockHttpContext.Object,
                 mockAuthManager.Object,
-                mockUrlHelper.Object);
+                mockUrlHelper.Object,
+                mockEmailService.Object);
 
             // Assert
             Assert.IsNotNull(controller);
-            
+
             // Now you can test ANY controller method that uses:
             // - Identity managers (UserManager, SignInManager)
             // - HttpContext (User, Request, Response)
@@ -509,10 +517,6 @@ namespace JCarrollOnlineV2.Test.Controllers
         #endregion
 
         #region Helper Methods
-
-
-
-
 
         private Mock<ApplicationSignInManager> CreateFullyMockedSignInManager(ApplicationUserManager userManager)
         {
@@ -745,7 +749,7 @@ namespace JCarrollOnlineV2.Test.Controllers
 
             // Setup common methods with default behaviors
             mockWrapper.Setup(m => m.SignOut(It.IsAny<string[]>()));
-            
+
             mockWrapper.Setup(m => m.GetExternalLoginInfoAsync())
                 .ReturnsAsync((ExternalLoginInfo)null);
 
@@ -785,6 +789,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IUrlHelperWrapper> mockUrlHelper = CreateMockedUrlHelperWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ApplicationUser testUser = new ApplicationUser
             {
@@ -811,7 +816,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 null,  // httpContextWrapper not needed for this test
                 null,  // authenticationManagerWrapper not needed for this test
-                mockUrlHelper.Object);
+                mockUrlHelper.Object,
+                mockEmailService.Object);
 
             LoginViewModel model = new LoginViewModel
             {
@@ -835,6 +841,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IAuthenticationManagerWrapper> mockAuth = CreateMockedAuthenticationManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ApplicationUser testUser = new ApplicationUser
             {
@@ -860,7 +867,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 null,
                 mockAuth.Object,
-                null);
+                null,
+                mockEmailService.Object);
 
             LoginViewModel model = new LoginViewModel
             {
@@ -885,12 +893,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.PasswordSignInAsync("testuser", "Test123!", false, false))
                 .ReturnsAsync(SignInStatus.LockedOut);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
             LoginViewModel model = new LoginViewModel
             {
                 UserName = "testuser",
@@ -912,12 +921,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.PasswordSignInAsync("testuser", "Test123!", true, false))
                 .ReturnsAsync(SignInStatus.RequiresVerification);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
             LoginViewModel model = new LoginViewModel
             {
                 UserName = "testuser",
@@ -940,12 +950,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.PasswordSignInAsync("testuser", "WrongPassword", false, false))
                 .ReturnsAsync(SignInStatus.Failure);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
             LoginViewModel model = new LoginViewModel
             {
                 UserName = "testuser",
@@ -974,6 +985,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IUrlHelperWrapper> mockUrl = CreateMockedUrlHelperWrapper();
             Mock<IHttpContextWrapper> mockHttp = CreateMockedHttpContextWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ApplicationUser createdUser = null;
             mockUserManager
@@ -1002,7 +1014,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 mockHttp.Object,
                 null,
-                mockUrl.Object);
+                mockUrl.Object,
+                mockEmailService.Object);
 
             RegisterViewModel model = new RegisterViewModel
             {
@@ -1031,8 +1044,9 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
             controller.ModelState.AddModelError("Password", "Password is required");
 
             RegisterViewModel model = new RegisterViewModel
@@ -1059,12 +1073,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockUserManager
                 .Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Failed("Username already exists"));
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             RegisterViewModel model = new RegisterViewModel
             {
@@ -1093,12 +1108,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.HasBeenVerifiedAsync())
                 .ReturnsAsync(false);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             // Act
             ViewResult result = await controller.VerifyCode("Email", "/Home/Index", false) as ViewResult;
@@ -1114,12 +1130,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.HasBeenVerifiedAsync())
                 .ReturnsAsync(true);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             // Act
             ViewResult result = await controller.VerifyCode("Email", "/Home/Index", true) as ViewResult;
@@ -1140,17 +1157,19 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IUrlHelperWrapper> mockUrlHelper = CreateMockedUrlHelperWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.TwoFactorSignInAsync("Email", "123456", true, false))
                 .ReturnsAsync(SignInStatus.Success);
 
             AccountController controller = new AccountController(
-                mockUserManager.Object, 
+                mockUserManager.Object,
                 mockSignInManager.Object,
                 null, // httpContextWrapper not needed for this test
                 null, // authenticationManagerWrapper not needed for this test
-                mockUrlHelper.Object);
+                mockUrlHelper.Object,
+                mockEmailService.Object);
 
             VerifyCodeViewModel model = new VerifyCodeViewModel
             {
@@ -1176,12 +1195,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.TwoFactorSignInAsync("Email", "wrong", false, false))
                 .ReturnsAsync(SignInStatus.Failure);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             VerifyCodeViewModel model = new VerifyCodeViewModel
             {
@@ -1211,12 +1231,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockUserManager
                 .Setup(m => m.ConfirmEmailAsync("user-id-123", It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             // Act
             ViewResult result = await controller.ConfirmEmail("user-id-123", "valid-token") as ViewResult;
@@ -1234,12 +1255,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockUserManager
                 .Setup(m => m.ConfirmEmailAsync("user-id-123", It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Failed("Invalid token"));
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             // Act
             ViewResult result = await controller.ConfirmEmail("user-id-123", "invalid-token") as ViewResult;
@@ -1255,8 +1277,9 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             // Act
             ViewResult result = await controller.ConfirmEmail(null, "some-code") as ViewResult;
@@ -1273,8 +1296,9 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             // Act
             ViewResult result = await controller.ConfirmEmail("user-id", null) as ViewResult;
@@ -1297,6 +1321,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IUrlHelperWrapper> mockUrl = CreateMockedUrlHelperWrapper();
             Mock<IHttpContextWrapper> mockHttp = CreateMockedHttpContextWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ApplicationUser testUser = new ApplicationUser
             {
@@ -1330,7 +1355,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 mockHttp.Object,
                 null,
-                mockUrl.Object);
+                mockUrl.Object,
+                mockEmailService.Object);
 
             ForgotPasswordViewModel model = new ForgotPasswordViewModel
             {
@@ -1354,12 +1380,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockUserManager
                 .Setup(m => m.FindByEmailAsync("nonexistent@example.com"))
                 .ReturnsAsync((ApplicationUser)null);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             ForgotPasswordViewModel model = new ForgotPasswordViewModel
             {
@@ -1383,6 +1410,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ApplicationUser testUser = new ApplicationUser
             {
@@ -1398,7 +1426,7 @@ namespace JCarrollOnlineV2.Test.Controllers
                 .Setup(m => m.IsEmailConfirmedAsync("user-id-123"))
                 .ReturnsAsync(false);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             ForgotPasswordViewModel model = new ForgotPasswordViewModel
             {
@@ -1422,8 +1450,9 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
             controller.ModelState.AddModelError("Email", "Email is required");
 
             ForgotPasswordViewModel model = new ForgotPasswordViewModel();
@@ -1447,6 +1476,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ApplicationUser testUser = new ApplicationUser
             {
@@ -1462,7 +1492,7 @@ namespace JCarrollOnlineV2.Test.Controllers
                 .Setup(m => m.ResetPasswordAsync("user-id-123", It.IsAny<string>(), "NewPassword123!"))
                 .ReturnsAsync(IdentityResult.Success);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             ResetPasswordViewModel model = new ResetPasswordViewModel
             {
@@ -1489,6 +1519,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ApplicationUser testUser = new ApplicationUser
             {
@@ -1504,7 +1535,7 @@ namespace JCarrollOnlineV2.Test.Controllers
                 .Setup(m => m.ResetPasswordAsync("user-id-123", It.IsAny<string>(), "NewPassword123!"))
                 .ReturnsAsync(IdentityResult.Failed("Invalid token"));
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             ResetPasswordViewModel model = new ResetPasswordViewModel
             {
@@ -1529,12 +1560,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockUserManager
                 .Setup(m => m.FindByEmailAsync("nonexistent@example.com"))
                 .ReturnsAsync((ApplicationUser)null);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             ResetPasswordViewModel model = new ResetPasswordViewModel
             {
@@ -1562,8 +1594,9 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             ResetPasswordViewModel model = new ResetPasswordViewModel
             {
@@ -1592,12 +1625,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.SendTwoFactorCodeAsync("Email"))
                 .ReturnsAsync(true);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             SendCodeViewModel model = new SendCodeViewModel
             {
@@ -1622,12 +1656,13 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockSignInManager
                 .Setup(m => m.SendTwoFactorCodeAsync("Email"))
                 .ReturnsAsync(false);
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
 
             SendCodeViewModel model = new SendCodeViewModel
             {
@@ -1650,8 +1685,9 @@ namespace JCarrollOnlineV2.Test.Controllers
             // Arrange
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
-            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object);
+            AccountController controller = new AccountController(mockUserManager.Object, mockSignInManager.Object, null, null, null, mockEmailService.Object);
             controller.ModelState.AddModelError("SelectedProvider", "Required");
 
             SendCodeViewModel model = new SendCodeViewModel();
@@ -1675,13 +1711,15 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IAuthenticationManagerWrapper> mockAuth = CreateMockedAuthenticationManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             AccountController controller = new AccountController(
                 mockUserManager.Object,
                 mockSignInManager.Object,
                 null,
                 mockAuth.Object,
-                null);
+                null,
+                mockEmailService.Object);
 
             // Act
             ActionResult result = controller.LogOff();
@@ -1706,6 +1744,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IAuthenticationManagerWrapper> mockAuth = CreateMockedAuthenticationManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ExternalLoginInfo loginInfo = new ExternalLoginInfo
             {
@@ -1726,7 +1765,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 null,
                 mockAuth.Object,
-                null);
+                null,
+                mockEmailService.Object);
 
             // Act
             ViewResult result = await controller.ExternalLoginCallback("/Home/Index") as ViewResult;
@@ -1748,6 +1788,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IAuthenticationManagerWrapper> mockAuth = CreateMockedAuthenticationManagerWrapper();
             Mock<IUrlHelperWrapper> mockUrlHelper = CreateMockedUrlHelperWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             ExternalLoginInfo loginInfo = new ExternalLoginInfo
             {
@@ -1772,7 +1813,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 null,
                 mockAuth.Object,
-                mockUrlHelper.Object);
+                mockUrlHelper.Object,
+                mockEmailService.Object);
 
             // Act
             ActionResult result = await controller.ExternalLoginCallback("/Home/Index");
@@ -1789,6 +1831,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IUserManagerWrapper> mockUserManager = CreateMockedUserManagerWrapper();
             Mock<ISignInManagerWrapper> mockSignInManager = CreateMockedSignInManagerWrapper();
             Mock<IAuthenticationManagerWrapper> mockAuth = CreateMockedAuthenticationManagerWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockAuth
                 .Setup(m => m.GetExternalLoginInfoAsync())
@@ -1799,7 +1842,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 null,
                 mockAuth.Object,
-                null);
+                null,
+                mockEmailService.Object);
 
             // Act
             ActionResult result = await controller.ExternalLoginCallback("/Home/Index");
@@ -1819,6 +1863,7 @@ namespace JCarrollOnlineV2.Test.Controllers
             Mock<IAuthenticationManagerWrapper> mockAuth = CreateMockedAuthenticationManagerWrapper();
             Mock<IHttpContextWrapper> mockHttp = CreateMockedHttpContextWrapper();
             Mock<IUrlHelperWrapper> mockUrl = CreateMockedUrlHelperWrapper();
+            Mock<IEmailService1Wrapper> mockEmailService = new Mock<IEmailService1Wrapper>();
 
             mockHttp.Setup(m => m.IsAuthenticated).Returns(false);
 
@@ -1855,7 +1900,8 @@ namespace JCarrollOnlineV2.Test.Controllers
                 mockSignInManager.Object,
                 mockHttp.Object,
                 mockAuth.Object,
-                mockUrl.Object);
+                mockUrl.Object,
+                mockEmailService.Object);
 
             ExternalLoginConfirmationViewModel model = new ExternalLoginConfirmationViewModel
             {

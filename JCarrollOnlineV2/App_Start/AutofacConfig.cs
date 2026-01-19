@@ -51,6 +51,10 @@ namespace JCarrollOnlineV2
                 .As<IHomeViewModelService>()
                 .InstancePerRequest();
 
+            builder.RegisterType<EmailService1>()
+                .As<IEmailService1>()
+                .InstancePerRequest();
+
             // Register NLog
             builder.Register(c => LogManager.GetCurrentClassLogger())
                 .As<ILogger>()

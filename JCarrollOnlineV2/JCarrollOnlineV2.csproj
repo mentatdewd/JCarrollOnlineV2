@@ -511,7 +511,9 @@
     <Compile Include="CustomLinqExtensions\LinqToSqlExtensionMethods.cs" />
     <Compile Include="Filters\CustomHandleErrorAttribute.cs" />
     <Compile Include="Infrastructure\AuthenticationManagerWrapper.cs" />
+    <Compile Include="Infrastructure\EmailService1Wrapper.cs" />
     <Compile Include="Infrastructure\HttpContextWrapper.cs" />
+    <Compile Include="Interfaces\IEmailService1Wrapper.cs" />
     <Compile Include="Infrastructure\SignInManagerWrapper.cs" />
     <Compile Include="Infrastructure\UrlHelperWrapper.cs" />
     <Compile Include="Infrastructure\UserManagerWrapper.cs" />
@@ -522,9 +524,11 @@
     <Compile Include="Interfaces\IUserManagerWrapper.cs" />
     <Compile Include="Services\BlogViewModelService.cs" />
     <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\EmailService1.cs" />
     <Compile Include="Services\HomeViewModelService.cs" />
     <Compile Include="Services\IBlogViewModelService.cs" />
     <Compile Include="Services\IEmailService.cs" />
+    <Compile Include="Services\IEmailService1.cs" />
     <Compile Include="Services\IHomeViewModelService.cs" />
     <Compile Include="Services\IMicroPostViewModelService.cs" />
     <Compile Include="Services\IRssService.cs" />
@@ -929,6 +933,7 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="EmailTemplates\UserForgotPasswordPage.hbs" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
