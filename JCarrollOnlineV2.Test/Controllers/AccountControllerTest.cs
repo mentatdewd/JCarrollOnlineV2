@@ -38,8 +38,9 @@ namespace JCarrollOnlineV2.Test.Controllers
         [TestMethod]
         public void Constructor_WithNoParameters_CreatesController()
         {
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
             // Act
-            AccountController controller = new AccountController();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Assert
             Assert.IsNotNull(controller);
@@ -70,7 +71,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Login_Get_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.Login(returnUrl: null);
@@ -84,7 +86,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Login_Get_ReturnsLoginViewModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ViewResult result = controller.Login(returnUrl: null) as ViewResult;
@@ -98,7 +101,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Login_Get_WithReturnUrl_SetsReturnUrlInModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
             string returnUrl = "/Home/Index";
 
             // Act
@@ -114,7 +118,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Login_Get_WithNullReturnUrl_CreatesViewModelWithNullReturnUrl()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ViewResult result = controller.Login(null) as ViewResult;
@@ -133,7 +138,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Register_Get_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.Register();
@@ -147,7 +153,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void Register_Get_ReturnsRegisterViewModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ViewResult result = controller.Register() as ViewResult;
@@ -165,7 +172,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void RegistrationNotification_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.RegistrationNotification();
@@ -179,7 +187,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void RegistrationNotification_ReturnsCorrectViewModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ViewResult result = controller.RegistrationNotification() as ViewResult;
@@ -197,7 +206,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ForgotPassword_Get_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.ForgotPassword();
@@ -211,7 +221,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ForgotPassword_Get_ReturnsForgotPasswordViewModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ViewResult result = controller.ForgotPassword() as ViewResult;
@@ -229,7 +240,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ForgotPasswordConfirmation_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.ForgotPasswordConfirmation();
@@ -243,7 +255,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ForgotPasswordConfirmation_ReturnsCorrectViewModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ViewResult result = controller.ForgotPasswordConfirmation() as ViewResult;
@@ -261,7 +274,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ResetPassword_Get_WithNullCode_ReturnsErrorView()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.ResetPassword(code: null);
@@ -277,7 +291,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ResetPassword_Get_WithEmptyCode_ReturnsErrorView()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.ResetPassword(string.Empty);
@@ -292,7 +307,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ResetPassword_Get_WithValidCode_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
             string code = "test-code-123";
 
             // Act
@@ -309,7 +325,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ResetPassword_Get_WithValidCode_SetsCodeInViewModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
             string code = "test-code-123";
 
             // Act
@@ -330,7 +347,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ResetPasswordConfirmation_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.ResetPasswordConfirmation();
@@ -344,7 +362,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ResetPasswordConfirmation_ReturnsCorrectViewModel()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ViewResult result = controller.ResetPasswordConfirmation() as ViewResult;
@@ -362,7 +381,8 @@ namespace JCarrollOnlineV2.Test.Controllers
         public void ExternalLoginFailure_ReturnsViewResult()
         {
             // Arrange
-            AccountController controller = new AccountController();
+            Mock<EmailService1> mockEmailService = new Mock<EmailService1>();
+            AccountController controller = new AccountController(mockEmailService.Object);
 
             // Act
             ActionResult result = controller.ExternalLoginFailure();
