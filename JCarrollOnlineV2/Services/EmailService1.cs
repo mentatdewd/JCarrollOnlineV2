@@ -2,6 +2,7 @@
 using Microsoft.Build.Framework;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,13 +16,15 @@ namespace JCarrollOnlineV2.Services
 
         public async Task SendEmailViaHostGatorAsync(string toEmail, string content)
         {
+            var test = ConfigurationManager.AppSettings["DebugTest"];
+
             // Read SMTP settings from web.config/appSettings
-            string smtpHost = System.Configuration.ConfigurationManager.AppSettings["SmtpHost"];
-            string smtpPortStr = System.Configuration.ConfigurationManager.AppSettings["SmtpPort"];
-            string smtpUsername = System.Configuration.ConfigurationManager.AppSettings["SmtpUsername"];
-            string smtpPassword = System.Configuration.ConfigurationManager.AppSettings["SmtpPassword"];
-            string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SmtpFromEmail"];
-            string enableSslStr = System.Configuration.ConfigurationManager.AppSettings["SmtpEnableSsl"];
+            string smtpHost = ConfigurationManager.AppSettings["SmtpHost"];
+            string smtpPortStr = ConfigurationManager.AppSettings["SmtpPort"];
+            string smtpUsername = ConfigurationManager.AppSettings["SmtpUsername"];
+            string smtpPassword = ConfigurationManager.AppSettings["SmtpPassword"];
+            string fromEmail = ConfigurationManager.AppSettings["SmtpFromEmail"];
+            string enableSslStr = ConfigurationManager.AppSettings["SmtpEnableSsl"];
 
             // Validate configuration
             if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpPassword))
