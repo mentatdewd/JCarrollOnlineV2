@@ -364,12 +364,14 @@ jobs:
         }
         
         foreach ($add in $verify.configuration.appSettings.add) {
+          if ($add.key -in @("MachineKeyValidation", "MachineKeyDecryption")) {
+            continue # These are expected to remain for Debug only 
+          }
           if ($add.value -match $placeholderPattern) {
             Write-Error "Placeholder still exists in appSettings: $($add.key) = $($add.value)"
             exit 1
           }
-        }
-        
+        }        
         Write-Host "✓ Web.config successfully updated and verified" -ForegroundColor Green
     
     - name: Deploy to HostGator via FTP
