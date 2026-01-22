@@ -510,6 +510,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\MicroPostsController.cs" />
     <Compile Include="Controllers\SandboxController.cs" />
+    <Compile Include="Controllers\UploadsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomLinqExtensions\EnumerableExtensions.cs" />
     <Compile Include="CustomLinqExtensions\LinqToSqlExtensionMethods.cs" />
@@ -526,6 +527,7 @@
     <Compile Include="Interfaces\ISignInManagerWrapper.cs" />
     <Compile Include="Interfaces\IUrlHelperWrapper.cs" />
     <Compile Include="Interfaces\IUserManagerWrapper.cs" />
+    <Compile Include="Services\BackblazeService.cs" />
     <Compile Include="Services\BlogViewModelService.cs" />
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\EmailService1.cs" />
@@ -944,6 +946,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\chat.js" />
+    <Content Include="Scripts\dragdrop.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />
     <Content Include="Scripts\jquery-3.7.1.slim.js" />
@@ -1161,6 +1164,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Uploads\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JCarrollOnlineV2.Entities\JCarrollOnlineV2.Entities.csproj">

@@ -21,6 +21,10 @@ table {
   margin-left: auto;
   margin-right: auto;
 }
+#Content.drag-hover {
+    border: 2px dashed #4a90e2;
+    background: #eef6ff;
+}
 .videoWrapper {
   position: relative;
   /*padding-bottom: 56.25%;*/

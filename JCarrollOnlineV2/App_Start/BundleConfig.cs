@@ -72,7 +72,7 @@ namespace JCarrollOnlineV2
                 .Include("~/Content/scripts/prism.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/signalr")
-                .Include("~/Scripts/jquery.signalR-{version}.js"));
+                .Include("~/Scripts/jquery.signalR-2.4.3.js"));
         }
     }
 }
