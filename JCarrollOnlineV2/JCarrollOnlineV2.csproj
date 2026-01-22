@@ -1058,15 +1058,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Web.config" />
-    <None Include="Web.config.bak">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Web.config.Debug.bak">
-      <DependentUpon>Web.config.bak</DependentUpon>
-    </None>
-    <None Include="Web.config.Release.bak">
-      <DependentUpon>Web.config.bak</DependentUpon>
-    </None>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
