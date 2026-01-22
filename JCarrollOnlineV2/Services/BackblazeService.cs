@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Configuration;
 using System.IO;
 using System.Net.Http;
@@ -14,6 +15,7 @@ public static class BackblazeService
     private static readonly string AppKey = ConfigurationManager.AppSettings["B2AppKey"];
     private static readonly string BucketId = ConfigurationManager.AppSettings["B2BucketId"];
     private static readonly string BucketName = ConfigurationManager.AppSettings["B2BucketName"];
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     public static async Task<string> UploadAsync(HttpPostedFileBase file)
     {
@@ -28,20 +30,23 @@ public static class BackblazeService
             throw new Exception("Backblaze KeyId or AppKey missing from Web.config");
 
         // 1. Authorize account
-        var basicAuth = Convert.ToBase64String(
+        string basicAuth = Convert.ToBase64String(
             Encoding.UTF8.GetBytes($"{KeyId}:{AppKey}")
         );
 
-        using (var client = new HttpClient())
+        using (HttpClient client = new HttpClient())
         {
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Basic", basicAuth);
 
-            var authResponse = await client.GetAsync(
+            _logger.Info("Authorizing with Backblaze B2");
+            HttpResponseMessage authResponse = await client.GetAsync(
                 "https://api.backblazeb2.com/b2api/v2/b2_authorize_account"
             );
 
             authResponse.EnsureSuccessStatusCode();
+
+            _logger.Info("Authorized with Backblaze B2");
 
             dynamic authJson = await authResponse.Content.ReadAsAsync<dynamic>();
 
@@ -56,12 +61,15 @@ public static class BackblazeService
             client.DefaultRequestHeaders.Remove("Authorization");
             client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authToken);
 
-            var uploadUrlResponse = await client.PostAsJsonAsync(
+            _logger.Info("Requesting upload URL from Backblaze B2");
+            HttpResponseMessage uploadUrlResponse = await client.PostAsJsonAsync(
                 $"{apiUrl}/b2api/v2/b2_get_upload_url",
                 uploadUrlRequest
             );
 
             uploadUrlResponse.EnsureSuccessStatusCode();
+
+            _logger.Info("Received upload URL from Backblaze B2");
 
             dynamic uploadUrlJson = await uploadUrlResponse.Content.ReadAsAsync<dynamic>();
 
@@ -73,22 +81,26 @@ public static class BackblazeService
             // 3. Upload file
             string safeFileName = MakeSafeFilename(file.FileName);
 
-            using (var fileStream = file.InputStream)
+            _logger.Info("Uploading file {FileName} to Backblaze B2", safeFileName);
+
+            using (Stream fileStream = file.InputStream)
             {
                 byte[] sha1 = ComputeSha1(fileStream);
                 fileStream.Position = 0;
 
-                var content = new StreamContent(fileStream);
+                StreamContent content = new StreamContent(fileStream);
                 content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                 content.Headers.Add("X-Bz-File-Name", safeFileName);
                 content.Headers.Add("X-Bz-Content-Sha1", BitConverter.ToString(sha1).Replace("-", "").ToLower());
 
-                var uploadClient = new HttpClient();
+                HttpClient uploadClient = new HttpClient();
                 uploadClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", uploadAuthToken);
 
-                var uploadResponse = await uploadClient.PostAsync(uploadUrl, content);
+                _logger.Info("Uploading file to Backblaze B2");
+                HttpResponseMessage uploadResponse = await uploadClient.PostAsync(uploadUrl, content);
                 uploadResponse.EnsureSuccessStatusCode();
 
+                _logger.Info("File {FileName} uploaded to Backblaze B2", safeFileName);
                 System.Diagnostics.Debug.WriteLine($"[B2] Upload complete: {safeFileName}");
             }
             //_logger.LogInformation("Uploaded file: {FileName}", safeFileName);
@@ -96,6 +108,8 @@ public static class BackblazeService
             // 4. Return public URL
             //string endpoint = "https://s3.us-east-005.backblazeb2.com";
             //return $"![image]({endpoint}/file/{BucketName}/{safeFileName})";
+            _logger.Info("Generating public URL for file {FileName}", safeFileName);
+
             return $"![image](https://JCarrollOnline.s3.us-east-005.backblazeb2.com/{safeFileName})";
         }
     }
@@ -109,7 +123,7 @@ public static class BackblazeService
 
     private static byte[] ComputeSha1(Stream stream)
     {
-        using (var sha1 = SHA1.Create())
+        using (SHA1 sha1 = SHA1.Create())
         {
             return sha1.ComputeHash(stream);
         }
