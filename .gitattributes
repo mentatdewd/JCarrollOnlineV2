@@ -60,6 +60,7 @@
 packages/* linguist-vendored
 
 # External Scripts
+*.js linguist-vendored
 Scripts/* linguist-vendored
 Content/scripts/* linguist-vendored
 
