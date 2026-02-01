@@ -1,4 +1,4 @@
-﻿name: Deploy to HostGator
+name: Deploy to HostGator
 
 on:
   push:
@@ -375,7 +375,7 @@ jobs:
         Write-Host "✓ Web.config successfully updated and verified" -ForegroundColor Green
     
     - name: Deploy to HostGator via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: mentatdewd
