@@ -1,4 +1,4 @@
-﻿name: Unit Tests
+name: Unit Tests
 
 on:
   workflow_call:
@@ -70,7 +70,7 @@ jobs:
       
     - name: Setup NuGet
       if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
-      uses: NuGet/setup-nuget@v1
+      uses: NuGet/setup-nuget@v2
       
     - name: Restore NuGet packages
       if: github.event_name != 'workflow_dispatch' || inputs.use-last-build != 'true' || env.BUILD_FROM_SOURCE == 'true'
